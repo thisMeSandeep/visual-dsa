@@ -12,7 +12,7 @@ import type { CompiledLesson } from '@/engine/lesson/types';
 import { CODE_SAMPLES } from './code';
 import type { CodeSamples } from './code-types';
 import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS, TOPIC_SANDBOXES } from './registry';
-import { LessonRecipeSchema, SandboxSchema, TopicMetaSchema, type TopicMeta } from './schema';
+import { LessonRecipeSchema, SandboxToolsSchema, TopicMetaSchema, type TopicMeta } from './schema';
 
 export type ContentIssue = {
   /** Which topic (or registry key) the problem is in. */
@@ -114,41 +114,43 @@ export function validateCodeLines(
 }
 
 /**
- * Checks each sandbox against the schema, then against the engine: the structure and every
- * operation exist, and every preset builds.
+ * Checks each topic's sandbox tools against the schema, then against the engine: each tool's
+ * structure and operations exist, and every preset builds. Paths start with the tool's index.
  */
 export function validateSandboxes(sandboxes: Record<string, unknown>): ContentIssue[] {
   return Object.entries(sandboxes).flatMap(([key, value]): ContentIssue[] => {
-    const result = SandboxSchema.safeParse(value);
+    const result = SandboxToolsSchema.safeParse(value);
     if (!result.success) return toIssues(key, result.error);
-    const sandbox = result.data;
-    const issue = (path: string, message: string): ContentIssue => ({
-      topicId: key,
-      path,
-      message,
-    });
 
-    if (sandbox.topicId !== key) {
-      return [issue('topicId', `Registered as "${key}" but its topicId is "${sandbox.topicId}"`)];
-    }
-    const definition = STRUCTURES[sandbox.structure];
-    if (!definition) return [issue('structure', `Unknown structure "${sandbox.structure}"`)];
+    return result.data.flatMap((tool, toolIndex): ContentIssue[] => {
+      const issue = (path: string, message: string): ContentIssue => ({
+        topicId: key,
+        path: `${toolIndex}.${path}`,
+        message,
+      });
 
-    const unknownOperations = sandbox.operations.flatMap((operation, index) =>
-      definition.operations[operation.id]
-        ? []
-        : [issue(`operations.${index}.id`, `"${sandbox.structure}" has no "${operation.id}"`)],
-    );
-    const brokenPresets = sandbox.presets.flatMap((preset, index) => {
-      try {
-        definition.create(preset.input, `presets.${index}`);
-        return [];
-      } catch (error) {
-        if (!(error instanceof CompileError)) throw error;
-        return [issue(error.at, error.reason)];
+      if (tool.topicId !== key) {
+        return [issue('topicId', `Registered as "${key}" but its topicId is "${tool.topicId}"`)];
       }
+      const definition = STRUCTURES[tool.structure];
+      if (!definition) return [issue('structure', `Unknown structure "${tool.structure}"`)];
+
+      const unknownOperations = tool.operations.flatMap((operation, index) =>
+        definition.operations[operation.id]
+          ? []
+          : [issue(`operations.${index}.id`, `"${tool.structure}" has no "${operation.id}"`)],
+      );
+      const brokenPresets = tool.presets.flatMap((preset, index) => {
+        try {
+          definition.create(preset.input, `presets.${index}`);
+          return [];
+        } catch (error) {
+          if (!(error instanceof CompileError)) throw error;
+          return [issue(error.at, error.reason)];
+        }
+      });
+      return [...unknownOperations, ...brokenPresets];
     });
-    return [...unknownOperations, ...brokenPresets];
   });
 }
 

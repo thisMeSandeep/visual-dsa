@@ -113,4 +113,45 @@ describe('Sandbox', () => {
     await renderSandbox('queue');
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
+
+  it('switches to the bracket checker, with the preset expression ready to check', async () => {
+    await renderSandbox();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Bracket checker' }));
+
+    expect(screen.getByRole('radio', { name: 'Bracket checker', checked: true })).toBeOnTheScreen();
+    expect(screen.getByLabelText('Expression').props.value).toBe('((5+3)+1)(2+9)');
+    expect(
+      screen.getByText('Every bracket has a partner. Tap Check to watch the stack match them.'),
+    ).toBeOnTheScreen();
+
+    await press('Check');
+    await playToEnd();
+    expect(
+      screen.getByText(
+        'The end, and the stack is empty: every bracket found its partner. Balanced.',
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  it('checks any expression the learner types, and explains a bad one', async () => {
+    await renderSandbox();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Bracket checker' }));
+
+    await fireEvent.changeText(screen.getByLabelText('Expression'), '  ');
+    await press('Check');
+    expect(screen.getByText('Type an expression first, or pick a preset.')).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByLabelText('Expression'), '[ ( ] )');
+    await press('Check');
+    await playToEnd();
+    expect(screen.getByLabelText('Expression').props.value).toBe('[(])');
+    expect(screen.getByText('] can’t close the ( on top. Unbalanced.')).toBeOnTheScreen();
+  });
+
+  it('fills the field from the Unbalanced preset', async () => {
+    await renderSandbox();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Bracket checker' }));
+    await preset('Unbalanced');
+    expect(screen.getByLabelText('Expression').props.value).toBe('(()');
+  });
 });

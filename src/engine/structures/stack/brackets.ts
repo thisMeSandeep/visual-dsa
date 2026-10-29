@@ -19,6 +19,10 @@ import { stackToScene, type StackAnnotations } from './to-scene';
 const PARTNERS: Readonly<Record<string, string>> = { ')': '(', ']': '[', '}': '{' };
 const OPENING = new Set(Object.values(PARTNERS));
 
+/** How many opening brackets an expression has: the most its stack must hold. */
+export const openingCount = (expression: string) =>
+  [...expression].filter((char) => OPENING.has(char)).length;
+
 export type BracketsModel = Readonly<{
   expression: string;
   /** Index of the character being read; -1 before the first, the length once done. */
@@ -42,8 +46,11 @@ export function createBrackets(expression: string): BracketsModel {
   if (expression.length === 0 || expression.length > maxLength) {
     throw new RangeError(`An expression needs 1–${maxLength} characters, got ${expression.length}`);
   }
-  const openings = [...expression].filter((char) => OPENING.has(char)).length;
-  return { expression, position: -1, stack: createStack([], Math.max(1, openings)) };
+  return {
+    expression,
+    position: -1,
+    stack: createStack([], Math.max(1, openingCount(expression))),
+  };
 }
 
 export const charId = (index: number) => `char-${index}`;

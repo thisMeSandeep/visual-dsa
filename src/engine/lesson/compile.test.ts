@@ -1,7 +1,7 @@
 import type { Step } from '../core/types';
 import { compileLesson } from './compile';
 import type { LessonRecipeInput, RecipeSegment } from './recipe';
-import { CompileError } from './structures';
+import { CompileError, STRUCTURES } from './structures';
 
 /* Helpers ------------------------------------------------------------------------------------- */
 
@@ -244,5 +244,38 @@ describe('compileLesson errors name the segment', () => {
     const error = compileError(chapter('intro'), setup(), { kind: 'trace', operation: 'x.y' });
     expect(error.name).toBe('CompileError');
     expect(error.at).toBe('segments[2]');
+  });
+});
+
+describe('bracket checker structure', () => {
+  const { brackets } = STRUCTURES;
+  const lines = (trace: { steps: readonly Step[] }) => trace.steps.map((step) => step.codeLine);
+
+  it('checks the expression it was set up with', () => {
+    const model = brackets!.create({ expression: '(1)' }, 'setup');
+    expect(lines(brackets!.operations.check!(model, undefined, 'check').trace).at(-1)).toBe(
+      'balanced',
+    );
+  });
+
+  it('checks a new expression when one is given (the sandbox checker)', () => {
+    const model = brackets!.create({ expression: '(1)' }, 'setup');
+    const { trace, model: next } = brackets!.operations.check!(
+      model,
+      { expression: '(]' },
+      'check',
+    );
+    expect(lines(trace).at(-1)).toBe('mismatch');
+    expect(next).not.toBe(model);
+  });
+
+  it('rejects an expression that cannot be drawn', () => {
+    const model = brackets!.create({ expression: '(1)' }, 'setup');
+    expect(() => brackets!.operations.check!(model, { expression: '' }, 'check')).toThrow(
+      CompileError,
+    );
+    expect(() =>
+      brackets!.operations.check!(model, { expression: '1'.repeat(40) }, 'check'),
+    ).toThrow(CompileError);
   });
 });

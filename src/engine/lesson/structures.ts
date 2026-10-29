@@ -136,7 +136,16 @@ const brackets: StructureDefinition<BracketsModel> = {
   toScene: (model) => bracketsToScene(model),
   describe: describeBrackets,
   operations: {
-    check: (model) => traceBrackets(model),
+    /**
+     * Checks the current expression, or `{ expression }` when given: the sandbox's checker
+     * runs whatever the learner typed. Lessons set the expression up first and pass nothing.
+     */
+    check: (model, input, at) => {
+      const fields = record(input, at);
+      if (fields.expression === undefined) return traceBrackets(model);
+      const expression = text(fields, 'expression', at);
+      return traceBrackets(atSegment(at, () => createBrackets(expression)));
+    },
   },
 };
 

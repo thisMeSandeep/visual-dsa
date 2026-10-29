@@ -2,7 +2,7 @@
 
 A React Native (Expo) mobile app that teaches data structures and algorithms through step-by-step animated visualisations. Each topic has three modes: **Learn** (guided lesson), **Play** (sandbox), and **Practice** (quizzes).
 
-**Status:** planning is complete and implementation has not started. Work proceeds one step at a time from `docs/IMPLEMENTATION-PLAN.md`. Find the current step by comparing `git log` with the plan's commit messages.
+**Status:** in progress. Steps 0.1–7.1 are done, followed by a UI rework (recorded in the plan between Steps 7.1 and 7.2). Work proceeds one step at a time from `docs/IMPLEMENTATION-PLAN.md`. Find the current step by comparing `git log` with the plan's commit messages.
 
 ## Docs: read the right one first
 

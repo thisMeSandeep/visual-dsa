@@ -144,11 +144,18 @@ export type LessonRecipe = z.infer<typeof LessonRecipeSchema>;
  * Sandbox (F-601–F-606): which structure Play mode drives, its operations, presets and stats.
  * ---------------------------------------------------------------------------------------------- */
 
-/** What an operation asks for. 'value' is a number typed in or picked at random. */
-export const SANDBOX_INPUTS = ['value'] as const;
+/**
+ * What an operation asks for. 'value' is a number typed in or picked at random; 'expression' is
+ * a short line of text such as `((5+3)+1)` (the bracket checker), which presets can fill in.
+ */
+export const SANDBOX_INPUTS = ['value', 'expression'] as const;
 
+/** One sandbox tool: a structure to play with, e.g. the stack, or the bracket checker. */
 export const SandboxSchema = z.strictObject({
   topicId: IdSchema,
+  /** Tool id and name, shown as a switch when a topic has more than one tool. */
+  id: IdSchema,
+  label: TextSchema,
   /** A structure from engine/lesson/structures.ts (STRUCTURES), e.g. "stack". */
   structure: IdSchema,
   /** In button order; the first is the primary action. */
@@ -182,6 +189,12 @@ export const SandboxSchema = z.strictObject({
 });
 
 export type SandboxConfig = z.infer<typeof SandboxSchema>;
+
+/** A topic's Play mode: one or more tools, the first opening by default. */
+export const SandboxToolsSchema = z
+  .array(SandboxSchema)
+  .min(1)
+  .refine(hasUniqueIds, 'Tool ids must be unique within a topic');
 
 /* ------------------------------------------------------------------------------------------------
  * Quiz (F-701, F-702, F-704)

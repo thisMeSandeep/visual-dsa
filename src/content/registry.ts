@@ -47,8 +47,8 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   stack: stackLesson,
 };
 
-/** Each topic's Play mode, under its topic id. */
-export const TOPIC_SANDBOXES: Partial<Record<TopicId, SandboxConfig>> = {
+/** Each topic's Play mode (one or more tools), under its topic id. */
+export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>> = {
   stack: stackSandbox,
 };
 

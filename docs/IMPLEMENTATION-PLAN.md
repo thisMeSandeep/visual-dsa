@@ -363,10 +363,20 @@ feat(progress): track lesson progress and resume where you left off
 feat(sandbox): add sandbox sessions with stack operations
 ```
 
+### UI rework (done, between Steps 7.1 and 7.2)
+Done outside the numbered steps, after testing on a phone; the commits are the `feat(ui)`, `feat(home)`, `feat(lesson)` and `refactor(theme)` ones after Step 7.1.
+- Fonts: Manrope + JetBrains Mono, registered by role in `src/theme/fonts.ts` (the only file that names a typeface).
+- Colour classes fixed: `--color-*: initial` had stopped Uniwind generating any colour class; lint now bans Tailwind's default palette instead.
+- Home: a two-column grid of topic cards with hand-drawn line art; no Continue card. Floating capsule tab bar with a sliding pill.
+- No Topic screen: a topic opens its lesson directly. The lesson is landscape and full screen (status and navigation bars hidden), with a top bar (speed, code, progress bar, chapters, reference, sandbox, practice), a chapter side panel and a hideable scrubber. The Reference sheet holds the summary and complexity.
+- Sandbox: portrait with one compact dock; inputs stay above the keyboard (react-native-keyboard-controller).
+- Settings: segmented controls for choices, native switches for on/off; the progress bar is a setting.
+
 ### Step 7.2: Bracket checker mini-tool
 **Goal:** the Stack sandbox's "check your own expression" tool (ALGORITHM-CATALOG L5).
-- An expression input on the Stack sandbox that runs `brackets.check` on what the learner types, with the balanced `((5+3)+1)(2+9)` and unbalanced `(()` presets.
+- An expression input on the Stack sandbox that runs `brackets.check` on what the learner types, with the balanced `((5+3)+1)(2+9)` and unbalanced `(()` presets. It fits the sandbox dock (the presets segmented control and the field with an accessory).
 - The sandbox config gains an expression input kind; invalid expressions (empty, too long, too many brackets) are explained like values.
+- Built as a second sandbox **tool**: a topic's sandbox is now a list of tools, with a switch in the dock when there's more than one.
 
 **Done when:** any expression up to the length limit can be checked step by step, and both presets load.
 
@@ -382,7 +392,7 @@ feat(sandbox): add bracket checker mini-tool to the stack sandbox
 ### Step 8.1: Topic quizzes
 **Goal:** practice questions with explanations (F-701, F-704, F-705, F-706).
 - Question types: multiple choice, true/false, complexity.
-- Quiz screen: segmented progress, option tiles, feedback panel (correct and wrong states), and a "see in lesson" link.
+- Quiz screen: segmented progress, option tiles, feedback panel (correct and wrong states), and a "see in lesson" link. It opens from the lesson's top bar (Practice) and from the Practice tab.
 - Scores go to the progress store, and wrong answers go to the revise list on the Practice tab.
 - Write the Stack quiz (at least 8 questions).
 
@@ -452,7 +462,7 @@ feat(big-o): add growth chart, Big O lesson, sandbox and quiz
 ```
 
 ### Step 9.6: Reference sheets
-- Reference sheet for every MVP topic: tabs, complexity table, key concepts and pitfalls (F-801–F-803). It opens from the topic and lesson screens.
+- Reference sheet for every MVP topic: tabs, complexity table, key concepts and pitfalls (F-801–F-803). It opens from the lesson's top bar (there's no separate topic screen since the UI rework), and keeps today's summary and "How it scales" strip at the top.
 
 **Commit:**
 ```

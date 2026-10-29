@@ -36,17 +36,24 @@ import {
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
+import { parseExpression } from './expression-input';
 import { parseValue } from './value-input';
 
-/** Sandbox / Play mode (F-601–F-603, F-606): run any operation on a live structure. */
+/**
+ * Sandbox / Play mode (F-601–F-603, F-606): run any operation on a live structure. A topic can
+ * have several tools (the Stack has the stack and the bracket checker); a switch at the top of
+ * the dock picks one, starting it fresh.
+ */
 export function Sandbox({ topicId }: { topicId: string }) {
   const meta = getTopicMeta(topicId);
-  const sandbox = isTopicId(topicId) ? TOPIC_SANDBOXES[topicId] : undefined;
+  const tools = isTopicId(topicId) ? TOPIC_SANDBOXES[topicId] : undefined;
+  const [toolId, setToolId] = useState(tools?.[0]?.id);
+  const tool = tools?.find((item) => item.id === toolId) ?? tools?.[0];
 
   if (!meta) {
     return <ScreenPlaceholder back title="Topic not found" note="This sandbox doesn’t exist." />;
   }
-  if (!sandbox) {
+  if (!tools || !tool) {
     return (
       <ScreenPlaceholder
         back
@@ -56,7 +63,9 @@ export function Sandbox({ topicId }: { topicId: string }) {
       />
     );
   }
-  return <Playground meta={meta} sandbox={sandbox} />;
+  return (
+    <Playground key={tool.id} meta={meta} sandbox={tool} tools={tools} onToolChange={setToolId} />
+  );
 }
 
 type Operation = SandboxConfig['operations'][number];
@@ -64,7 +73,23 @@ type Preset = SandboxConfig['presets'][number];
 
 const UNDONE = 'Undone: back to before the last change.';
 
-function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig }) {
+/** The expression a bracket-checker preset starts with, to show in the field. */
+const presetExpression = (preset: Preset): string => {
+  const input = preset.input as { expression?: unknown } | undefined;
+  return typeof input?.expression === 'string' ? input.expression : '';
+};
+
+function Playground({
+  meta,
+  sandbox,
+  tools,
+  onToolChange,
+}: {
+  meta: TopicMeta;
+  sandbox: SandboxConfig;
+  tools: readonly SandboxConfig[];
+  onToolChange: (toolId: string) => void;
+}) {
   // Content validation checks the structure, its operations and every preset.
   const definition = STRUCTURES[sandbox.structure]!;
   const firstPreset = sandbox.presets[0]!;
@@ -78,7 +103,11 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
   const [session, setSession] = useState<SandboxSession<unknown>>(() =>
     startSession(build(firstPreset), restWith(firstPreset.hint)),
   );
-  const [text, setText] = useState('');
+  const [primary, ...secondary] = sandbox.operations;
+  // The expression field starts filled with the preset's expression, ready to check.
+  const [text, setText] = useState(() =>
+    primary?.input === 'expression' ? presetExpression(firstPreset) : '',
+  );
   const [problem, setProblem] = useState<string>();
   const [rng] = useState(() => createRng(Date.now()));
 
@@ -105,6 +134,14 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
       }
       input = { value: parsed.value };
       setText('');
+    } else if (operation.input === 'expression') {
+      const parsed = parseExpression(text);
+      if (!parsed.ok) {
+        setProblem(parsed.problem);
+        return;
+      }
+      input = { expression: parsed.expression };
+      setText(parsed.expression);
     }
     setProblem(undefined);
     const result = definition.operations[operation.id]!(session.model, input, 'sandbox');
@@ -114,9 +151,12 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
   const choosePreset = (next: Preset) => {
     setPreset(next);
     setSession(loadPreset(session, build(next), restWith(next.hint)));
+    if (primary?.input === 'expression') {
+      setText(presetExpression(next));
+      setProblem(undefined);
+    }
   };
 
-  const [primary, ...secondary] = sandbox.operations;
   const valueRange = config.engine.valueRange;
 
   const stats = sandbox.stats.map((stat) => ({
@@ -198,6 +238,14 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
 
       {/* The dock: every control in one card. */}
       <View className="mx-4 mt-3 mb-safe-offset-3 gap-3 rounded-xl border-hairline border-line-strong bg-surface-raised p-3">
+        {tools.length > 1 ? (
+          <SegmentedControl
+            label="Tool"
+            options={tools.map((item) => ({ value: item.id, label: item.label }))}
+            value={sandbox.id}
+            onChange={onToolChange}
+          />
+        ) : null}
         <SegmentedControl
           label="Starting state"
           options={sandbox.presets.map((option) => ({ value: option.id, label: option.label }))}
@@ -237,22 +285,44 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
             />
             <Button label={primary.label} size="compact" onPress={() => run(primary)} />
           </View>
+        ) : primary?.input === 'expression' ? (
+          <View className="flex-row items-start gap-2">
+            <TextField
+              label="Expression"
+              labelHidden
+              value={text}
+              onChangeText={(next) => {
+                setText(next);
+                setProblem(undefined);
+              }}
+              error={problem}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="done"
+              onSubmitEditing={() => run(primary)}
+              placeholder="Expression, e.g. (1+2)*3"
+              className="flex-1"
+            />
+            <Button label={primary.label} size="compact" onPress={() => run(primary)} />
+          </View>
         ) : primary ? (
           <Button label={primary.label} size="compact" onPress={() => run(primary)} />
         ) : null}
 
-        <View className="flex-row gap-2">
-          {secondary.map((operation) => (
-            <Button
-              key={operation.id}
-              label={operation.label}
-              variant="tinted"
-              size="compact"
-              className="flex-1"
-              onPress={() => run(operation)}
-            />
-          ))}
-        </View>
+        {secondary.length > 0 ? (
+          <View className="flex-row gap-2">
+            {secondary.map((operation) => (
+              <Button
+                key={operation.id}
+                label={operation.label}
+                variant="tinted"
+                size="compact"
+                className="flex-1"
+                onPress={() => run(operation)}
+              />
+            ))}
+          </View>
+        ) : null}
       </View>
     </KeyboardAvoidingView>
   );
