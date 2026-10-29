@@ -5,10 +5,15 @@
  */
 import type { Scene, Trace } from '../core/types';
 import {
+  bracketsToScene,
+  createBrackets,
   createStack,
+  describeBrackets,
   describeStack,
   stackToScene,
+  traceBrackets,
   traceStack,
+  type BracketsModel,
   type StackModel,
 } from '../structures/stack';
 
@@ -105,7 +110,22 @@ const stack: StructureDefinition<StackModel> = {
   },
 };
 
+/** The bracket checker: an expression read left to right with a stack of open brackets. */
+const brackets: StructureDefinition<BracketsModel> = {
+  /** { expression: string } */
+  create: (input, at) => {
+    const expression = text(record(input, at), 'expression', at);
+    return atSegment(at, () => createBrackets(expression));
+  },
+  toScene: (model) => bracketsToScene(model),
+  describe: describeBrackets,
+  operations: {
+    check: (model) => traceBrackets(model),
+  },
+};
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
+  brackets: brackets as StructureDefinition<unknown>,
 };

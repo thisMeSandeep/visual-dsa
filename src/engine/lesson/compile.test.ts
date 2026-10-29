@@ -150,13 +150,14 @@ describe('compileLesson', () => {
     const lesson = compile(chapter('intro'), {
       kind: 'scene',
       sceneId: 'browser-back',
-      steps: [{ caption: 'You open a page.' }, { caption: 'Then another.' }],
+      steps: [{ caption: 'You open a page.' }, { caption: 'Then **another**.' }],
     });
     expect(lesson.steps.map((step) => step.scene)).toEqual([
       { renderer: 'analogy', elements: [], meta: { sceneId: 'browser-back', sceneStep: 0 } },
       { renderer: 'analogy', elements: [], meta: { sceneId: 'browser-back', sceneStep: 1 } },
     ]);
     expect(lesson.steps.map((step) => step.a11y)).toEqual(['You open a page.', 'Then another.']);
+    expect(lesson.steps[1]?.caption).toEqual({ text: 'Then **another**.' });
   });
 
   it('gives the same lesson every time', () => {

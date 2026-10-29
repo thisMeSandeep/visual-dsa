@@ -1,0 +1,33 @@
+import type { VizSizes } from '@/theme';
+
+/** The canvas token values from tokens.css, for layout tests (Jest can't read CSS variables). */
+export const SIZES: VizSizes = {
+  cellWidth: 46,
+  cellHeight: 52,
+  bucketWidth: 44,
+  bucketHeight: 40,
+  nodeHeight: 44,
+  gap: 8,
+  radius: 10,
+  borderWidth: 1.5,
+  borderWidthActive: 2,
+  edgeWidth: 1.5,
+  dimmedOpacity: 0.4,
+  dash: 4,
+  dashGap: 3,
+  arrowSize: 6,
+  fontValue: 20,
+  fontDetail: 12,
+  fontLabel: 13,
+  fontIndex: 12,
+  labelGap: 4,
+  pointerLength: 16,
+  pointerLabelWidth: 32,
+  stackItemWidth: 132,
+  stackPadding: 10,
+  stackRadius: 18,
+  charWidth: 28,
+  charHeight: 40,
+  charGap: 4,
+  sceneGap: 32,
+};

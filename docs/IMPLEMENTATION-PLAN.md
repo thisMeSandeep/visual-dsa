@@ -303,8 +303,9 @@ feat(code): add Shiki code pipeline and synced code panel
 
 ### Step 5.3: Stack lesson content
 **Goal:** the complete Stack topic lesson (ALGORITHM-CATALOG L5).
-- The 6-chapter recipe, plus the browser back button and balanced parentheses examples (`viz/scenes/`).
-- Review the Stack code samples from Step 5.2 against the new chapters' steps.
+- The 6-chapter recipe, plus the browser back button example (an analogy scene in `viz/scenes/`, drawn by the new `analogy` renderer) and the balanced parentheses example (a real bracket-checker trace, `brackets.check`, drawn by the stack renderer with the expression above the stack).
+- `isBalanced` added to the Stack code samples, so the code panel follows the bracket checker too.
+- The implementations chapter is captions over the array-backed stack for now; a side-by-side array vs linked-list picture can follow once the linked-list renderer exists (Step 9.3).
 
 **Done when:** the whole lesson plays from the Topic screen, and content validation passes.
 

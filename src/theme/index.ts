@@ -116,6 +116,10 @@ const VIZ_SIZE_VARS = {
   stackItemWidth: '--viz-stack-item-width',
   stackPadding: '--viz-stack-padding',
   stackRadius: '--viz-stack-radius',
+  charWidth: '--viz-char-width',
+  charHeight: '--viz-char-height',
+  charGap: '--viz-char-gap',
+  sceneGap: '--viz-scene-gap',
 } as const;
 
 const ICON_SIZE_VARS = {

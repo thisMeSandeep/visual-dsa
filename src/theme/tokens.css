@@ -249,6 +249,14 @@
   --viz-stack-padding: 10px; /* inside the U-shaped container */
   --viz-stack-radius: 18px; /* container's bottom corners */
 
+  /* Input row: an expression read left to right above a structure (bracket checker) */
+  --viz-char-width: 28px;
+  --viz-char-height: 40px;
+  --viz-char-gap: 4px;
+
+  /* Analogy scenes (browser back button…) */
+  --viz-scene-gap: 32px; /* between the parts of a scene, e.g. the browser and its back stack */
+
   /* Icons (VISUAL-SPEC §5) */
   --icon-xs: 18px; /* inside buttons */
   --icon-sm: 20px; /* small icon buttons */

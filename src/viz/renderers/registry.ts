@@ -6,9 +6,11 @@ import type { ComponentType } from 'react';
 
 import type { RendererId } from '@/engine/core/renderer';
 
+import { AnalogyRenderer } from './analogy/renderer';
 import { StackRenderer } from './stack/renderer';
 import type { RendererProps } from './types';
 
 export const RENDERERS: Partial<Record<RendererId, ComponentType<RendererProps>>> = {
   stack: StackRenderer,
+  analogy: AnalogyRenderer,
 };

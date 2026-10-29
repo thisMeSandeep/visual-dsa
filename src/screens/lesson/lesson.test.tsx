@@ -71,14 +71,18 @@ describe('Lesson player', () => {
     await act(async () => {
       useLessonNavigation.getState().requestChapter('stack', 'overflow-underflow');
     });
-    expect(caption('Push 17. First, check there’s room on the stack.')).toBeOnTheScreen();
+    expect(
+      caption('A fixed-size stack can run out of room, and any stack can run out of items.'),
+    ).toBeOnTheScreen();
     expect(screen.getByText('Overflow and underflow')).toBeOnTheScreen();
     expect(useLessonNavigation.getState().chapterRequest).toBeNull();
   });
 
   it('can start at a chapter', async () => {
     await renderLesson(<Lesson topicId="stack" chapter="push-pop-peek" />);
-    expect(caption('Pop. First, check the stack isn’t empty.')).toBeOnTheScreen();
+    expect(
+      caption('Three operations, all at the top: push adds, pop removes, peek only looks.'),
+    ).toBeOnTheScreen();
   });
 
   it('shows the code with the current line following the steps', async () => {

@@ -9,7 +9,7 @@ export function describeStack(scene: Scene): string {
   const values = scene.elements
     .filter(
       (element): element is Extract<SceneElement, { kind: 'cell' }> =>
-        element.kind === 'cell' && element.id !== REJECTED_ID,
+        element.kind === 'cell' && element.id !== REJECTED_ID && element.slot.type === 'index',
     )
     .map((cell) => cell.value);
   const capacity = scene.meta?.capacity;

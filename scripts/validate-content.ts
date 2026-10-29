@@ -1,9 +1,9 @@
 /**
  * bun run validate:content
  *
- * Checks every topic against the content schemas and compiles every lesson, plus two things the
- * schemas can't see: every folder under src/content/topics is registered, and every glyph name
- * exists.
+ * Checks every topic against the content schemas and compiles every lesson, plus what content
+ * alone can't see: every folder under src/content/topics is registered, every glyph name exists,
+ * and every lesson scene exists with one caption per step.
  * Exits with code 1 when anything is wrong, so CI fails before broken content ships.
  */
 import { readdirSync } from 'node:fs';
@@ -12,6 +12,9 @@ import { join } from 'node:path';
 import { GLYPH_NAMES } from '@/components/topic-glyph/glyphs';
 import { TOPIC_IDS, TOPIC_LESSONS, TOPIC_METAS } from '@/content/registry';
 import { validateContent, type ContentIssue } from '@/content/validate';
+import { SCENES } from '@/viz/scenes';
+
+import { sceneIssues } from './lib/check-scenes';
 
 const TOPICS_DIR = join(import.meta.dirname, '..', 'src', 'content', 'topics');
 
@@ -35,7 +38,12 @@ const unknownGlyphs: ContentIssue[] = Object.entries(TOPIC_METAS)
     message: `No glyph named "${meta.glyph}". Known glyphs: ${GLYPH_NAMES.join(', ')}`,
   }));
 
-const issues = [...validateContent(), ...unregisteredFolders, ...unknownGlyphs];
+const issues = [
+  ...validateContent(),
+  ...unregisteredFolders,
+  ...unknownGlyphs,
+  ...sceneIssues(TOPIC_LESSONS, SCENES),
+];
 
 if (issues.length > 0) {
   console.error(`✗ Content has ${issues.length} problem(s):\n`);

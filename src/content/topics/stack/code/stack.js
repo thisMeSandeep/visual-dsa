@@ -31,3 +31,25 @@ class Stack {
     this.items = []; // @line clear
   }
 }
+
+function isBalanced(text) {
+  const partners = { ")": "(", "]": "[", "}": "{" };
+  const stack = new Stack(text.length);
+  for (const ch of text) { // @line scan
+    if ("([{".includes(ch)) {
+      stack.push(ch); // @line push-open
+    } else if (ch in partners) {
+      if (stack.items.length === 0) {
+        return false; // @line close-empty
+      }
+      if (stack.peek() !== partners[ch]) { // @line close-match
+        return false; // @line mismatch
+      }
+      stack.pop(); // @line pop-open
+    }
+  }
+  if (stack.items.length > 0) {
+    return false; // @line unclosed
+  }
+  return true; // @line balanced
+}

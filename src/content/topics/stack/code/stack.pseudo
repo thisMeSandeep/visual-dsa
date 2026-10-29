@@ -29,3 +29,24 @@ end function
 function clear()
   top = -1 // @line clear
 end function
+
+function isBalanced(text)
+  stack = an empty stack
+  for each ch in text do // @line scan
+    if ch is an opening bracket then
+      push(ch) // @line push-open
+    else if ch is a closing bracket then
+      if stack is empty then
+        return false // @line close-empty
+      end if
+      if peek() is not the partner of ch then // @line close-match
+        return false // @line mismatch
+      end if
+      pop() // @line pop-open
+    end if
+  end for
+  if stack is not empty then
+    return false // @line unclosed
+  end if
+  return true // @line balanced
+end function

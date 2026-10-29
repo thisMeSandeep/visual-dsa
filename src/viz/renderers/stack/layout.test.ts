@@ -1,5 +1,12 @@
-import { createStack, traceStack, stackToScene, type StackModel } from '@/engine/structures/stack';
-import type { VizSizes } from '@/theme';
+import {
+  bracketsToScene,
+  createBrackets,
+  createStack,
+  stackToScene,
+  traceBrackets,
+  traceStack,
+  type StackModel,
+} from '@/engine/structures/stack';
 
 import type {
   BoxDrawable,
@@ -8,35 +15,8 @@ import type {
   PathDrawable,
   TextDrawable,
 } from '../../canvas/types';
+import { SIZES } from '../../sizes.fixture';
 import { CONTAINER_ID, layoutStack } from './layout';
-
-/** The token values from tokens.css (tests can't read CSS variables). */
-const SIZES: VizSizes = {
-  cellWidth: 46,
-  cellHeight: 52,
-  bucketWidth: 44,
-  bucketHeight: 40,
-  nodeHeight: 44,
-  gap: 8,
-  radius: 10,
-  borderWidth: 1.5,
-  borderWidthActive: 2,
-  edgeWidth: 1.5,
-  dimmedOpacity: 0.4,
-  dash: 4,
-  dashGap: 3,
-  arrowSize: 6,
-  fontValue: 20,
-  fontDetail: 12,
-  fontLabel: 13,
-  fontIndex: 12,
-  labelGap: 4,
-  pointerLength: 16,
-  pointerLabelWidth: 32,
-  stackItemWidth: 132,
-  stackPadding: 10,
-  stackRadius: 18,
-};
 
 const layout = (model: StackModel) => layoutStack(stackToScene(model), SIZES);
 const boxes = (drawables: Drawable[]) =>
@@ -108,5 +88,28 @@ describe('layoutStack', () => {
     const { trace } = traceStack(createStack(['1'], 4), { type: 'push', value: '9' });
     const { drawables } = layoutStack(trace.steps.at(-1)!.scene, SIZES);
     expect(boxes(drawables).find((b) => b.value === '9')?.state).toBe('new');
+  });
+
+  it('draws an input row on top, one cell per character, with the stack centred under it', () => {
+    const { drawables, width } = layoutStack(bracketsToScene(createBrackets('((5+3)+1)')), SIZES);
+    const chars = boxes(drawables).filter((b) => b.id.startsWith('char-'));
+    const container = byId<PathDrawable>(drawables, CONTAINER_ID)!;
+
+    expect(chars.map((c) => c.value).join('')).toBe('((5+3)+1)');
+    expect(chars.every((c) => c.y === 0 && c.width === SIZES.charWidth)).toBe(true);
+    expect(chars[1]!.x - chars[0]!.x).toBe(SIZES.charWidth + SIZES.charGap);
+    // The row is wider than the stack, so it sets the width and the stack is centred under it.
+    expect(chars[0]!.x).toBe(0);
+    expect(chars.at(-1)!.x + SIZES.charWidth).toBe(width);
+    const containerTop = Number(container.path.split(' ')[2]);
+    expect(containerTop).toBeGreaterThan(SIZES.charHeight);
+  });
+
+  it('keeps bracket items in the stack, not the row', () => {
+    const { trace } = traceBrackets(createBrackets('((1'));
+    const { drawables, width } = layoutStack(trace.steps.at(-1)!.scene, SIZES);
+    const items = boxes(drawables).filter((b) => b.id.startsWith('item-'));
+    expect(items.map((b) => b.value)).toEqual(['(', '(']);
+    expect(items[0]!.x + items[0]!.width / 2).toBe(width / 2);
   });
 });

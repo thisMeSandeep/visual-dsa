@@ -146,13 +146,15 @@ const hardCodedValues = [
     rules: { 'no-restricted-syntax': ['error', ...arbitraryClassRules] },
   },
   {
-    // Config, tokens, lesson data, tests and dev showcase sample data are where concrete values belong.
+    // Config, tokens, lesson data, tests, test fixtures and dev showcase sample data are where
+    // concrete values belong.
     files: [
       'src/config/**',
       'src/theme/**',
       'src/content/**',
       'src/screens/dev/**',
       'src/**/*.test.{ts,tsx}',
+      'src/**/*.fixture.ts',
     ],
     rules: { '@typescript-eslint/no-magic-numbers': 'off' },
   },

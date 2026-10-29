@@ -211,7 +211,8 @@ type SceneElement =
 type Slot =
   | { type: 'index'; index: number }                       // array, stack, queue
   | { type: 'bucket'; bucket: number; chainIndex: number } // hash table
-  | { type: 'node' };                                      // list, tree, graph (laid out by renderer)
+  | { type: 'node' }                                       // list, tree, graph (laid out by renderer)
+  | { type: 'input'; index: number };                      // a character of an input read left to right
 
 interface Scene {
   renderer: RendererId;              // 'array' | 'linked-list' | 'stack' | …
@@ -374,7 +375,8 @@ interface CompiledLesson {
 - `say` segments repeat the current structure at rest with a new caption, keeping the last counters. `interactive` does the same with `pause: 'interactive'`, and `predict` with `pause: 'predict'` and the `lesson.predict` caption.
 - `scene` segments append one step per caption, drawn by the `analogy` renderer from hand-built scenes (`meta: { sceneId, sceneStep }`).
 - The last step of each chapter gets `pause: 'chapter-end'`, unless it already pauses for input.
-- The structures a recipe can use are registered in `engine/lesson/structures.ts` (`STRUCTURES`), each with `create`, `toScene`, `describe` and its operations. Recipe input is untrusted, so each one is checked there.
+- The structures a recipe can use are registered in `engine/lesson/structures.ts` (`STRUCTURES`), each with `create`, `toScene`, `describe` and its operations. Recipe input is untrusted, so each one is checked there. Today: `stack` (`push`, `pop`, `peek`, `clear`) and `brackets` (`{ expression }`, `check`: the balanced-brackets checker in `engine/structures/stack/brackets.ts`, drawn by the stack renderer with the expression as a row of `input` cells above the stack).
+- `scene` captions double as the step's screen-reader text, with the `**` bold marks removed.
 - Anything wrong throws a `CompileError` with `at` (e.g. `segments[4]`) and a `reason`: an unknown chapter, structure or operation, a chapter that's repeated or empty, a step before any `setup`, a caption for a step the trace doesn't have, or bad input. `bun run validate:content` compiles every registered lesson, so these fail before release.
 - Compilation is fast (milliseconds), so `getLesson()` runs it on device the first time a lesson opens and memoises the result. `content/lessons.test.ts` snapshots a readable outline of every lesson (caption, code line, screen-reader text and pause per step), so any change to an algorithm that changes a lesson shows up in review.
 
@@ -454,7 +456,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 
 **Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its component. `SceneView` (`viz/scene-view.tsx`) draws any scene with the renderer it names, and shows a plain message for a renderer that doesn't exist yet. Each renderer is a pure `layout<Name>(scene, sizes)` returning drawables plus the content's natural size, wrapped in a component that hands them to `VizCanvas`. `VizCanvas` scales content down to fit its viewport (never up) and centres it (`viz/canvas/fit.ts`). Adding a topic that reuses an existing renderer needs no viz code at all. The stack renderer (Step 4.2) is the reference.
 
-**Analogy scenes** (`viz/scenes/`) are small hand-built Skia components for the real-world examples (browser back button, phone book). They receive a scene step index and animate between their own fixed states.
+**Analogy scenes** (`viz/scenes/`) are hand-built real-world examples (browser back button, phone book). Each is an `AnalogyScene`: a `stepCount` and a pure `layout(step, sizes)` that returns drawables for one of its fixed pictures. They use the same drawables as the renderers, so the canvas animates between pictures for free (a page keeps its id while it slides from the browser window into the back stack). The `analogy` renderer looks the scene up in `SCENES` by `scene.meta.sceneId` and draws `meta.sceneStep`. Content can't import viz, so `bun run validate:content` (`scripts/lib/check-scenes.ts`) checks every lesson `scene` segment names a scene in `SCENES` and gives exactly `stepCount` captions.
 
 ### 6.2b Lesson screen (Step 4.4)
 
@@ -665,7 +667,7 @@ Numbers that are part of an algorithm's definition (heap child index `2i + 1`, `
 | Script | When | Output |
 |---|---|---|
 | `scripts/highlight-code.ts` (`bun run highlight`) | `postinstall`, before `start`/`start:tunnel`/`start:ngrok` and `validate:content`, and by hand after editing a sample. EAS builds run `postinstall` too | `src/content/generated/code-tokens.json` (git-ignored). Fails on an unknown file extension, a missing or second sample for a language, or a line id that isn't kebab-case |
-| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), or highlights a code line that a language's sample doesn't mark |
+| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), highlights a code line that a language's sample doesn't mark, or has a `scene` segment whose scene doesn't exist or whose caption count doesn't match the scene's steps |
 
 ---
 

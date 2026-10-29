@@ -29,7 +29,9 @@ export type Slot =
   /** hash-table chain nodes */
   | { type: 'bucket'; bucket: number; chainIndex: number }
   /** lists, trees and graphs: laid out by the renderer */
-  | { type: 'node' };
+  | { type: 'node' }
+  /** characters of an input read left to right, e.g. the bracket checker's expression */
+  | { type: 'input'; index: number };
 
 /**
  * One thing on the canvas. `id` is stable across steps, so the viz layer can tell what moved,

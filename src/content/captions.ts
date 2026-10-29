@@ -21,6 +21,18 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'stack.cleared': 'The stack is empty again.',
   'stack.already-empty': 'The stack is already empty.',
 
+  // Bracket checker (engine/structures/stack/brackets.ts)
+  'brackets.start': 'Read **{expression}** left to right. Opening brackets wait on the stack.',
+  'brackets.open': '**{bracket}** opens a group, so push it.',
+  'brackets.match': '**{bracket}** closes the **{open}** on top. They match.',
+  'brackets.popped': 'Pop **{open}**: that pair is done.',
+  'brackets.unmatched': '**{bracket}** has nothing to close: the stack is empty. **Unbalanced**.',
+  'brackets.mismatch': '**{bracket}** can’t close the **{open}** on top. **Unbalanced**.',
+  'brackets.unclosed':
+    'The end, but the stack isn’t empty: an opening bracket never closed. **Unbalanced**.',
+  'brackets.balanced':
+    'The end, and the stack is empty: every bracket found its partner. **Balanced**.',
+
   // Lessons (engine/lesson/compile.ts)
   'lesson.predict': 'What happens next?',
 

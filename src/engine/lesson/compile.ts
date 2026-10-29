@@ -126,8 +126,8 @@ export function compileLesson(
             scene,
             caption: { text: sceneStep.caption },
             counters: ZERO_COUNTERS,
-            // The scene is a picture; its caption is the best description of it.
-            a11y: sceneStep.caption,
+            // The scene is a picture; its caption, without the **bold** marks, describes it best.
+            a11y: sceneStep.caption.replaceAll('**', ''),
           });
         });
         return;

@@ -40,6 +40,13 @@ describe.each(Object.entries(TOPIC_LESSONS))('the %s lesson', (topicId, recipe) 
     expect(used).toEqual([...used].sort((a, b) => a - b));
   });
 
+  it('keeps every caption to about two lines (ALGORITHM-CATALOG §2.2)', () => {
+    const long = lesson.steps
+      .map((step) => captionText(step.caption).replaceAll('**', ''))
+      .filter((text) => text.length > 120);
+    expect(long).toEqual([]);
+  });
+
   it('ends each chapter with a pause', () => {
     for (const chapter of lesson.chapters.slice(1)) {
       expect(lesson.steps[chapter.firstStep - 1]?.pause).toBeDefined();
