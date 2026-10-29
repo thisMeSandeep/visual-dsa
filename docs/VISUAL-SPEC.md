@@ -350,8 +350,8 @@ These match the concept canvas.
 
 | Screen | Key layout |
 |---|---|
-| **Home** | `display` "Learn" + streak chip → Continue card → categories with topic rows → tab bar |
-| **Topic** | Back / bookmark → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
+| **Home** | `display` "Learn" (+ streak chip once streaks exist, P1) → Continue card ("Start here" before any progress) → categories with topic rows → tab bar |
+| **Topic** | Back / reference sheet (bookmark joins in P1) → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
 | **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption` → scrubber → speed · prev · **play** · next · code |
 | **Sandbox** | Back · title · reset → live structure with pointers → stat strip → value input + random → primary action + tinted secondary actions |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |

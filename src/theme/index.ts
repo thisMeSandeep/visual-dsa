@@ -112,6 +112,7 @@ const ICON_STYLE_VARS = {
 
 const GLYPH_VARS = {
   size: '--glyph-size',
+  sizeSm: '--glyph-size-sm',
   strokeWidth: '--glyph-stroke',
 } as const;
 

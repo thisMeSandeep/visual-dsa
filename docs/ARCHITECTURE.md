@@ -159,7 +159,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── storage.ts              #   storage keys, schema versions
 │   │   └── features.ts             #   feature flags
 │   │
-│   ├── hooks/                      # use-reduced-motion…
+│   ├── hooks/                      # use-topic-progress (store-backed from Step 6.2)…
 │   └── utils/
 ├── global.css                      # only imports tailwind, uniwind, src/theme/tokens.css
 ├── app.json

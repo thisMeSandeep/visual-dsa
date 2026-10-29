@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native';
 
 import { AppText } from './app-text';
 import { Icon } from './icon';
-import { TopicGlyph, type GlyphName, type TopicCategory } from './topic-glyph';
+import { TopicGlyph, type TopicCategory } from './topic-glyph';
 
 export type TopicStatus =
   | { kind: 'done' }
@@ -13,7 +13,8 @@ export type TopicRowProps = {
   title: string;
   /** e.g. "5 chapters" */
   subtitle: string;
-  glyph: GlyphName;
+  /** Glyph name from content (validated by `bun run validate:content`). */
+  glyph: string;
   category: TopicCategory;
   status: TopicStatus;
   onPress?: () => void;

@@ -22,7 +22,7 @@ describe('TopicRow', () => {
     const row = screen.getByRole('button', {
       name: 'Linked List, 5 chapters, 2 of 5 chapters done',
     });
-    fireEvent.press(row);
+    await fireEvent.press(row);
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(screen.getByText('2/5')).toBeOnTheScreen();
   });
@@ -68,8 +68,8 @@ describe('ContinueCard', () => {
       />,
     );
 
-    fireEvent.press(
-      screen.getByRole('button', { name: 'Continue Hash Table, Collision · step 6 of 70' }),
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Continue: Hash Table, Collision · step 6 of 70' }),
     );
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -89,7 +89,7 @@ describe('FeedbackPanel', () => {
     );
 
     expect(screen.getByRole('header', { name: 'Correct' })).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
     expect(onAction).toHaveBeenCalledTimes(1);
   });
 });

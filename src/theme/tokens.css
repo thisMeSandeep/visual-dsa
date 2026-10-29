@@ -229,6 +229,7 @@
 
   /* Topic glyphs: custom line drawings on a 24 grid, drawn in the category colour */
   --glyph-size: 30px;
+  --glyph-size-sm: 18px; /* next to a category overline */
   --glyph-stroke: 1.7px;
 
   /* Touch */

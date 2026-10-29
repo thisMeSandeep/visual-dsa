@@ -161,9 +161,9 @@ feat(content): add content schemas, topic registry and validator
 
 ### Step 2.3: Home and Topic screens
 **Goal:** real Home and Topic detail screens built from content (F-101, F-102).
-- Home: "Learn" title, streak chip (static), Continue card (placeholder), topics grouped by category using TopicRow with glyphs.
-- Topic detail: category overline, title, summary, stat strip, Continue lesson / Sandbox / Practice buttons, chapter list.
-- Use FlashList where lists can grow.
+- Home: "Learn" title, a "Start here" card for the first topic (it becomes the Continue card once progress exists in Step 6.2), topics grouped by category using TopicRow with glyphs. The streak chip waits for real streak data (Step 13.4), so no invented numbers are shown.
+- Topic detail: back and reference-sheet buttons, category overline, title, summary, stat strip, Start/Continue lesson + Sandbox / Practice buttons, chapter list. Unknown topic ids show a "Topic not found" state. The bookmark button arrives with bookmarks (P1).
+- Home is a FlashList (it grows to 38 topics). Progress comes from a `useTopicProgress` hook that reports "not started" until the progress store exists (Step 6.2).
 
 **Done when:** you can go from Home to any MVP topic's detail screen, and both screens match the concept canvas.
 

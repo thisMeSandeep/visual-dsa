@@ -29,6 +29,16 @@ export const TOPIC_CATEGORIES = [
 ] as const;
 export type TopicCategory = (typeof TOPIC_CATEGORIES)[number];
 
+/** How each category is named on screen (Home section headers, Topic overline). */
+export const CATEGORY_LABELS: Record<TopicCategory, string> = {
+  foundations: 'Foundations',
+  linear: 'Linear structures',
+  hashing: 'Hashing',
+  trees: 'Trees',
+  graphs: 'Graphs',
+  algorithms: 'Algorithms',
+};
+
 export const PRIORITIES = ['P0', 'P1', 'P2'] as const;
 
 /** True when every item's `id` is different. */

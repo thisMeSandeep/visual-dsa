@@ -8,7 +8,7 @@ describe('Button', () => {
     const onPress = jest.fn();
     await render(<Button label="Continue lesson" onPress={onPress} />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Continue lesson' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue lesson' }));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
@@ -17,7 +17,7 @@ describe('Button', () => {
     await render(<Button label="Push" onPress={onPress} disabled />);
 
     const button = screen.getByRole('button', { name: 'Push' });
-    fireEvent.press(button);
+    await fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
     expect(button).toBeDisabled();
   });
@@ -30,7 +30,7 @@ describe('IconButton', () => {
       <IconButton label="Next step" icon="step-forward" variant="step" onPress={onPress} />,
     );
 
-    fireEvent.press(screen.getByRole('button', { name: 'Next step' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Next step' }));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 

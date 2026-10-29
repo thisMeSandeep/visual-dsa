@@ -270,6 +270,8 @@ The full strategy goes in `TESTING.md`. Tools:
 - React Native Testing Library v14 renders with the `test-renderer` package, and its `render` is awaited (`await render(<Home />)`).
 - `tsconfig.json` sets `"types": ["jest"]`, because TypeScript 6 no longer includes `@types/*` packages automatically.
 - Tests sit next to the code they test (`home.test.tsx` beside `index.tsx`), never inside `src/app/` (every file there becomes a route).
+- **Always `await` user events in tests.** In Testing Library v14, `fireEvent.press` and friends return Promises. An un-awaited press leaks state into the next test, which then fails for no visible reason.
+- **FlashList in Jest:** `@shopify/flash-list/jestSetup` (layout mocks) is in `setupFiles`, and the package is in `transformIgnorePatterns` because it ships ES modules.
 - **Two TypeScript projects:** the app (`tsconfig.json`, Jest types) and `scripts/` (`scripts/tsconfig.json`, Node types). `bun run typecheck` checks both, so app code can't accidentally use Node-only globals.
 - **Reanimated in Jest** (`jest.setup.ts`): Reanimated 4.7's official mock imports the real package, whose native initializer throws under Jest. So `jest.setup.ts` mocks only the Reanimated APIs the app uses (`Animated.View`, `cubicBezier`, `useReducedMotion`…). **When code starts using a new Reanimated API, add it to that mock.** Worklets uses its official mock.
 
