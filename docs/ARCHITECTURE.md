@@ -297,29 +297,37 @@ Each structure folder in `engine/structures/<name>/` contains:
 Operations are written as ordinary, readable algorithm code. They call the tracer at each moment worth showing:
 
 ```ts
-export function put(t: Tracer<HashTableModel>, key: string, value: string) {
-  const i = t.model.hash(key);
-  t.step({ line: 'hash', highlight: { bucket: i }, callout: `h("${key}") = ${i}`,
+export function put(t: Tracer<HashTableModel, HashAnnotations>, key: string, value: string) {
+  const i = hash(t.model, key);
+  t.step({ line: 'hash', annotations: { bucket: i, callout: `h("${key}") = ${i}` },
            caption: { key: 'hash.hashed', params: { key, i } } });
 
   const bucket = t.model.buckets[i];
   if (bucket.length > 0) {
-    t.step({ line: 'collision', highlight: { bucket: i, state: 'collision' },
+    t.step({ line: 'collision', annotations: { bucket: i, state: 'collision' },
              caption: { key: 'hash.collision', params: { key, other: bucket[0].key } } });
   }
 
-  t.update((m) => m.insert(i, key, value));
+  t.update((m) => insert(m, i, key, value));
   t.count('writes');
-  t.step({ line: 'append', highlight: { node: key, state: 'new' },
+  t.step({ line: 'append', annotations: { node: key, state: 'new' },
            caption: { key: 'hash.inserted', params: { key, i } } });
 }
+
+// Run it: the trace, plus the final model the sandbox continues from.
+const { trace, model } = runTrace(
+  { operation: 'hash-table.put', model: table, toScene, describe },
+  (t) => put(t, 'Sid', '555-0196'),
+);
 ```
 
-The tracer:
-- holds the current model and calls `toScene` on every `step()`, so every step is a full snapshot.
-- tracks counters (`comparisons`, `swaps`, `reads`, `writes`) for F-902.
-- enforces **limits** (`engine/core/limits.ts`): a maximum number of steps per trace (2,000) and a maximum input size per structure. A sandbox input that would exceed them is rejected with a friendly error step.
-- is **deterministic**: random inputs use a seeded RNG (`engine/core/rng.ts`), so a shared scenario (F-607) or a test always produces the same trace.
+The tracer (`engine/core/tracer.ts`):
+- holds the current model and calls `toScene(model, annotations)` on every `step()`, so every step is a full snapshot. `annotations` are the structure's own highlight type (active index, new node, callout…).
+- changes the model only through `update(m => newModel)`. Models are immutable, so earlier snapshots stay valid.
+- tracks counters (`comparisons`, `swaps`, `reads`, `writes`) for F-902, snapshotted on each step.
+- records learner-facing failures with `fail(code, caption)`. This adds a final error step and sets `trace.error`. Overflow and not-found are lesson content, not exceptions.
+- enforces **limits** (`engine/core/limits.ts`, values in `config.engine`): at most 2,000 steps per trace. `runTrace` turns hitting the limit into an `engine.step-limit` error step instead of throwing. Inputs are checked with `checkItemCount` (12 items) and `checkValue` (whole numbers 0–99). Breaking a rule produces an error step, not an alert.
+- is **deterministic**: random inputs use a seeded RNG (`engine/core/rng.ts`, mulberry32, default seed in config), so a shared scenario (F-607) or a test always produces the same trace.
 
 ### 5.3 Code-line mapping
 
