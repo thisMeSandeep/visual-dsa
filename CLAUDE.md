@@ -55,7 +55,8 @@ bun run lint                # ESLint (includes no-hard-coding and boundary rules
 bun run typecheck           # tsc --noEmit
 bun run format              # Prettier (format:check in CI)
 bun run doctor              # expo-doctor: dependency and config health
-bun run test                # Jest (from Step 0.3). NOT `bun test`
+bun run test                # Jest. NOT `bun test`
+bun run test:watch          # Jest in watch mode
 bun run validate:content    # Zod-check all topic content (from Step 2.2)
 bunx expo install <pkg>     # add an Expo-compatible dependency
 ```

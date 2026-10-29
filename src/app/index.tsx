@@ -1,9 +1,5 @@
-import { StyleSheet, View } from 'react-native';
+import { Home } from '@/screens/home';
 
-export default function Index() {
-  return <View style={styles.container} />;
+export default function HomeRoute() {
+  return <Home />;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-});

@@ -262,6 +262,12 @@ The full strategy goes in `TESTING.md`. Tools:
 | End-to-end | **Maestro** | Flows: open topic → play lesson → take quiz. Runs in the cloud on EAS Workflows against release builds, so no local simulator is needed. Day-to-day checks are manual in Expo Go. |
 | Type safety | `tsc --noEmit` | Run in CI on every PR |
 
+**Setup notes (Step 0.3):**
+- Jest 30 with the `jest-expo` preset, configured under `"jest"` in `package.json`. `jest-expo` also needs `@react-native/jest-preset`.
+- React Native Testing Library v14 renders with the `test-renderer` package, and its `render` is awaited (`await render(<Home />)`).
+- `tsconfig.json` sets `"types": ["jest"]`, because TypeScript 6 no longer includes `@types/*` packages automatically.
+- Tests sit next to the code they test (`home.test.tsx` beside `index.tsx`), never inside `src/app/` (every file there becomes a route).
+
 ## 11. Build, release & CI/CD
 
 - **EAS Build:** iOS and Android builds in the cloud. Profiles are `development`, `preview` (internal testers), and `production`.
