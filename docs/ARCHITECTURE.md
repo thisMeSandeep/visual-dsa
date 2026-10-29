@@ -292,6 +292,8 @@ Each structure folder in `engine/structures/<name>/` contains:
 | `describe.ts` | `describe(scene) → string`: the screen-reader summary for each step. |
 | `*.test.ts` | Correctness of the operations and the shape of the trace. |
 
+Each structure also exports one entry point that runs a single operation and returns `{ trace, model }`, e.g. `traceStack(model, { type: 'push', value: '42' })`. The lesson compiler (§5.4) and the sandbox (§6.4) call it. Models are immutable, items have stable ids that are never reused (so the canvas can animate them), and the operations file lists the code line ids and caption keys it emits. Code samples (§5.3) must use those ids. Stack (Step 3.3) is the reference implementation.
+
 ### 5.2 The tracer
 
 Operations are written as ordinary, readable algorithm code. They call the tracer at each moment worth showing:
@@ -611,6 +613,7 @@ const delay = config.player.baseStepMs / speed;
 | `engine.ts` | Max steps per trace, max input size per structure, allowed value range, default RNG seed |
 | `sandbox.ts` | Default capacities, undo history depth, preset sizes |
 | `navigation.ts` | Form-sheet detents and grabber |
+| `structures.ts` | Per-structure defaults, e.g. stack capacity |
 | `practice.ts` | Questions per quiz, revise-list limit |
 | `storage.ts` | Storage keys and schema versions per store |
 | `features.ts` | Feature flags (compare mode, narration, haptics…) |
