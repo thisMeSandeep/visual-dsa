@@ -402,14 +402,18 @@ State: `{ index, status, speed, totalSteps, pauses, pauseAtChapterEnd, resumePla
 `stores/create-player-store.ts` creates **one Zustand store per player instance**, not a global store, because Compare mode (F-901) runs two players side by side.
 
 ```ts
-const store = createPlayerStore({ steps, chapters });
-// state:   machine state + steps + chapters
-// actions: dispatch(action), plus the step timer
+// In a screen: one player for this component, kept in sync with the trace.
+const player = usePlayer(trace.steps);
+const step = useCurrentStep(player);          // re-renders only when the step changes
+const status = usePlayerStatus(player);
+const { play, pause, next, prev, seek, setSpeed } = playerActions(player);
 ```
 
-- The **step timer** lives in the store. It runs a JS timeout of `stepDuration / speed` and dispatches `tick`. Frames in between are animated on the UI thread, so a busy JS thread never causes stutter.
-- Components subscribe with selectors (`useStore(s => s.steps[s.index])`), so the caption, the controls and the canvas each re-render only when their own slice changes.
-- The current step index is mirrored to the URL (`learn?step=6`) and saved to the progress store for "Continue where you left off" (F-104).
+- **`createPlayerStore({ steps, startIndex?, speed? })`** (vanilla Zustand) holds the machine state (§5.5) plus `steps`, with two actions. `dispatch(action)` runs the pure reducer, and skips the update when the reducer returns the same state. `load(steps, startIndex?)` swaps in a new trace and keeps the speed. `destroy()` stops the timer.
+- **The step timer lives in the store.** While `playing`, a timeout dispatches `tick` after `config.player.baseStepMs / speed` (1,500ms at 1×: the 400ms move plus reading time). It's rescheduled whenever the index, status, speed or steps change, so a speed change restarts the countdown, and pausing or waiting for an answer stops it. Frames in between are animated on the UI thread, so a busy JS thread never causes stutter.
+- **`usePlayer(steps)`** (`stores/use-player.ts`) creates the store once per component, loads a new trace into it when `steps` changes, and destroys it on unmount.
+- **Selector hooks return single values** (`useCurrentStep`, `usePlayerStatus`, `usePlayerSpeed`, `useStepNumber`, `useTotalSteps`, `useCanGoBack`, `useCanGoForward`). Never a new object: in Zustand v5 that makes the component re-render forever. The caption, the controls and the canvas each re-render only when their own value changes.
+- **(Step 6.2)** The current step index is mirrored to the URL (`learn?step=6`) and saved to the progress store for "Continue where you left off" (F-104).
 
 ### 6.2 Viz layer
 

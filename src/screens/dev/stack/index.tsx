@@ -4,6 +4,8 @@ import { ScrollView, View } from 'react-native';
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { IconButton } from '@/components/icon-button';
+import { Scrubber } from '@/components/scrubber';
+import { config } from '@/config';
 import { createRng } from '@/engine/core/rng';
 import type { Trace } from '@/engine/core/types';
 import {
@@ -12,6 +14,17 @@ import {
   type StackModel,
   type StackOperation,
 } from '@/engine/structures/stack';
+import {
+  playerActions,
+  useCanGoBack,
+  useCanGoForward,
+  useCurrentStep,
+  usePlayer,
+  usePlayerSpeed,
+  usePlayerStatus,
+  useStepNumber,
+  useTotalSteps,
+} from '@/stores/use-player';
 import { SceneView } from '@/viz/scene-view';
 
 import { DevHeader } from '../dev-header';
@@ -19,41 +32,47 @@ import { DevHeader } from '../dev-header';
 const CAPACITY = 5;
 const START_VALUES = ['23', '8'];
 const CANVAS_HEIGHT = 380;
-/** Time each step stays on screen while auto-playing (the player store takes over in 4.3). */
-const STEP_MS = 900;
+const SPEEDS = config.player.speeds;
 
-/** Dev-only check for Step 4.2: real stack traces drawn by the stack renderer. */
+/** Dev-only check for Steps 4.2 and 4.3: real stack traces, played by the player store. */
 export function DevStack() {
   const rng = useRef(createRng());
   const [model, setModel] = useState<StackModel>(() => createStack(START_VALUES, CAPACITY));
   const [trace, setTrace] = useState<Trace<string | undefined>>(
     () => traceStack(model, { type: 'peek' }).trace,
   );
-  const [index, setIndex] = useState(0);
   const [width, setWidth] = useState(0);
 
-  const step = trace.steps[index];
-  const lastIndex = trace.steps.length - 1;
+  const player = usePlayer(trace.steps);
+  const actions = playerActions(player);
+  const step = useCurrentStep(player);
+  const status = usePlayerStatus(player);
+  const speed = usePlayerSpeed(player);
+  const stepNumber = useStepNumber(player);
+  const total = useTotalSteps(player);
+  const canBack = useCanGoBack(player);
+  const canForward = useCanGoForward(player);
 
-  // Auto-advance through the trace's steps after each operation.
+  // Each new operation plays its trace from the start.
   useEffect(() => {
-    if (index >= lastIndex) return;
-    const timer = setTimeout(() => setIndex((i) => i + 1), STEP_MS);
-    return () => clearTimeout(timer);
-  }, [index, lastIndex]);
+    playerActions(player).play();
+  }, [player, trace]);
 
   const run = (operation: StackOperation) => {
     const result = traceStack(model, operation);
     setModel(result.model);
     setTrace(result.trace);
-    setIndex(0);
   };
 
   const reset = () => {
     const fresh = createStack(START_VALUES, CAPACITY);
     setModel(fresh);
     setTrace(traceStack(fresh, { type: 'peek' }).trace);
-    setIndex(0);
+  };
+
+  const nextSpeed = () => {
+    const at = SPEEDS.indexOf(speed as (typeof SPEEDS)[number]);
+    actions.setSpeed(SPEEDS[(at + 1) % SPEEDS.length] ?? config.player.defaultSpeed);
   };
 
   return (
@@ -61,7 +80,7 @@ export function DevStack() {
       className="flex-1 bg-background"
       contentContainerClassName="gap-6 px-6 pt-safe-offset-4 pb-safe-offset-6"
     >
-      <DevHeader title="Stack renderer" />
+      <DevHeader title="Stack player" />
 
       <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
         {width > 0 && step ? (
@@ -69,14 +88,42 @@ export function DevStack() {
             scene={step.scene}
             width={width}
             height={CANVAS_HEIGHT}
+            speed={speed}
             accessibilityLabel={step.a11y}
           />
         ) : null}
       </View>
 
+      <Scrubber current={stepNumber} total={total} />
+
+      <View className="flex-row items-center justify-between">
+        <IconButton label="Playback speed" text={`${speed}×`} variant="round" onPress={nextSpeed} />
+        <IconButton
+          label="Previous step"
+          icon="step-back"
+          variant="step"
+          disabled={!canBack}
+          onPress={actions.prev}
+        />
+        <IconButton
+          label={status === 'playing' ? 'Pause' : 'Play'}
+          icon={status === 'playing' ? 'pause' : 'play'}
+          variant="play"
+          onPress={status === 'playing' ? actions.pause : actions.play}
+        />
+        <IconButton
+          label="Next step"
+          icon="step-forward"
+          variant="step"
+          disabled={!canForward}
+          onPress={actions.next}
+        />
+        <IconButton label="Restart" icon="reset" variant="round" onPress={() => actions.seek(0)} />
+      </View>
+
       <View className="gap-2">
         <AppText variant="overline">
-          {trace.operation} · step {index + 1} of {trace.steps.length}
+          {trace.operation} · {status}
           {trace.error ? ` · ${trace.error.code}` : ''}
         </AppText>
         <AppText variant="code">{step ? JSON.stringify(step.caption) : ''}</AppText>
@@ -85,23 +132,6 @@ export function DevStack() {
         </AppText>
         <AppText variant="code">counters: {JSON.stringify(step?.counters ?? {})}</AppText>
         <AppText variant="label">{step?.a11y}</AppText>
-      </View>
-
-      <View className="flex-row items-center justify-center gap-6">
-        <IconButton
-          label="Previous step"
-          icon="step-back"
-          variant="step"
-          disabled={index === 0}
-          onPress={() => setIndex((i) => Math.max(0, i - 1))}
-        />
-        <IconButton
-          label="Next step"
-          icon="step-forward"
-          variant="step"
-          disabled={index >= lastIndex}
-          onPress={() => setIndex((i) => Math.min(lastIndex, i + 1))}
-        />
       </View>
 
       <View className="gap-3">

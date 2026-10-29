@@ -138,7 +138,7 @@ function DevLinks() {
         <Button label="Canvas" variant="tinted" size="compact" />
       </Link>
       <Link href="/dev/stack" asChild>
-        <Button label="Stack renderer" variant="tinted" size="compact" />
+        <Button label="Stack player" variant="tinted" size="compact" />
       </Link>
     </View>
   );
