@@ -193,7 +193,16 @@ Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
 | **Step** | 56 × 56 with a 1.5 `line-strong` outline (previous / next). |
 | **Play** | 72 × 72 `primary` fill, icon 24. The largest control on the lesson screen. |
 
-Press feedback: scale to 0.97 with 120ms plus a light haptic on the primary and play buttons.
+Press feedback: scale to 0.97 over 120ms with a strong ease-out, on press-in (`PressableScale`, values in `config.motion.press`). With reduced motion on, the press becomes a 0.7 opacity change instead. A light haptic fires on press when `config.features.haptics` is on (P1). Disabled buttons sit at 40% opacity. Full-width rows (topic, chapter) never scale: they highlight with `active:bg-surface`.
+
+**In code** (`src/components/`):
+
+| Spec | Component |
+|---|---|
+| Primary / Primary tinted / Mode | `<Button variant="primary" \| "tinted" \| "sandbox" \| "practice">` |
+| Heights 56 / 52 / Pill 44 | `<Button size="md" \| "compact" \| "pill">` |
+| Header icon (44, no fill) / Round icon / Step / Play | `<IconButton variant="ghost" \| "round" \| "step" \| "play">`, `active` for the selected state, `text` for "1×" |
+| 1.5pt outline | `border-control` utility (defined in `tokens.css`) |
 
 ### Continue card
 `primary-soft` background, `radius-xl`, padding 24. Contents: overline "Continue" in `primary`, `headline` topic name, `label` position ("Collision · step 6 of 70"), then a 4px progress bar (`primary` on a `primary` 18% track) and a Resume pill.
@@ -285,7 +294,7 @@ Built with Reanimated (see TECH-STACK.md).
 | Element move / swap | Spring (damping ~18, stiffness ~180). Swaps move along a small arc so the elements don't overlap. |
 | Highlight in/out | 150ms colour/opacity fade |
 | Insert / remove | Scale 0.9 → 1 with a fade, 200ms |
-| Button press | Scale 0.97, 120ms |
+| Button press | Scale 0.97, 120ms, ease-out `cubic-bezier(0.23, 1, 0.32, 1)`. Reduced motion: opacity 0.7 instead. Rows highlight instead of scaling |
 | Sheets | Native sheet spring |
 | Screen transitions | Native stack transitions (Expo Router) |
 

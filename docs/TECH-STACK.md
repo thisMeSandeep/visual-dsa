@@ -268,6 +268,7 @@ The full strategy goes in `TESTING.md`. Tools:
 - React Native Testing Library v14 renders with the `test-renderer` package, and its `render` is awaited (`await render(<Home />)`).
 - `tsconfig.json` sets `"types": ["jest"]`, because TypeScript 6 no longer includes `@types/*` packages automatically.
 - Tests sit next to the code they test (`home.test.tsx` beside `index.tsx`), never inside `src/app/` (every file there becomes a route).
+- **Reanimated in Jest** (`jest.setup.ts`): Reanimated 4.7's official mock imports the real package, whose native initializer throws under Jest. So `jest.setup.ts` mocks only the Reanimated APIs the app uses (`Animated.View`, `cubicBezier`, `useReducedMotion`…). **When code starts using a new Reanimated API, add it to that mock.** Worklets uses its official mock.
 
 ## 11. Build, release & CI/CD
 

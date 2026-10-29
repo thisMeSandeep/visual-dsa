@@ -1,19 +1,12 @@
-import { router } from 'expo-router';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { AppText, Strong, TEXT_VARIANTS, type TextVariant } from '@/components/app-text';
 import { Icon } from '@/components/icon';
 import { ICON_NAMES } from '@/components/icons';
 import { TopicGlyph, type GlyphName, type TopicCategory } from '@/components/topic-glyph';
-import {
-  THEME_PREFERENCES,
-  setThemePreference,
-  useColor,
-  useThemePreference,
-  useVizSizes,
-  type ColorToken,
-  type ThemePreference,
-} from '@/theme';
+import { useColor, useVizSizes, type ColorToken } from '@/theme';
+
+import { DevHeader } from '../dev-header';
 
 /* Class names must be complete strings so Uniwind can find them at build time. */
 const GROUPS: { title: string; swatches: { token: ColorToken; className: string }[] }[] = [
@@ -99,14 +92,7 @@ const TOPIC_GLYPHS: { glyph: GlyphName; category: TopicCategory; title: string }
   { glyph: 'hash-table', category: 'hashing', title: 'Hash Table' },
 ];
 
-const THEME_LABELS: Record<ThemePreference, string> = {
-  system: 'System',
-  light: 'Light',
-  dark: 'Dark',
-};
-
 export function DevTokens() {
-  const preference = useThemePreference();
   const viz = useVizSizes();
 
   return (
@@ -114,41 +100,7 @@ export function DevTokens() {
       className="flex-1 bg-background"
       contentContainerClassName="gap-7 px-6 pt-safe-offset-4 pb-safe-offset-6"
     >
-      <View className="flex-row items-center justify-between">
-        <AppText variant="headline">Design tokens</AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} className="py-2">
-          <AppText variant="body-sm" weight="bold" tone="primary">
-            Close
-          </AppText>
-        </Pressable>
-      </View>
-
-      <View className="flex-row gap-2">
-        {THEME_PREFERENCES.map((option) => {
-          const selected = preference === option;
-          return (
-            <Pressable
-              key={option}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              onPress={() => setThemePreference(option)}
-              className={
-                selected
-                  ? 'flex-1 items-center rounded-lg bg-primary py-3'
-                  : 'flex-1 items-center rounded-lg bg-surface py-3'
-              }
-            >
-              <AppText
-                variant="body-sm"
-                weight={selected ? 'bold' : 'regular'}
-                tone={selected ? 'on-primary' : 'ink'}
-              >
-                {THEME_LABELS[option]}
-              </AppText>
-            </Pressable>
-          );
-        })}
-      </View>
+      <DevHeader title="Design tokens" />
 
       <View className="gap-4">
         <AppText variant="overline">Topic glyphs</AppText>

@@ -223,7 +223,7 @@ feat(engine): implement traced stack operations
 - Install `@shopify/react-native-skia`, `react-native-reanimated`, `react-native-worklets` and `react-native-gesture-handler`.
 - `viz/canvas/`: `VizCanvas` plus `useAnimatedElements` (shared values per element id; enter, exit, move and restyle).
 - `viz/state-style.ts`: maps ElementState to token names, resolved through `src/theme`.
-- Add `src/config/motion.ts` (durations, springs, reduced-motion fade) and use it for every transition.
+- Extend `src/config/motion.ts` (it already holds press feedback from Step 1.4) with step durations, springs and the reduced-motion fade, and use it for every transition.
 - Load the Atkinson fonts into Skia, and respect reduced motion.
 
 **Done when:** a demo scene animates smoothly between two snapshots in Expo Go on your phone. Expo Go runs in development mode, so final frame-rate checks happen on a release build in Step 10.4.

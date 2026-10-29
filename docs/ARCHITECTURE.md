@@ -85,13 +85,13 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
 │   │   ├── app-text.tsx            #   ALL text: variant / weight / tone props
-│   │   ├── button.tsx
+│   │   ├── pressable-scale.tsx     #   press feedback for every button (0.97 scale)
+│   │   ├── button.tsx              #   primary / tinted / mode × md / compact / pill
+│   │   ├── icon-button.tsx         #   ghost / round / step / play
 │   │   ├── icon.tsx                #   Phosphor wrapper (token colours)
-│   │   ├── icons.ts                #   per-file Phosphor re-exports
-│   │   ├── progress-bar.tsx
-│   │   ├── scrubber.tsx
-│   │   ├── stat-strip.tsx
-│   │   ├── topic-row.tsx
+│   │   ├── icons.ts                #   icon registry by meaning
+│   │   ├── chip.tsx · progress-bar.tsx · scrubber.tsx · stat-strip.tsx
+│   │   ├── topic-row.tsx · chapter-row.tsx · continue-card.tsx · feedback-panel.tsx
 │   │   └── topic-glyph/            #   custom category glyphs
 │   │
 │   ├── viz/                        # visualisation layer (React + Skia)

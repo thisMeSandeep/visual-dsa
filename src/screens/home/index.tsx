@@ -1,19 +1,20 @@
 import { Link } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
-import { AppText } from '@/components/app-text';
+import { Button } from '@/components/button';
 
 export function Home() {
   return (
-    <View testID="home-screen" className="flex-1 items-center justify-center bg-background">
+    <View testID="home-screen" className="flex-1 justify-center gap-3 bg-background px-6">
       {__DEV__ ? (
-        <Link href="/dev/tokens" asChild>
-          <Pressable accessibilityRole="button" className="rounded-lg bg-primary-soft px-6 py-3">
-            <AppText variant="body-sm" weight="bold" tone="primary">
-              Design tokens
-            </AppText>
-          </Pressable>
-        </Link>
+        <>
+          <Link href="/dev/tokens" asChild>
+            <Button label="Design tokens" variant="tinted" />
+          </Link>
+          <Link href="/dev/components" asChild>
+            <Button label="Components" variant="tinted" />
+          </Link>
+        </>
       ) : null}
     </View>
   );

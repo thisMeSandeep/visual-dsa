@@ -236,6 +236,15 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * 4. Custom utilities for values Tailwind's scales don't have.
+ * ---------------------------------------------------------------------------------------------- */
+
+/* 1.5pt outline: step buttons, inputs, quiz tiles, canvas cells (VISUAL-SPEC §6–7) */
+@utility border-control {
+  border-width: 1.5px;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Mark every colour token as used, so TypeScript can read it with useCSSVariable even when no
  * screen uses it as a class yet (the Skia canvas reads colours this way).
  * ---------------------------------------------------------------------------------------------- */
