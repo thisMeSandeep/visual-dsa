@@ -93,21 +93,26 @@ The three ways into a topic each have a fixed tint, used on the Topic screen but
 
 **Atkinson Hyperlegible Next** for all UI text. **Atkinson Hyperlegible Mono** for values, indices, pointers, code, counters and Big-O notation.
 
-| Style | Font | Size / line height | Weight | Notes |
-|---|---|---|---|---|
-| `display` | Next | 34 / 1.1 | 700 | Screen titles ("Learn", "Hash Table"), letter-spacing −0.02em |
-| `title` | Next | 28 / 1.25 | 700 | Quiz questions |
-| `headline` | Next | 26 / 1.2 | 700 | Card titles (Continue card) |
-| `caption-lg` | Next | 19 / 1.5 | 400 (bold terms 700) | **Lesson step captions**, the most important reading text |
-| `body` | Next | 17 / 1.5 | 400 | Summaries, list titles (500) |
-| `body-sm` | Next | 15–16 / 1.5 | 400 | Explanations, button labels (700) |
-| `label` | Next | 13–14 / 1.4 | 400 | Secondary lines ("4 chapters"), stat labels |
-| `overline` | Next | 12 / 1.3 | 500–700 | UPPERCASE, letter-spacing 0.1em, section labels |
-| `tab` | Next | 12 | 400 (active 700) | Tab bar labels |
-| `value-lg` | Mono | 20–28 | 500 | Canvas cell values, quiz answer numbers |
-| `value` | Mono | 15–17 | 500 | Stack items, stats (`O(1)`), callouts |
-| `code` | Mono | 13 / 1.9 | 400 | Code panel |
-| `index` | Mono | 12–13 | 400 | Array indices, bucket numbers, step counters (`6 / 70`) |
+Sizes and line heights are in points. These are the exact values in `src/theme/tokens.css` (`--text-*`).
+
+| Style | Font | Size / line height | Weight | Default tone | Notes |
+|---|---|---|---|---|---|
+| `display` | Next | 34 / 38 | 700 | ink | Screen titles ("Learn", "Hash Table"), letter-spacing −0.68 |
+| `title` | Next | 28 / 35 | 700 | ink | Quiz questions, letter-spacing −0.28 |
+| `headline` | Next | 26 / 32 | 700 | ink | Card titles (Continue card), letter-spacing −0.26 |
+| `caption` | Next | 19 / 28 | 400 (bold terms 700) | ink | **Lesson step captions**, the most important reading text |
+| `body` | Next | 17 / 26 | 400 (list titles 500) | ink | Summaries, list titles |
+| `body-sm` | Next | 15 / 22 | 400 (button labels 700) | ink-2 | Explanations, button labels |
+| `label` | Next | 13 / 18 | 400 | muted | Secondary lines ("4 chapters"), stat labels |
+| `overline` | Next | 12 / 16 | 500 | muted | UPPERCASE, letter-spacing 1.2, section labels |
+| `tab` | Next | 12 / 16 | 400 (active 700) | muted | Tab bar labels |
+| `value-xl` | Mono | 28 / 34 | 500 | ink | Quiz answer numbers |
+| `value-lg` | Mono | 20 / 26 | 500 | ink | Canvas cell values |
+| `value` | Mono | 16 / 22 | 500 | ink | Stack items, stats (`O(1)`), callouts |
+| `code` | Mono | 13 / 24 | 400 | ink | Code panel |
+| `index` | Mono | 12 / 16 | 400 | muted | Array indices, bucket numbers, step counters (`6 / 70`) |
+
+**In code:** all text uses `<AppText variant="…" weight="…" tone="…">` from `src/components/app-text.tsx`. Weight is chosen through the font family (`font-sans-bold`), never through `font-weight`, because React Native needs one family per weight. Mono is loaded in 400 and 500 only. Bold words inside a caption use `<Strong>`.
 
 **Rules**
 - Use tabular numerals wherever digits line up (counters, scrubber, stats).
@@ -335,7 +340,7 @@ These match the concept canvas.
 |---|---|
 | **Home** | `display` "Learn" + streak chip → Continue card → categories with topic rows → tab bar |
 | **Topic** | Back / bookmark → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
-| **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption-lg` caption → scrubber → speed · prev · **play** · next · code |
+| **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption` → scrubber → speed · prev · **play** · next · code |
 | **Sandbox** | Back · title · reset → live structure with pointers → stat strip → value input + random → primary action + tinted secondary actions |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |
 | **Lesson (dark)** | Same as the lesson player, plus the docked code panel with the current line highlighted |

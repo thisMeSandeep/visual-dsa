@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo-google-fonts/atkinson-hyperlegible-mono": "^0.4.1",
+    "@expo-google-fonts/atkinson-hyperlegible-next": "^0.4.1",
     "@expo/ui": "~58.0.25",
     "expo": "~58.0.21",
     "expo-constants": "~58.0.14",

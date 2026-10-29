@@ -94,7 +94,7 @@ feat(theme): add Uniwind with Visual-DSA colour tokens
 **Goal:** Atkinson Hyperlegible everywhere, with the VISUAL-SPEC §3 type scale.
 - Install `@expo-google-fonts/atkinson-hyperlegible-next` and `@expo-google-fonts/atkinson-hyperlegible-mono` (Next 400/500/700, Mono 400/500).
 - Load the fonts at runtime with `useFonts` in the root layout (no config plugin, so it works in Expo Go), and keep the splash screen up until they're ready.
-- Add `--font-*` tokens (one per weight, matching the registered family names) and the type-scale tokens to `tokens.css`, giving text styles `display`, `title`, `caption-lg`, `body`, `label`, `overline`, `value`, `code`…
+- Add `--font-*` tokens (one per weight, matching the registered family names) and the type-scale tokens to `tokens.css`, giving text styles `display`, `title`, `caption`, `body`, `label`, `overline`, `value`, `code`…, used through an `<AppText>` component (variant, weight and tone props)
 
 **Done when:** the test screen shows each text style in the right font, with tabular figures in Mono.
 
@@ -260,7 +260,7 @@ feat(player): add per-instance player store with step timer
 
 ### Step 4.4: Lesson player screen
 **Goal:** the lesson screen from the concept canvas (F-201, F-202, F-205, F-401, F-402, F-403).
-- Header (close, title/chapter, chapters button), canvas, `caption-lg` caption with bold terms, scrubber, controls (speed, previous, play/pause, next, code placeholder).
+- Header (close, title/chapter, chapters button), canvas, `caption` text with bold terms, scrubber, controls (speed, previous, play/pause, next, code placeholder).
 - Swipe left/right to step, and a chapters sheet that jumps to a chapter.
 - Wire it to a hard-coded Stack trace.
 

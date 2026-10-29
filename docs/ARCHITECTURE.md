@@ -84,6 +84,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   └── settings/
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
+│   │   ├── app-text.tsx            #   ALL text: variant / weight / tone props
 │   │   ├── button.tsx
 │   │   ├── icon.tsx                #   Phosphor wrapper (token colours)
 │   │   ├── icons.ts                #   per-file Phosphor re-exports
@@ -136,6 +137,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │
 │   ├── theme/                      # DESIGN TOKENS: how it looks (§9.1)
 │   │   ├── tokens.css              #   THE place to change colours, fonts, sizes
+│   │   ├── fonts.ts                #   font files for useFonts (keys = --font-* names)
 │   │   └── index.ts                #   typed token access for TS (Skia, icons, @expo/ui)
 │   │
 │   ├── config/                     # CONFIG: how it behaves (§9.2)
@@ -515,12 +517,12 @@ Lesson data (e.g. the input `[42, 17, 8, 23]` or the key "Sid") is **content**, 
   }
 }
 
-/* 2. Tokens used through class names: font-sans, text-caption-lg, p-6, rounded-lg */
+/* 2. Tokens used through class names: font-sans, text-caption, p-6, rounded-lg */
 @theme {
   --font-sans: 'AtkinsonHyperlegibleNext_400Regular';
   --font-sans-bold: 'AtkinsonHyperlegibleNext_700Bold';
   --font-mono: 'AtkinsonHyperlegibleMono_400Regular';
-  --text-caption-lg: 19px;
+  --text-caption: 19px;
   --radius-lg: 16px;
   /* …type scale, spacing, radii from VISUAL-SPEC §3–4 */
 }

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
+import { AppText, Strong, TEXT_VARIANTS, type TextVariant } from '@/components/app-text';
 import {
   THEME_PREFERENCES,
   setThemePreference,
@@ -67,6 +68,24 @@ const GROUPS: { title: string; swatches: { token: ColorToken; className: string 
   },
 ];
 
+/** Sample copy per text style, written the way the app will use it. */
+const TYPE_SAMPLES: Record<TextVariant, string> = {
+  display: 'Hash Table',
+  title: 'Which bucket does Kat go to?',
+  headline: 'Continue: Hash Table',
+  caption: 'Sid also hashes to bucket 2, where Jim already is.',
+  body: 'Store key–value pairs and find any of them fast.',
+  'body-sm': '17 divided by 6 leaves a remainder of 5.',
+  label: '4 chapters · step 6 of 70',
+  overline: 'Linear structures',
+  tab: 'Practice',
+  'value-xl': '5',
+  'value-lg': '42  0O  1lI',
+  value: 'O(1)  h("Sid") = 2',
+  code: 'if a[j] > a[j+1]: swap(a, j, j+1)',
+  index: '0  1  2  3  4  5',
+};
+
 const THEME_LABELS: Record<ThemePreference, string> = {
   system: 'System',
   light: 'Light',
@@ -83,35 +102,57 @@ export function DevTokens() {
       contentContainerClassName="gap-7 px-6 pt-safe-offset-4 pb-safe-offset-6"
     >
       <View className="flex-row items-center justify-between">
-        <Text className="text-ink font-bold">Design tokens</Text>
+        <AppText variant="headline">Design tokens</AppText>
         <Pressable accessibilityRole="button" onPress={() => router.back()} className="py-2">
-          <Text className="text-primary font-bold">Close</Text>
+          <AppText variant="body-sm" weight="bold" tone="primary">
+            Close
+          </AppText>
         </Pressable>
       </View>
 
       <View className="flex-row gap-2">
-        {THEME_PREFERENCES.map((option) => (
-          <Pressable
-            key={option}
-            accessibilityRole="button"
-            accessibilityState={{ selected: preference === option }}
-            onPress={() => setThemePreference(option)}
-            className={
-              preference === option
-                ? 'flex-1 items-center rounded-lg bg-primary py-3'
-                : 'flex-1 items-center rounded-lg bg-surface py-3'
-            }
-          >
-            <Text className={preference === option ? 'text-on-primary font-bold' : 'text-ink'}>
-              {THEME_LABELS[option]}
-            </Text>
-          </Pressable>
+        {THEME_PREFERENCES.map((option) => {
+          const selected = preference === option;
+          return (
+            <Pressable
+              key={option}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              onPress={() => setThemePreference(option)}
+              className={
+                selected
+                  ? 'flex-1 items-center rounded-lg bg-primary py-3'
+                  : 'flex-1 items-center rounded-lg bg-surface py-3'
+              }
+            >
+              <AppText
+                variant="body-sm"
+                weight={selected ? 'bold' : 'regular'}
+                tone={selected ? 'on-primary' : 'ink'}
+              >
+                {THEME_LABELS[option]}
+              </AppText>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View className="gap-4">
+        <AppText variant="overline">Typography</AppText>
+        {TEXT_VARIANTS.map((variant) => (
+          <View key={variant} className="gap-1">
+            <AppText variant="index">{variant}</AppText>
+            <AppText variant={variant}>{TYPE_SAMPLES[variant]}</AppText>
+          </View>
         ))}
+        <AppText variant="caption">
+          Two keys in one bucket is a <Strong>collision</Strong>.
+        </AppText>
       </View>
 
       {GROUPS.map((group) => (
         <View key={group.title} className="gap-3">
-          <Text className="text-muted uppercase">{group.title}</Text>
+          <AppText variant="overline">{group.title}</AppText>
           {group.swatches.map((swatch) => (
             <Swatch key={swatch.token} {...swatch} />
           ))}
@@ -119,13 +160,13 @@ export function DevTokens() {
       ))}
 
       <View className="gap-1">
-        <Text className="text-muted uppercase">Canvas sizes (TS-only tokens)</Text>
-        <Text className="text-ink-2">
+        <AppText variant="overline">Canvas sizes (TS-only tokens)</AppText>
+        <AppText variant="body-sm">
           cell {viz.cellWidth} × {viz.cellHeight} · bucket {viz.bucketWidth} × {viz.bucketHeight}
-        </Text>
-        <Text className="text-ink-2">
+        </AppText>
+        <AppText variant="body-sm">
           gap {viz.gap} · radius {viz.radius} · edge {viz.edgeWidth} · dimmed {viz.dimmedOpacity}
-        </Text>
+        </AppText>
       </View>
     </ScrollView>
   );
@@ -139,8 +180,10 @@ function Swatch({ token, className }: { token: ColorToken; className: string }) 
     <View className="flex-row items-center gap-3">
       <View className={`h-10 w-10 rounded-md border border-line ${className}`} />
       <View className="flex-1">
-        <Text className="text-ink">{token}</Text>
-        <Text className="text-muted">{value || 'not readable from TS'}</Text>
+        <AppText variant="body-sm" tone="ink">
+          {token}
+        </AppText>
+        <AppText variant="index">{value || 'not readable from TS'}</AppText>
       </View>
     </View>
   );

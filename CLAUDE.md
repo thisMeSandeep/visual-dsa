@@ -30,6 +30,7 @@ Reference screenshots of the app that inspired this one are in `Dsa images/`. Th
    - Tunable constants (timings, speeds, limits, storage keys, flags) go only in `src/config/`, read as `config.*`.
    - Lesson data goes in `src/content/`.
    - No arbitrary Tailwind values (`bg-[#…]`). Lint enforces all of this.
+   - All text uses `<AppText variant weight tone>` (`src/components/app-text.tsx`), never raw `<Text>` with font or colour classes. Uniwind resolves conflicting classes by CSS cascade, not class order, so `className` is for layout only.
 6. **Respect the architecture boundaries** (`ARCHITECTURE.md` §3): `src/engine/` is pure TypeScript (it may import `config/` only, with no React or React Native); `src/app/` holds routes only; `viz/` never imports `content/`.
 7. **Don't trust memory for Expo APIs.** Expo makes breaking changes every SDK. Check the SDK 58 docs (`https://docs.expo.dev/versions/v58.0.0/`, plus `https://docs.expo.dev/llms.txt`) or the matching skill before using an Expo, EAS or React Native API.
 8. **Use skills.** Before working in an area, load the matching skill (see the "Skills used per phase" table in the plan): `expo-project-structure`, `uniwind`, `expo-router`, `expo-animation`, `expo-ui`, `expo-native-ui`, `expo-design-system`, `vercel-react-native-skills`, `eas-*`. Don't guess library APIs.

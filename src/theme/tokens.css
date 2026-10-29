@@ -141,6 +141,66 @@
   --radius-md: 12px; /* chapter rows, inputs, context blocks */
   --radius-lg: 16px; /* buttons, quiz tiles */
   --radius-xl: 24px; /* cards and panels */
+
+  /* Fonts (VISUAL-SPEC §3). React Native needs one family per weight, so weight is picked by
+     family (font-sans-bold), never by font-weight. Names must match the keys in src/theme/fonts.ts. */
+  --font-*: initial;
+  --font-weight-*: initial;
+  --font-sans: 'AtkinsonHyperlegibleNext_400Regular';
+  --font-sans-medium: 'AtkinsonHyperlegibleNext_500Medium';
+  --font-sans-bold: 'AtkinsonHyperlegibleNext_700Bold';
+  --font-mono: 'AtkinsonHyperlegibleMono_400Regular';
+  --font-mono-medium: 'AtkinsonHyperlegibleMono_500Medium';
+
+  /* Type scale (VISUAL-SPEC §3). Each size carries its line height and letter spacing.
+     Use through <AppText variant="…">, which also sets the font family and colour. */
+  --text-*: initial;
+
+  --text-display: 34px; /* screen titles */
+  --text-display--line-height: 38px;
+  --text-display--letter-spacing: -0.68px;
+
+  --text-title: 28px; /* quiz questions */
+  --text-title--line-height: 35px;
+  --text-title--letter-spacing: -0.28px;
+
+  --text-headline: 26px; /* card titles */
+  --text-headline--line-height: 32px;
+  --text-headline--letter-spacing: -0.26px;
+
+  --text-caption: 19px; /* lesson step captions: the main reading text */
+  --text-caption--line-height: 28px;
+
+  --text-body: 17px; /* summaries, list titles */
+  --text-body--line-height: 26px;
+
+  --text-body-sm: 15px; /* explanations, button labels */
+  --text-body-sm--line-height: 22px;
+
+  --text-label: 13px; /* secondary lines, stat labels */
+  --text-label--line-height: 18px;
+
+  --text-overline: 12px; /* UPPERCASE section labels */
+  --text-overline--line-height: 16px;
+  --text-overline--letter-spacing: 1.2px;
+
+  --text-tab: 12px; /* tab bar labels */
+  --text-tab--line-height: 16px;
+
+  --text-value-xl: 28px; /* quiz answer numbers */
+  --text-value-xl--line-height: 34px;
+
+  --text-value-lg: 20px; /* canvas cell values */
+  --text-value-lg--line-height: 26px;
+
+  --text-value: 16px; /* stack items, stats like O(1), callouts */
+  --text-value--line-height: 22px;
+
+  --text-code: 13px; /* code panel */
+  --text-code--line-height: 24px;
+
+  --text-index: 12px; /* array indices, step counters */
+  --text-index--line-height: 16px;
 }
 
 /* -------------------------------------------------------------------------------------------------

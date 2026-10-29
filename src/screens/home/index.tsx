@@ -1,5 +1,7 @@
 import { Link } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+
+import { AppText } from '@/components/app-text';
 
 export function Home() {
   return (
@@ -7,7 +9,9 @@ export function Home() {
       {__DEV__ ? (
         <Link href="/dev/tokens" asChild>
           <Pressable accessibilityRole="button" className="rounded-lg bg-primary-soft px-6 py-3">
-            <Text className="text-primary font-bold">Design tokens</Text>
+            <AppText variant="body-sm" weight="bold" tone="primary">
+              Design tokens
+            </AppText>
           </Pressable>
         </Link>
       ) : null}
