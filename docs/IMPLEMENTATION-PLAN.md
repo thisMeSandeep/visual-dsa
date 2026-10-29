@@ -247,7 +247,7 @@ feat(viz): add stack renderer
 
 ### Step 4.3: Player store
 **Goal:** per-instance playback state (ARCHITECTURE §6.1).
-- Install Zustand. Add `src/config/player.ts` (base step duration, speeds, default speed, swipe threshold).
+- Install Zustand. Extend `src/config/player.ts` (it already holds speeds, default speed and pause-at-chapter-end from Step 3.2) with the base step duration and swipe threshold.
 - Write `stores/create-player-store.ts`, which wraps the machine and runs the step timer at `config.player.baseStepMs / speed`.
 - Add selector hooks for the current step, status and progress.
 

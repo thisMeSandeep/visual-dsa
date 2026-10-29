@@ -378,7 +378,18 @@ interface CompiledLesson {
               last step ──▶ ended
 ```
 
-State: `{ index, status, speed, totalSteps }`. Actions: `play`, `pause`, `next`, `prev`, `seek(n)`, `setSpeed(x)`, `tick`, `answer(value)`. Being pure means the playback rules are unit-tested without rendering anything.
+State: `{ index, status, speed, totalSteps, pauses, pauseAtChapterEnd, resumePlaying }`, created from the trace's per-step pause reasons with `createPlayerState`. Actions: `play`, `pause`, `next`, `prev`, `seek(index)`, `setSpeed(speed)`, `tick`, `answer`. Being pure means the playback rules are unit-tested (100% branch coverage) without rendering anything.
+
+**Rules** (`engine/player/machine.ts`):
+- **`tick`** (the step timer) only moves while playing. Past the last step the lesson is `ended`.
+- **Chapter ends:** autoplay stops on a `chapter-end` step (`config.player.pauseAtChapterEnd`).
+- **`predict` / `interactive` steps** put the player in `awaiting-input`. `tick`, `next` and `play` are blocked until `answer`. After the answer it resumes playing if it was playing, and stays paused if the learner was stepping by hand. Checking whether the answer is right happens outside the machine (§6.5).
+- **`next`** stops autoplay. On the last step it ends the lesson.
+- **`prev` and `seek`** are review: they pause, clamp to the steps, and never re-ask a question.
+- **`play`** after the end restarts from the first step.
+- **`setSpeed`** only accepts the speeds in `config.player.speeds`.
+- **Unchanged actions** return the same state object, so React can skip re-renders.
+- **Display helpers:** `canGoBack`, `canGoForward` and `stepNumber`.
 
 ---
 
