@@ -6,13 +6,13 @@ import type { z } from 'zod';
 
 import { config } from '@/config';
 import { compileLesson } from '@/engine/lesson/compile';
-import { CompileError } from '@/engine/lesson/structures';
+import { CompileError, STRUCTURES } from '@/engine/lesson/structures';
 import type { CompiledLesson } from '@/engine/lesson/types';
 
 import { CODE_SAMPLES } from './code';
 import type { CodeSamples } from './code-types';
-import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS } from './registry';
-import { LessonRecipeSchema, TopicMetaSchema, type TopicMeta } from './schema';
+import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS, TOPIC_SANDBOXES } from './registry';
+import { LessonRecipeSchema, SandboxSchema, TopicMetaSchema, type TopicMeta } from './schema';
 
 export type ContentIssue = {
   /** Which topic (or registry key) the problem is in. */
@@ -113,7 +113,50 @@ export function validateCodeLines(
   });
 }
 
+/**
+ * Checks each sandbox against the schema, then against the engine: the structure and every
+ * operation exist, and every preset builds.
+ */
+export function validateSandboxes(sandboxes: Record<string, unknown>): ContentIssue[] {
+  return Object.entries(sandboxes).flatMap(([key, value]): ContentIssue[] => {
+    const result = SandboxSchema.safeParse(value);
+    if (!result.success) return toIssues(key, result.error);
+    const sandbox = result.data;
+    const issue = (path: string, message: string): ContentIssue => ({
+      topicId: key,
+      path,
+      message,
+    });
+
+    if (sandbox.topicId !== key) {
+      return [issue('topicId', `Registered as "${key}" but its topicId is "${sandbox.topicId}"`)];
+    }
+    const definition = STRUCTURES[sandbox.structure];
+    if (!definition) return [issue('structure', `Unknown structure "${sandbox.structure}"`)];
+
+    const unknownOperations = sandbox.operations.flatMap((operation, index) =>
+      definition.operations[operation.id]
+        ? []
+        : [issue(`operations.${index}.id`, `"${sandbox.structure}" has no "${operation.id}"`)],
+    );
+    const brokenPresets = sandbox.presets.flatMap((preset, index) => {
+      try {
+        definition.create(preset.input, `presets.${index}`);
+        return [];
+      } catch (error) {
+        if (!(error instanceof CompileError)) throw error;
+        return [issue(error.at, error.reason)];
+      }
+    });
+    return [...unknownOperations, ...brokenPresets];
+  });
+}
+
 /** Validates all registered content. */
 export function validateContent(): ContentIssue[] {
-  return [...validateTopicMetas(TOPIC_METAS), ...validateLessons(TOPIC_LESSONS, TOPIC_METAS)];
+  return [
+    ...validateTopicMetas(TOPIC_METAS),
+    ...validateLessons(TOPIC_LESSONS, TOPIC_METAS),
+    ...validateSandboxes(TOPIC_SANDBOXES),
+  ];
 }

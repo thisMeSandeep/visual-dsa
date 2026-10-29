@@ -3,7 +3,7 @@
  * at rest, and which operations exist. Recipe input is untrusted data, so every input is checked
  * here and a bad one is a CompileError naming the segment.
  */
-import type { Scene, Trace } from '../core/types';
+import type { Caption, Counters, Scene, Step, Trace } from '../core/types';
 import {
   bracketsToScene,
   createBrackets,
@@ -38,6 +38,22 @@ export type StructureDefinition<Model> = {
     Record<string, (model: Model, input: unknown, at: string) => { trace: Trace; model: Model }>
   >;
 };
+
+const ZERO_COUNTERS: Counters = { comparisons: 0, swaps: 0, reads: 0, writes: 0 };
+
+/**
+ * A step showing a structure at rest with a caption: a lesson's 'say' step, or the sandbox after
+ * an undo or a preset. Counters carry on from the step before, if any.
+ */
+export function restingStep(
+  definition: StructureDefinition<unknown>,
+  model: unknown,
+  caption: Caption,
+  counters: Counters = ZERO_COUNTERS,
+): Step {
+  const scene = definition.toScene(model);
+  return { scene, caption, counters, a11y: definition.describe(scene) };
+}
 
 /* Input checks --------------------------------------------------------------------------------- */
 

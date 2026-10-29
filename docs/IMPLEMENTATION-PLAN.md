@@ -354,12 +354,25 @@ feat(progress): track lesson progress and resume where you left off
 - `SandboxSession`: current model, history, undo and reset (ARCHITECTURE §6.4).
 - Sandbox screen: canvas, stat strip, value input (Zod-validated), random value, operation buttons, and presets from content.
 - Errors (overflow, underflow) are shown as canvas error steps.
+- Each topic's Play mode is content (`content/topics/<topic>/sandbox.ts`: operations, presets with hints, stats), checked by `validate:content`.
 
 **Done when:** you can push, pop, peek, undo, reset and load every preset, and invalid input is explained.
 
 **Commit:**
 ```
 feat(sandbox): add sandbox sessions with stack operations
+```
+
+### Step 7.2: Bracket checker mini-tool
+**Goal:** the Stack sandbox's "check your own expression" tool (ALGORITHM-CATALOG L5).
+- An expression input on the Stack sandbox that runs `brackets.check` on what the learner types, with the balanced `((5+3)+1)(2+9)` and unbalanced `(()` presets.
+- The sandbox config gains an expression input kind; invalid expressions (empty, too long, too many brackets) are explained like values.
+
+**Done when:** any expression up to the length limit can be checked step by step, and both presets load.
+
+**Commit:**
+```
+feat(sandbox): add bracket checker mini-tool to the stack sandbox
 ```
 
 ---

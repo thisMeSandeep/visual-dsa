@@ -82,7 +82,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── settings/
 │   │   ├── topic/
 │   │   ├── lesson/                 #   player layout, caption, controls
-│   │   ├── sandbox/                #   operation bar, inputs per structure
+│   │   ├── sandbox/                #   Play mode screen, value-input.ts (Zod + engine limits)
 │   │   ├── practice/               #   one topic's quiz
 │   │   ├── chapters/               #   form sheet
 │   │   ├── reference/              #   form sheet
@@ -96,6 +96,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── icon.tsx                #   Phosphor wrapper (token colours)
 │   │   ├── icons.ts                #   icon registry by meaning
 │   │   ├── chip.tsx · progress-bar.tsx · scrubber.tsx · stat-strip.tsx
+│   │   ├── text-field.tsx · caption-text.tsx
 │   │   ├── topic-row.tsx · chapter-row.tsx · continue-card.tsx · feedback-panel.tsx
 │   │   └── topic-glyph/            #   custom category glyphs
 │   │
@@ -120,7 +121,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts
 │   │   ├── algorithms/             #   sorting/, searching/ (P1)
-│   │   ├── lesson/                 #   lesson compiler (recipe → steps)
+│   │   ├── lesson/                 #   lesson compiler (recipe → steps), STRUCTURES
+│   │   ├── sandbox/                #   sandbox session: run, undo, reset, presets
 │   │   └── player/                 #   player state machine (pure reducer)
 │   │
 │   ├── content/                    # DATA: no logic beyond small helpers
@@ -132,6 +134,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   └── hash-table/
 │   │   │       ├── meta.ts         #     title, category, chapters, renderer
 │   │   │       ├── lesson.ts       #     lesson recipe
+│   │   │       ├── sandbox.ts      #     Play mode: operations, presets, stats
 │   │   │       ├── quiz.ts
 │   │   │       ├── reference.ts
 │   │   │       └── code/           #     one sample per language: hash-table.pseudo,
@@ -157,7 +160,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── player.ts               #   step duration, speeds, swipe threshold
 │   │   ├── motion.ts               #   durations, springs, press scale
 │   │   ├── engine.ts               #   step limits, input sizes, value ranges
-│   │   ├── sandbox.ts              #   capacities, undo depth
+│   │   ├── sandbox.ts              #   undo depth
 │   │   ├── practice.ts             #   quiz length, revise-list size
 │   │   ├── storage.ts              #   storage keys, schema versions
 │   │   └── features.ts             #   feature flags
@@ -472,21 +475,24 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 
 ### 6.4 Sandbox
 
-A sandbox session keeps the current model and a history:
+A sandbox session (`engine/sandbox/session.ts`, pure) keeps the current model and a history:
 
 ```ts
-interface SandboxSession {
+type SandboxSession<Model> = {
   model: Model;                  // current structure
-  history: Model[];              // for undo/reset
-  lastTrace?: Trace;             // what the player is showing
-}
+  history: Model[];              // models before each change, for Undo (config.sandbox.historyDepth)
+  initial: Model;                // the preset loaded last, for Reset
+  steps: Step[];                 // what the player shows: the last trace, or the model at rest
+};
+// startSession, applyOperation, undo, reset, loadPreset, canUndo
 ```
 
-1. The user picks an operation and enters input. The input is validated with Zod and checked against the engine limits.
-2. The engine runs that operation **from the current model** and returns a trace.
-3. A player store plays the trace, and the final model becomes the new current model.
-4. Errors (overflow, not found) are steps in the trace with the `error` state (F-606), not alerts.
-5. Presets (empty, full, worst case…) are just initial models defined in the topic's content.
+1. The user picks an operation and enters input. A value is checked with Zod (it must be a number) and then with the engine's `checkValue` (a whole number in `config.engine.valueRange`); a problem is explained under the field (`screens/sandbox/value-input.ts`), never ignored.
+2. The engine runs that operation **from the current model** through `STRUCTURES` (`engine/lesson/structures.ts`, the same registry lessons use) and returns a trace.
+3. A player store plays the trace at the learner's speed, and the final model becomes the new current model. Only a change is remembered for Undo, so a peek or a push that overflowed leaves nothing to undo.
+4. Errors (overflow, underflow, not found) are steps in the trace with the `error` state (F-606), not alerts.
+5. Undo, Reset and loading a preset show the structure at rest (`restingStep`, shared with the lesson compiler) with a caption: the preset's hint, or "Undone". Reset and loading a preset can themselves be undone.
+6. Each topic's `content/topics/<topic>/sandbox.ts` (`SandboxSchema`) names the structure, the operations in button order (the first is the primary action; `input: 'value'` adds the value field and Random), the presets (setup input plus a hint; the first is where the sandbox opens) and the stat strip (keys read from the scene's `meta`, e.g. the stack's `size`, `capacity` and `top`). `validate:content` checks the structure and operations exist and every preset builds.
 
 ### 6.5 Practice
 
@@ -647,7 +653,7 @@ const delay = config.player.baseStepMs / speed;
 | `player.ts` | Base step duration, speed options, default speed, swipe threshold, pause at chapter end |
 | `motion.ts` | Highlight/insert/fade durations, spring configs, press scale, reduced-motion fade |
 | `engine.ts` | Max steps per trace, max input size per structure, allowed value range, default RNG seed |
-| `sandbox.ts` | Default capacities, undo history depth, preset sizes |
+| `sandbox.ts` | Undo history depth (capacities and presets are content, in each topic's `sandbox.ts`) |
 | `navigation.ts` | Form-sheet detents and grabber |
 | `structures.ts` | Per-structure defaults, e.g. stack capacity |
 | `practice.ts` | Questions per quiz, revise-list limit |
@@ -673,7 +679,7 @@ Numbers that are part of an algorithm's definition (heap child index `2i + 1`, `
 | Script | When | Output |
 |---|---|---|
 | `scripts/highlight-code.ts` (`bun run highlight`) | `postinstall`, before `start`/`start:tunnel`/`start:ngrok` and `validate:content`, and by hand after editing a sample. EAS builds run `postinstall` too | `src/content/generated/code-tokens.json` (git-ignored). Fails on an unknown file extension, a missing or second sample for a language, or a line id that isn't kebab-case |
-| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), highlights a code line that a language's sample doesn't mark, or has a `scene` segment whose scene doesn't exist or whose caption count doesn't match the scene's steps |
+| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a sandbox whose structure, operations or presets don't work, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), highlights a code line that a language's sample doesn't mark, or has a `scene` segment whose scene doesn't exist or whose caption count doesn't match the scene's steps |
 
 ---
 

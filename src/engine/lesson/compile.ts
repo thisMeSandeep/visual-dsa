@@ -6,7 +6,7 @@
  */
 import type { Counters, Scene, Step } from '../core/types';
 import type { LessonRecipeInput } from './recipe';
-import { CompileError, STRUCTURES } from './structures';
+import { CompileError, restingStep as rest, STRUCTURES } from './structures';
 import type { CompiledLesson, LessonChapter } from './types';
 
 const ZERO_COUNTERS: Counters = { comparisons: 0, swaps: 0, reads: 0, writes: 0 };
@@ -30,14 +30,7 @@ export function compileLesson(
   /** The current structure drawn at rest, for steps that only change the caption. */
   const restingStep = (caption: Step['caption'], at: string): Step => {
     if (!active) throw new CompileError('Add a setup segment before this one', at);
-    const definition = STRUCTURES[active.name]!;
-    const scene = definition.toScene(active.model);
-    return {
-      scene,
-      caption,
-      counters: steps.at(-1)?.counters ?? ZERO_COUNTERS,
-      a11y: definition.describe(scene),
-    };
+    return rest(STRUCTURES[active.name]!, active.model, caption, steps.at(-1)?.counters);
   };
 
   recipe.segments.forEach((segment, i) => {

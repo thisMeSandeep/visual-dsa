@@ -141,6 +141,49 @@ export type LessonSegment = z.infer<typeof LessonSegmentSchema>;
 export type LessonRecipe = z.infer<typeof LessonRecipeSchema>;
 
 /* ------------------------------------------------------------------------------------------------
+ * Sandbox (F-601–F-606): which structure Play mode drives, its operations, presets and stats.
+ * ---------------------------------------------------------------------------------------------- */
+
+/** What an operation asks for. 'value' is a number typed in or picked at random. */
+export const SANDBOX_INPUTS = ['value'] as const;
+
+export const SandboxSchema = z.strictObject({
+  topicId: IdSchema,
+  /** A structure from engine/lesson/structures.ts (STRUCTURES), e.g. "stack". */
+  structure: IdSchema,
+  /** In button order; the first is the primary action. */
+  operations: z
+    .array(
+      z.strictObject({
+        /** The structure's operation, e.g. "push". */
+        id: z.string().regex(/^[a-zA-Z]+$/, 'Use the operation name, e.g. "push"'),
+        label: TextSchema,
+        input: z.enum(SANDBOX_INPUTS).optional(),
+      }),
+    )
+    .min(1)
+    .refine(hasUniqueIds, 'Operation ids must be unique'),
+  /** Starting states. The first is where the sandbox opens. */
+  presets: z
+    .array(
+      z.strictObject({
+        id: IdSchema,
+        label: TextSchema,
+        /** Setup input for the structure, as in a lesson's setup segment. */
+        input: z.unknown().optional(),
+        /** Shown as the caption when the preset loads: what to try. */
+        hint: TextSchema,
+      }),
+    )
+    .min(1)
+    .refine(hasUniqueIds, 'Preset ids must be unique'),
+  /** The stat strip: values read from the scene's meta, e.g. size and capacity. */
+  stats: z.array(z.strictObject({ label: TextSchema, key: z.string() })).min(1),
+});
+
+export type SandboxConfig = z.infer<typeof SandboxSchema>;
+
+/* ------------------------------------------------------------------------------------------------
  * Quiz (F-701, F-702, F-704)
  * ---------------------------------------------------------------------------------------------- */
 

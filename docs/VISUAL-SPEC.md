@@ -237,7 +237,7 @@ Four tabs: Learn, Practice, Progress, Settings. `background` fill with a top `li
 - **Scrubber:** bar plus a 14px `primary` knob, with mono step numbers at each end.
 
 ### Inputs
-Height 52, `surface-raised` fill, 1.5px `line-input` border, `radius-md`, mono 17 for values. The label sits above in `label` style. Focus: 2px `primary` ring.
+Height 52, `surface-raised` fill, 1.5px `line-input` border, `radius-md`, mono values (`value` style). The label sits above in `label` style. Focus: 2px `primary` ring. Error: 2px `danger` border with the message below in `label` style, `danger` tone. In code: `<TextField label error>` (`src/components/text-field.tsx`).
 
 ### Quiz option tile
 Height 92, `radius-lg`, `surface-raised` with a `line-strong` border. Small "Bucket" label over a mono 28 value. **Correct:** 2px `success` border, `success-soft` fill, success check badge. **Wrong:** 2px `danger` border, `danger-soft` fill, `X` badge.
@@ -370,7 +370,7 @@ These match the concept canvas.
 | **Home** | `display` "Learn" (+ streak chip once streaks exist, P1) → Continue card ("Start here" before any progress) → categories with topic rows → tab bar |
 | **Topic** | Back / reference sheet (bookmark joins in P1) → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
 | **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption` → scrubber → speed · prev · **play** · next · code |
-| **Sandbox** | Back · title · reset → live structure with pointers → stat strip → value input + random → primary action + tinted secondary actions |
+| **Sandbox** | Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → live structure with pointers → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → stat strip → preset pills (current one solid `primary`, others tinted) → value field + round Random button → primary action → tinted secondary actions in one row |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |
 | **Lesson (dark)** | Same as the lesson player, plus the docked code panel with the current line highlighted |
 | **Settings** | `display` "Settings" → sections (`overline` title, `surface` card with `radius-xl`, rows divided by `line` hairlines): Appearance (theme), Lessons (code language, playback speed), Motion and feel (reduce motion, haptics). Each row: `body` label + `label` detail on the left, a native `@expo/ui` picker or switch tinted `primary` on the right → `label` note that everything is saved on this device |

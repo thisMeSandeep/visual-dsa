@@ -19,7 +19,8 @@ export const REJECTED_ID = 'rejected';
 
 /**
  * Stack → scene. Items are cells in index slots, bottom first; a "top" pointer marks the top.
- * Scene meta carries size, capacity and the container's state for the renderer and describe().
+ * Scene meta carries size, capacity, the top value and the container's state for the renderer,
+ * describe() and the sandbox's stat strip.
  */
 export function stackToScene(model: StackModel, annotations: StackAnnotations = {}): Scene {
   const cells: SceneElement[] = model.items.map((item, index) => ({
@@ -57,6 +58,7 @@ export function stackToScene(model: StackModel, annotations: StackAnnotations = 
     meta: {
       size: model.items.length,
       capacity: model.capacity,
+      ...(topItem ? { top: topItem.value } : {}),
       container: annotations.container ?? 'default',
     },
   };

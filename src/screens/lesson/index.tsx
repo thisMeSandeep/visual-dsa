@@ -4,6 +4,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 
 import { AppText } from '@/components/app-text';
+import { CaptionText } from '@/components/caption-text';
 import { IconButton } from '@/components/icon-button';
 import { Scrubber } from '@/components/scrubber';
 import { config } from '@/config';
@@ -33,7 +34,6 @@ import { CodePanel } from '@/viz/code-panel';
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
-import { CaptionText } from './caption-text';
 
 const { swipe } = config.player;
 
