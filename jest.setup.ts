@@ -19,6 +19,8 @@ jest.mock('react-native-reanimated', () => {
     default: Animated,
     ...Animated,
     css: { create: <T>(styles: T) => styles },
+    // Used by Gesture Handler 3 to tell shared values from plain config values.
+    isSharedValue: () => false,
     cubicBezier: () => 'cubic-bezier',
     useReducedMotion: () => false,
   };

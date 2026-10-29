@@ -441,6 +441,13 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 
 **Analogy scenes** (`viz/scenes/`) are small hand-built Skia components for the real-world examples (browser back button, phone book). They receive a scene step index and animate between their own fixed states.
 
+### 6.2b Lesson screen (Step 4.4)
+
+- **Captions:** the engine emits caption keys with params. `content/captions.ts` holds the text for each key, with `{param}` placeholders and `**bold**` for key terms. `captionText` fills a template, and `CaptionText` (`screens/lesson`) draws the bold runs with `<Strong>`. Authored lesson text is used as it is. A test checks that every key a lesson uses has text, with no placeholder left unfilled.
+- **Lessons:** `getLesson(topicId)` (`hooks/use-lesson.ts`) returns a `CompiledLesson` (`engine/lesson/types.ts`: steps plus chapters with their first step), built once and cached. Until Step 5.1 it serves a hard-coded Stack lesson (`engine/lesson/stack-demo.ts`). It's made of real stack traces under the topic's own chapter ids, with a `chapter-end` pause on each chapter's last step. Step 5.1 replaces it with recipes compiled from content.
+- **Gestures (Gesture Handler 3 hook API):** swipe the canvas left/right to step (`usePanGesture`, values in `config.player.swipe`: a 48pt swipe or a fast flick). Drag or tap the scrubber to seek. The scrubber is also an `adjustable` control for screen readers. The app root is wrapped in `GestureHandlerRootView`.
+- **Chapter sheet → lesson:** the sheet is its own route. A chapter pick goes through a small shared store (`stores/lesson-navigation.ts`): the sheet records `{ topicId, chapterId }` and closes, and the open lesson seeks to that chapter's first step and clears the request. This doesn't rely on how route params merge when a sheet is dismissed. The lesson opens the sheet with `current=<chapterId>` so the current chapter is highlighted.
+
 ### 6.3 Code panel
 
 `viz/code-panel/` renders the pre-tokenised lines as native `<Text>` spans and highlights the line that `step.codeLine` resolves to in the selected language. It also shows live `vars` in a small watch row (F-503). It docks below the canvas in portrait and beside it in landscape (F-506).

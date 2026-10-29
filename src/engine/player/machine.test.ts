@@ -3,6 +3,7 @@ import {
   canGoBack,
   canGoForward,
   createPlayerState,
+  nextSpeed,
   playerReducer,
   stepNumber,
   type PlayerAction,
@@ -197,5 +198,16 @@ describe('derived values', () => {
   it('numbers steps from 1', () => {
     expect(stepNumber(createPlayerState({ pauses: steps(70), startIndex: 5 }))).toBe(6);
     expect(stepNumber(createPlayerState({ pauses: [] }))).toBe(0);
+  });
+});
+
+describe('nextSpeed', () => {
+  it('steps through the offered speeds and wraps around', () => {
+    expect(nextSpeed(1)).toBe(1.5);
+    expect(nextSpeed(4)).toBe(0.25);
+  });
+
+  it('falls back to the first offered speed for an unknown one', () => {
+    expect(nextSpeed(3)).toBe(0.25);
   });
 });

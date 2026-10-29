@@ -3,6 +3,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { Lesson } from '@/screens/lesson';
 
 export default function LessonRoute() {
-  const { topicId } = useLocalSearchParams<{ topicId: string }>();
-  return <Lesson topicId={topicId} />;
+  const { topicId, chapter } = useLocalSearchParams<{ topicId: string; chapter?: string }>();
+  return <Lesson topicId={topicId} {...(chapter ? { chapter } : {})} />;
 }

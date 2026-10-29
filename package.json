@@ -65,7 +65,8 @@
     "preset": "jest-expo",
     "setupFiles": [
       "<rootDir>/jest.setup.ts",
-      "@shopify/flash-list/jestSetup"
+      "@shopify/flash-list/jestSetup",
+      "react-native-gesture-handler/jestSetup"
     ],
     "transformIgnorePatterns": [
       "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|phosphor-react-native|uniwind|@shopify/flash-list))",

@@ -5,9 +5,9 @@ import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { IconButton } from '@/components/icon-button';
 import { Scrubber } from '@/components/scrubber';
-import { config } from '@/config';
 import { createRng } from '@/engine/core/rng';
 import type { Trace } from '@/engine/core/types';
+import { nextSpeed } from '@/engine/player/machine';
 import {
   createStack,
   traceStack,
@@ -32,7 +32,6 @@ import { DevHeader } from '../dev-header';
 const CAPACITY = 5;
 const START_VALUES = ['23', '8'];
 const CANVAS_HEIGHT = 380;
-const SPEEDS = config.player.speeds;
 
 /** Dev-only check for Steps 4.2 and 4.3: real stack traces, played by the player store. */
 export function DevStack() {
@@ -70,11 +69,6 @@ export function DevStack() {
     setTrace(traceStack(fresh, { type: 'peek' }).trace);
   };
 
-  const nextSpeed = () => {
-    const at = SPEEDS.indexOf(speed as (typeof SPEEDS)[number]);
-    actions.setSpeed(SPEEDS[(at + 1) % SPEEDS.length] ?? config.player.defaultSpeed);
-  };
-
   return (
     <ScrollView
       className="flex-1 bg-background"
@@ -97,7 +91,12 @@ export function DevStack() {
       <Scrubber current={stepNumber} total={total} />
 
       <View className="flex-row items-center justify-between">
-        <IconButton label="Playback speed" text={`${speed}×`} variant="round" onPress={nextSpeed} />
+        <IconButton
+          label="Playback speed"
+          text={`${speed}×`}
+          variant="round"
+          onPress={() => actions.setSpeed(nextSpeed(speed))}
+        />
         <IconButton
           label="Previous step"
           icon="step-back"

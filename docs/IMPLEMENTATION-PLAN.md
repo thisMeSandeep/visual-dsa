@@ -277,7 +277,7 @@ feat(lesson): build lesson player screen
 
 ### Step 5.1: Lesson compiler
 **Goal:** lessons are recipes compiled into steps (ARCHITECTURE §5.4).
-- `engine/lesson/compile.ts`: handles chapter, trace, say, scene and interactive segments, and captions that override the engine's.
+- `engine/lesson/compile.ts`: handles chapter, trace, say, scene and interactive segments, and captions that override the engine's. It produces the `CompiledLesson` type from Step 4.4, and `getLesson()` switches from the hard-coded `stack-demo.ts` to compiled recipes (then delete the demo).
 - Compiled-lesson snapshot tests, and memoisation on device.
 
 **Done when:** a recipe compiles into the right steps and chapter index, and snapshots catch changes.

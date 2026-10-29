@@ -139,5 +139,11 @@ export const canGoBack = (state: PlayerState) => state.index > 0;
 export const canGoForward = (state: PlayerState) =>
   state.status !== 'awaiting-input' && state.status !== 'ended' && state.totalSteps > 0;
 
+/** The speed the speed button moves to next, wrapping from fastest back to slowest. */
+export function nextSpeed(speed: number): number {
+  const at = SPEEDS.indexOf(speed);
+  return SPEEDS[(at + 1) % SPEEDS.length] ?? config.player.defaultSpeed;
+}
+
 /** 1-based step number for display ("6 / 70"). */
 export const stepNumber = (state: PlayerState) => (state.totalSteps === 0 ? 0 : state.index + 1);

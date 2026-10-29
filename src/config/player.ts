@@ -10,4 +10,13 @@ export const player = {
   defaultSpeed: 1,
   /** Autoplay stops at the last step of each chapter, so a chapter never runs into the next. */
   pauseAtChapterEnd: true,
+  /** Swiping the canvas left/right steps forward/back (F-202). */
+  swipe: {
+    /** Horizontal travel before the swipe takes over from other touches. */
+    activateAfterPx: 12,
+    /** A swipe this long changes the step… */
+    commitPx: 48,
+    /** …and so does a quick flick, whatever its length (points per second). */
+    flickVelocity: 500,
+  },
 } as const;
