@@ -7,7 +7,7 @@ import { Button } from '@/components/button';
 import { CaptionText } from '@/components/caption-text';
 import { IconButton } from '@/components/icon-button';
 import { KeyboardAvoidingView } from '@/components/keyboard-avoiding-view';
-import { PressableScale } from '@/components/pressable-scale';
+import { SegmentedControl } from '@/components/segmented-control';
 import { Scrubber } from '@/components/scrubber';
 import { TextField } from '@/components/text-field';
 import { config } from '@/config';
@@ -198,31 +198,15 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
 
       {/* The dock: every control in one card. */}
       <View className="mx-4 mt-3 mb-safe-offset-3 gap-3 rounded-xl border-hairline border-line-strong bg-surface-raised p-3">
-        <View accessibilityRole="tablist" className="flex-row gap-1 rounded-full bg-surface p-1">
-          {sandbox.presets.map((option) => {
-            const selected = option.id === preset.id;
-            return (
-              <PressableScale
-                key={option.id}
-                accessibilityRole="tab"
-                accessibilityState={{ selected }}
-                accessibilityHint="Loads this starting state"
-                onPress={() => choosePreset(option)}
-                className="flex-1"
-                contentClassName={`h-9 items-center justify-center rounded-full px-2 ${selected ? 'bg-primary-soft' : ''}`}
-              >
-                <AppText
-                  variant="label"
-                  weight={selected ? 'bold' : 'medium'}
-                  tone={selected ? 'primary' : 'ink-2'}
-                  numberOfLines={1}
-                >
-                  {option.label}
-                </AppText>
-              </PressableScale>
-            );
-          })}
-        </View>
+        <SegmentedControl
+          label="Starting state"
+          options={sandbox.presets.map((option) => ({ value: option.id, label: option.label }))}
+          value={preset.id}
+          onChange={(id) => {
+            const next = sandbox.presets.find((option) => option.id === id);
+            if (next) choosePreset(next);
+          }}
+        />
 
         {primary?.input === 'value' ? (
           <View className="flex-row items-start gap-2">

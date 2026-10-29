@@ -31,7 +31,7 @@ All colours are tokens. Components never use raw hex values.
 |---|---|---|---|
 | `background` | `#FAF8F4` | `#1A1917` | Screen background |
 | `surface` | `#F0ECE4` | `#24221F` | Chips, secondary buttons, code panel, context blocks |
-| `surface-raised` | `#FFFDF9` | `#24221F` | Canvas cells/nodes, inputs, quiz tiles |
+| `surface-raised` | `#FFFDF9` | `#2B2925` | Canvas cells/nodes, inputs, quiz tiles, cards (a step above `surface` in dark too, so cards read as layers) |
 | `line` | `#E5E0D6` | `#34312C` | Hairlines (tab bar, stat strips), progress tracks |
 | `line-strong` | `#DDD7CC` | `#3A3631` | Cell/node borders, outline buttons |
 | `line-input` | `#8F877B` | `#6B655C` | Text input borders (≥3:1 for form controls) |
@@ -258,6 +258,9 @@ Bottom panel inset 16, `radius-xl`, `success-soft` (or `danger-soft`) fill. Head
 
 The header holds the language pills on the left (selected: `primary-soft` fill, `primary` label in medium; others: `muted` label) and a ghost **Copy** button on the right, which shows a `Check` for 1.5 s after copying. The round code button in the player controls opens and closes it (active state when open). Docked under the canvas in portrait (at most 240pt tall, the canvas shrinks to fit) and beside it in landscape (half the width).
 
+### Segmented control
+One choice from a few, all visible at once: equal segments on a fully rounded `surface` track (4 padding), each 36 tall; the chosen one is a `primary-soft` pill with a bold `primary` label and, if it has one, a filled `primary` icon; the others have a medium `ink-2` label and a `muted` regular icon. A radio group for screen readers. In code: `<SegmentedControl label options value onChange>` (`src/components/segmented-control.tsx`). Used for settings and the sandbox presets.
+
 ### Chips
 Pill, height 36, tinted fill (e.g. the streak chip: `signal` 12% fill, `Flame` fill icon, mono count, `muted` unit).
 
@@ -383,7 +386,7 @@ These match the concept canvas.
 | **Sandbox** | Portrait. Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → the canvas in a `surface` panel (`radius-xl`) taking most of the screen, with the stats as small pills in its top corner (`label` name + mono `index` value on `surface-raised`, hairline `line` outline) → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → **the dock**: one `surface-raised` card (`radius-xl`, hairline `line-strong` outline, 12 padding, 12 from the screen edges) holding the presets as a segmented control (on a `surface` track; the current one `primary-soft` with a bold `primary` label), the value field with Random inside it next to the primary action, and the other actions as tinted buttons in one row. The dock rises with the keyboard |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |
 | **Lesson (dark)** | Same as the lesson player, plus the code panel beside the canvas with the current line highlighted |
-| **Settings** | `display` "Settings" → sections (`overline` title, `surface` card with `radius-xl`, rows divided by `line` hairlines): Appearance (theme), Lessons (code language, playback speed), Motion and feel (reduce motion, haptics). Each row: `body` label + `label` detail on the left, a native `@expo/ui` picker or switch tinted `primary` on the right → `label` note that everything is saved on this device |
+| **Settings** | `display` "Settings" over a `body-sm` note that changes save as you make them → sections (`overline` title, `surface-raised` card with a hairline `line-strong` outline and `radius-xl`, rows divided by `line` hairlines): Appearance (theme: Device / Light / Dark with icons), Lessons (code language, playback speed, progress bar), Motion and feel (reduce motion, haptics). A choice row has its `body` medium name and `label` hint, with a full-width **segmented control** underneath; an on/off row has a native `@expo/ui` switch (tinted `primary`) on the right |
 
 ---
 

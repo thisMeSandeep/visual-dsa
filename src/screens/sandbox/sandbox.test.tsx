@@ -16,7 +16,7 @@ const renderSandbox = (topicId = 'stack') =>
 const stat = (label: string, value: string) => screen.getByLabelText(`${label}: ${value}`);
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const valueField = () => screen.getByLabelText(/^Value/);
-const preset = (name: string) => fireEvent.press(screen.getByRole('tab', { name }));
+const preset = (name: string) => fireEvent.press(screen.getByRole('radio', { name }));
 
 /** Plays the current trace to its last step. */
 const playToEnd = () =>
@@ -40,7 +40,7 @@ describe('Sandbox', () => {
     expect(stat('Capacity', '5')).toBeOnTheScreen();
     expect(stat('Top', '42')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled();
-    expect(screen.getByRole('tab', { name: 'A few items', selected: true })).toBeOnTheScreen();
+    expect(screen.getByRole('radio', { name: 'A few items', checked: true })).toBeOnTheScreen();
   });
 
   it('pushes a typed value, plays the steps, and can undo it', async () => {

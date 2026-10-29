@@ -1,30 +1,41 @@
-import { Host, Picker, Switch } from '@expo/ui';
+import { Host, Switch } from '@expo/ui';
 import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { TAB_BAR_CLEARANCE } from '@/components/floating-tab-bar';
-import { config } from '@/config';
+import { SegmentedControl, type SegmentOption } from '@/components/segmented-control';
+import { config, type CodeLanguage } from '@/config';
 import { useSettings, type ReducedMotionChoice, type ThemeChoice } from '@/stores/settings';
 import { useActiveTheme, useColor } from '@/theme';
 import { CODE_LANGUAGE_LABELS } from '@/viz/code-panel';
 
-const THEME_LABELS: Record<ThemeChoice, string> = {
-  system: 'Match device',
-  light: 'Light',
-  dark: 'Dark',
-};
+const THEME_OPTIONS: readonly SegmentOption<ThemeChoice>[] = [
+  { value: 'system', label: 'Device', icon: 'theme-system' },
+  { value: 'light', label: 'Light', icon: 'theme-light' },
+  { value: 'dark', label: 'Dark', icon: 'theme-dark' },
+];
 
-const REDUCED_MOTION_LABELS: Record<ReducedMotionChoice, string> = {
-  system: 'Match device',
-  on: 'On',
-  off: 'Off',
-};
+const LANGUAGE_OPTIONS: readonly SegmentOption<CodeLanguage>[] = config.app.codeLanguages.map(
+  (language) => ({ value: language, label: CODE_LANGUAGE_LABELS[language] }),
+);
+
+const SPEED_OPTIONS: readonly SegmentOption<number>[] = config.player.speeds.map((speed) => ({
+  value: speed,
+  label: `${speed}×`,
+}));
+
+const REDUCED_MOTION_OPTIONS: readonly SegmentOption<ReducedMotionChoice>[] = [
+  { value: 'system', label: 'Device' },
+  { value: 'on', label: 'On' },
+  { value: 'off', label: 'Off' },
+];
 
 /**
- * Settings tab (F-1101–F-1104, F-1107). Rows are the app's own design; the controls are native
- * @expo/ui pickers and switches, tinted cobalt and following the app's theme. Every change is
- * saved on the device at once (stores/settings.ts).
+ * Settings tab (F-1101–F-1104, F-1107). Grouped cards in the app's own style: choices are
+ * segmented controls, so every option is visible at once; on/off settings are native @expo/ui
+ * switches, tinted cobalt and following the app's theme. Every change is saved on the device at
+ * once (stores/settings.ts).
  */
 export function Settings() {
   const settings = useSettings();
@@ -37,124 +48,155 @@ export function Settings() {
         className="flex-1"
         contentContainerClassName={`gap-7 px-6 pt-4 ${TAB_BAR_CLEARANCE}`}
       >
-        <AppText variant="display" accessibilityRole="header">
-          Settings
-        </AppText>
+        <View className="gap-1">
+          <AppText variant="display" accessibilityRole="header">
+            Settings
+          </AppText>
+          <AppText variant="body-sm">Saved on this device as you change them.</AppText>
+        </View>
 
         <Section title="Appearance">
-          <Row label="Theme" last>
-            <Picker
-              testID="setting-theme"
-              selectedValue={settings.theme}
-              onValueChange={settings.setTheme}
-            >
-              {Object.entries(THEME_LABELS).map(([value, label]) => (
-                <Picker.Item key={value} value={value as ThemeChoice} label={label} />
-              ))}
-            </Picker>
-          </Row>
+          <ChoiceRow label="Theme" detail="Device follows your phone’s light or dark mode" last>
+            <SegmentedControl
+              label="Theme"
+              options={THEME_OPTIONS}
+              value={settings.theme}
+              onChange={settings.setTheme}
+            />
+          </ChoiceRow>
         </Section>
 
         <Section title="Lessons">
-          <Row label="Code language" detail="The code panel opens in this language">
-            <Picker
-              testID="setting-code-language"
-              selectedValue={settings.codeLanguage}
-              onValueChange={settings.setCodeLanguage}
-            >
-              {config.app.codeLanguages.map((language) => (
-                <Picker.Item
-                  key={language}
-                  value={language}
-                  label={CODE_LANGUAGE_LABELS[language]}
-                />
-              ))}
-            </Picker>
-          </Row>
-          <Row label="Playback speed" detail="Lessons start at this speed" last>
-            <Picker
-              testID="setting-speed"
-              selectedValue={settings.defaultSpeed}
-              onValueChange={settings.setDefaultSpeed}
-            >
-              {config.player.speeds.map((speed) => (
-                <Picker.Item key={speed} value={speed} label={`${speed}×`} />
-              ))}
-            </Picker>
-          </Row>
+          <ChoiceRow label="Code language" detail="The code panel opens in this language">
+            <SegmentedControl
+              label="Code language"
+              options={LANGUAGE_OPTIONS}
+              value={settings.codeLanguage}
+              onChange={settings.setCodeLanguage}
+            />
+          </ChoiceRow>
+          <ChoiceRow label="Playback speed" detail="Lessons start at this speed">
+            <SegmentedControl
+              label="Playback speed"
+              options={SPEED_OPTIONS}
+              value={settings.defaultSpeed}
+              onChange={settings.setDefaultSpeed}
+            />
+          </ChoiceRow>
+          <SwitchRow
+            label="Progress bar"
+            detail="Show the scrubber under the canvas"
+            value={settings.showScrubber}
+            onChange={settings.setShowScrubber}
+            testID="setting-progress-bar"
+            last
+          />
         </Section>
 
         <Section title="Motion and feel">
-          <Row
+          <ChoiceRow
             label="Reduce motion"
             detail="Fade between steps instead of moving"
             last={!config.features.haptics}
           >
-            <Picker
-              testID="setting-reduced-motion"
-              selectedValue={settings.reducedMotion}
-              onValueChange={settings.setReducedMotion}
-            >
-              {Object.entries(REDUCED_MOTION_LABELS).map(([value, label]) => (
-                <Picker.Item key={value} value={value as ReducedMotionChoice} label={label} />
-              ))}
-            </Picker>
-          </Row>
+            <SegmentedControl
+              label="Reduce motion"
+              options={REDUCED_MOTION_OPTIONS}
+              value={settings.reducedMotion}
+              onChange={settings.setReducedMotion}
+            />
+          </ChoiceRow>
           {config.features.haptics ? (
-            <Row label="Haptics" detail="A light tap when you press a button" last>
-              <Switch
-                testID="setting-haptics"
-                value={settings.haptics}
-                onValueChange={settings.setHaptics}
-              />
-            </Row>
+            <SwitchRow
+              label="Haptics"
+              detail="A light tap when you press a button"
+              value={settings.haptics}
+              onChange={settings.setHaptics}
+              testID="setting-haptics"
+              last
+            />
           ) : null}
         </Section>
-
-        <AppText variant="label">Settings and progress are saved on this device only.</AppText>
       </ScrollView>
     </View>
   );
 }
 
+/** A titled card of rows, divided by hairlines. */
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-2">
       <AppText variant="overline" accessibilityRole="header">
         {title}
       </AppText>
-      <View className="overflow-hidden rounded-xl bg-surface">{children}</View>
+      <View className="overflow-hidden rounded-xl border-hairline border-line-strong bg-surface-raised">
+        {children}
+      </View>
     </View>
   );
 }
 
-/** A label on the left and a native control on the right. */
-function Row({
+/** Rows divide themselves with a hairline; the last in a card leaves it off. */
+const rowDivider = (last: boolean) => (last ? '' : 'border-b-hairline border-line');
+
+function RowText({ label, detail }: { label: string; detail: string }) {
+  return (
+    <View className="gap-0.5">
+      <AppText variant="body" weight="medium">
+        {label}
+      </AppText>
+      <AppText variant="label">{detail}</AppText>
+    </View>
+  );
+}
+
+/** A setting with a few choices: its name and a hint, with the choices underneath. */
+function ChoiceRow({
   label,
   detail,
   last = false,
   children,
 }: {
   label: string;
-  detail?: string;
-  /** The last row in its section has no divider below it. */
+  detail: string;
   last?: boolean;
   children: ReactNode;
+}) {
+  return (
+    <View className={`gap-3 px-4 py-4 ${rowDivider(last)}`}>
+      <RowText label={label} detail={detail} />
+      {children}
+    </View>
+  );
+}
+
+/** An on/off setting: its name and a hint, with a native switch on the right. */
+function SwitchRow({
+  label,
+  detail,
+  value,
+  onChange,
+  testID,
+  last = false,
+}: {
+  label: string;
+  detail: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+  testID: string;
+  last?: boolean;
 }) {
   const theme = useActiveTheme();
   const primary = useColor('primary');
 
   return (
-    <View
-      className={`min-h-14 flex-row items-center gap-4 px-4 py-3 ${last ? '' : 'border-b border-line'}`}
-    >
-      <View className="flex-1 gap-0.5">
-        <AppText variant="body">{label}</AppText>
-        {detail ? <AppText variant="label">{detail}</AppText> : null}
+    <View className={`flex-row items-center gap-4 px-4 py-4 ${rowDivider(last)}`}>
+      <View className="flex-1">
+        <RowText label={label} detail={detail} />
       </View>
       {/* Native controls follow the app's theme (which may differ from the device's). */}
       <Host matchContents colorScheme={theme} seedColor={primary}>
-        {children}
+        <Switch testID={testID} value={value} onValueChange={onChange} />
       </Host>
     </View>
   );

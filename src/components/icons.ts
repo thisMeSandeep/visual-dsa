@@ -15,15 +15,18 @@ import { ChartLineUpIcon } from 'phosphor-react-native/src/icons/ChartLineUp';
 import { CheckIcon } from 'phosphor-react-native/src/icons/Check';
 import { CodeIcon } from 'phosphor-react-native/src/icons/Code';
 import { CopyIcon } from 'phosphor-react-native/src/icons/Copy';
+import { DeviceMobileIcon } from 'phosphor-react-native/src/icons/DeviceMobile';
 import { FlameIcon } from 'phosphor-react-native/src/icons/Flame';
 import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { GraduationCapIcon } from 'phosphor-react-native/src/icons/GraduationCap';
 import { LightbulbIcon } from 'phosphor-react-native/src/icons/Lightbulb';
 import { ListNumbersIcon } from 'phosphor-react-native/src/icons/ListNumbers';
+import { MoonIcon } from 'phosphor-react-native/src/icons/Moon';
 import { PauseIcon } from 'phosphor-react-native/src/icons/Pause';
 import { PlayIcon } from 'phosphor-react-native/src/icons/Play';
 import { ShuffleIcon } from 'phosphor-react-native/src/icons/Shuffle';
 import { SlidersHorizontalIcon } from 'phosphor-react-native/src/icons/SlidersHorizontal';
+import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 
 /* VISUAL-SPEC §5 */
@@ -51,6 +54,10 @@ export const ICONS = {
   practice: GraduationCapIcon,
   progress: ChartLineUpIcon,
   settings: GearIcon,
+  // Settings: theme
+  'theme-system': DeviceMobileIcon,
+  'theme-light': SunIcon,
+  'theme-dark': MoonIcon,
   // Status
   bookmark: BookmarkSimpleIcon,
   streak: FlameIcon,

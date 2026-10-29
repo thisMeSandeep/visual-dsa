@@ -82,7 +82,7 @@
       /* Neutrals */
       --color-background: #1a1917;
       --color-surface: #24221f;
-      --color-surface-raised: #24221f;
+      --color-surface-raised: #2b2925; /* a step above surface, so cards read as layers */
       --color-line: #34312c;
       --color-line-strong: #3a3631;
       --color-line-input: #6b655c;
