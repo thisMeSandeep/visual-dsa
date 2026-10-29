@@ -217,9 +217,10 @@ Phosphor is clean and minimal, but much less common than Lucide, which has becom
 | `light` / `thin` / `bold` | Not used, to keep the set small and consistent |
 
 **Rules**
-- **Import each icon from its own file**, e.g. `import { Play } from 'phosphor-react-native/src/icons/Play'`. Importing from the package root pulls in all 1,442 icons, because Metro doesn't reliably drop unused exports. The package's `exports` map supports these per-icon paths.
-- Every icon the app uses is re-exported from one file (`components/icons.ts`), so the set we use is visible in one place.
-- All icons go through one `<Icon>` wrapper with a fixed size scale (16/20/24) and theme colours. Phosphor's `IconContext` sets the default weight and colour app-wide.
+- **Import each icon from its own file**, e.g. `import { PlayIcon } from 'phosphor-react-native/src/icons/Play'` (the `*Icon` names; plain `Play` is deprecated). Importing from the package root pulls in all 1,442 icons, because Metro doesn't reliably drop unused exports. A bundle check (Step 1.3) confirmed that only the registered icons ship.
+- **Icons are registered by meaning** in `src/components/icons.ts` (`close`, `chapters`, `step-forward`, `streak`, `done`…). App code writes `<Icon name="chapters" />` and never imports Phosphor directly, so changing an icon, or the whole library, happens in that one file.
+- **`<Icon name size tone weight label>`** (`src/components/icon.tsx`): sizes `xs` 18 / `sm` 20 / `md` 22 / `lg` 24 come from tokens, and the colour is a colour token. Icons are decorative (hidden from screen readers) unless a `label` is passed.
+- **Jest:** Phosphor ships untranspiled TSX, so it's added to `transformIgnorePatterns` in `package.json`, alongside `uniwind`.
 - **Topic card illustrations** (array boxes, linked-list chain, LIFO/FIFO) are **custom SVG/Skia artwork**, not library icons. They are part of the app's visual identity.
 - **Maintenance note:** the last release was April 2026. Icons are static SVGs and the peer dependencies are loose, so this is low risk. Check it still installs when the Expo SDK is upgraded.
 

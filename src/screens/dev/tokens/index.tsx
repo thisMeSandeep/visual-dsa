@@ -2,6 +2,9 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, View } from 'react-native';
 
 import { AppText, Strong, TEXT_VARIANTS, type TextVariant } from '@/components/app-text';
+import { Icon } from '@/components/icon';
+import { ICON_NAMES } from '@/components/icons';
+import { TopicGlyph, type GlyphName, type TopicCategory } from '@/components/topic-glyph';
 import {
   THEME_PREFERENCES,
   setThemePreference,
@@ -86,6 +89,16 @@ const TYPE_SAMPLES: Record<TextVariant, string> = {
   index: '0  1  2  3  4  5',
 };
 
+/** Each MVP topic's glyph in its category colour. */
+const TOPIC_GLYPHS: { glyph: GlyphName; category: TopicCategory; title: string }[] = [
+  { glyph: 'big-o', category: 'foundations', title: 'Big O' },
+  { glyph: 'array', category: 'linear', title: 'Array' },
+  { glyph: 'linked-list', category: 'linear', title: 'Linked List' },
+  { glyph: 'stack', category: 'linear', title: 'Stack' },
+  { glyph: 'queue', category: 'linear', title: 'Queue' },
+  { glyph: 'hash-table', category: 'hashing', title: 'Hash Table' },
+];
+
 const THEME_LABELS: Record<ThemePreference, string> = {
   system: 'System',
   light: 'Light',
@@ -135,6 +148,50 @@ export function DevTokens() {
             </Pressable>
           );
         })}
+      </View>
+
+      <View className="gap-4">
+        <AppText variant="overline">Topic glyphs</AppText>
+        {TOPIC_GLYPHS.map((item) => (
+          <View key={item.glyph} className="flex-row items-center gap-4">
+            <TopicGlyph glyph={item.glyph} category={item.category} />
+            <AppText variant="body" weight="medium">
+              {item.title}
+            </AppText>
+          </View>
+        ))}
+      </View>
+
+      <View className="gap-4">
+        <AppText variant="overline">Icons</AppText>
+        <View className="flex-row flex-wrap gap-4">
+          {ICON_NAMES.map((name) => (
+            <View key={name} className="w-16 items-center gap-1">
+              <Icon name={name} size="lg" />
+              <AppText variant="index">{name}</AppText>
+            </View>
+          ))}
+        </View>
+        <AppText variant="label">Weights: regular · fill · duotone</AppText>
+        <View className="flex-row gap-6">
+          <Icon name="bookmark" size="lg" />
+          <Icon name="bookmark" size="lg" weight="fill" tone="primary" />
+          <Icon name="predict" size="lg" weight="duotone" tone="mode-practice" />
+        </View>
+        <AppText variant="label">Sizes: xs · sm · md · lg</AppText>
+        <View className="flex-row items-end gap-6">
+          <Icon name="play" size="xs" weight="fill" />
+          <Icon name="play" size="sm" weight="fill" />
+          <Icon name="play" size="md" weight="fill" />
+          <Icon name="play" size="lg" weight="fill" />
+        </View>
+        <AppText variant="label">Tones: streak · done · tab active · tab inactive</AppText>
+        <View className="flex-row gap-6">
+          <Icon name="streak" size="lg" weight="fill" tone="signal" />
+          <Icon name="done" size="lg" tone="success" label="Completed" />
+          <Icon name="learn" size="lg" weight="fill" tone="primary" />
+          <Icon name="practice" size="lg" tone="muted" />
+        </View>
       </View>
 
       <View className="gap-4">

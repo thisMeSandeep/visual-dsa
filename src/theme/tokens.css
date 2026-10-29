@@ -225,6 +225,11 @@
   --icon-sm: 20px; /* small icon buttons */
   --icon-md: 22px; /* headers */
   --icon-lg: 24px; /* tab bar */
+  --icon-duotone-opacity: 0.2; /* second tone of duotone icons */
+
+  /* Topic glyphs: custom line drawings on a 24 grid, drawn in the category colour */
+  --glyph-size: 30px;
+  --glyph-stroke: 1.7px;
 
   /* Touch */
   --touch-min: 44px;

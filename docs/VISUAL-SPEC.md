@@ -162,18 +162,21 @@ Sizes and line heights are in points. These are the exact values in `src/theme/t
 - **No background tiles.** Icons sit directly on the surface.
 - **Topic glyphs:** custom line drawings on a 24 grid with a 1.7 stroke, rounded joins, drawn at 30px in the category colour. They show the structure itself (boxes in a row, chained boxes, stacked bars, bucket column).
 
-| Need | Phosphor icon |
-|---|---|
-| Close / back | `X`, `CaretLeft` |
-| Chapters | `ListNumbers` |
-| Play / pause / step | `Play` (fill), `Pause` (fill), `CaretLeft`, `CaretRight` |
-| Code panel | `Code` |
-| Reset / random | `ArrowCounterClockwise`, `Shuffle` |
-| Bookmark | `BookmarkSimple` |
-| Tabs | `BookOpen` (Learn), `GraduationCap` (Practice), `ChartLineUp` (Progress), `Gear` (Settings) |
-| Streak | `Flame` (fill, `signal`) |
-| Done / correct | `Check` (`success`) |
-| Prediction prompt | `Lightbulb` (fill, violet) |
+Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
+
+| Need | `name` | Phosphor icon |
+|---|---|---|
+| Close / back | `close`, `back` | `X`, `CaretLeft` |
+| Chapters | `chapters` | `ListNumbers` |
+| Play / pause / step | `play`, `pause` (fill), `step-back`, `step-forward` | `Play`, `Pause`, `CaretLeft`, `CaretRight` |
+| Code panel / copy | `code`, `copy` | `Code`, `Copy` |
+| Reference sheet | `reference` | `BookOpen` |
+| Reset / undo / random | `reset`, `undo`, `random` | `ArrowCounterClockwise`, `ArrowUUpLeft`, `Shuffle` |
+| Bookmark | `bookmark` | `BookmarkSimple` |
+| Tabs | `learn`, `practice`, `progress`, `settings` | `BookOpen`, `GraduationCap`, `ChartLineUp`, `Gear` |
+| Streak | `streak` (fill, `signal`) | `Flame` |
+| Done / incorrect | `done` (`success`), `incorrect` (`danger`) | `Check`, `X` |
+| Prediction prompt | `predict` (fill or duotone, violet) | `Lightbulb` |
 
 ---
 

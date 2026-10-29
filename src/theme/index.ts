@@ -106,8 +106,18 @@ const ICON_SIZE_VARS = {
   lg: '--icon-lg',
 } as const;
 
+const ICON_STYLE_VARS = {
+  duotoneOpacity: '--icon-duotone-opacity',
+} as const;
+
+const GLYPH_VARS = {
+  size: '--glyph-size',
+  strokeWidth: '--glyph-stroke',
+} as const;
+
 export type VizSizes = Record<keyof typeof VIZ_SIZE_VARS, number>;
 export type IconSize = keyof typeof ICON_SIZE_VARS;
+export type GlyphStyle = Record<keyof typeof GLYPH_VARS, number>;
 
 /** Turns `46`, `'46px'` or `'0.4'` into a number. Missing or unparsable values become 0. */
 function toNumber(value: string | number | undefined): number {
@@ -134,6 +144,18 @@ export function useVizSizes(): VizSizes {
 export function useIconSizes(): Record<IconSize, number> {
   const values = useCSSVariable(Object.values(ICON_SIZE_VARS)) as (string | number | undefined)[];
   return readSizes(ICON_SIZE_VARS, values);
+}
+
+/** Non-size icon styling (duotone second-tone opacity). */
+export function useIconStyle(): Record<keyof typeof ICON_STYLE_VARS, number> {
+  const values = useCSSVariable(Object.values(ICON_STYLE_VARS)) as (string | number | undefined)[];
+  return readSizes(ICON_STYLE_VARS, values);
+}
+
+/** Size and stroke width of the custom topic glyphs. */
+export function useGlyphStyle(): GlyphStyle {
+  const values = useCSSVariable(Object.values(GLYPH_VARS)) as (string | number | undefined)[];
+  return readSizes(GLYPH_VARS, values);
 }
 
 /* ------------------------------------------------------------------------------------------------
