@@ -5,6 +5,7 @@ import { AppText } from '@/components/app-text';
 import { ChapterRow } from '@/components/chapter-row';
 import { getTopicMeta } from '@/content/registry';
 import { getLesson } from '@/hooks/use-lesson';
+import { useTopicProgress } from '@/hooks/use-topic-progress';
 import { useLessonNavigation } from '@/stores/lesson-navigation';
 
 /** Chapter index, presented as a form sheet over the lesson (F-203). */
@@ -12,6 +13,7 @@ export function Chapters({ topicId, current }: { topicId: string; current?: stri
   const meta = getTopicMeta(topicId);
   const lesson = getLesson(topicId);
   const requestChapter = useLessonNavigation((state) => state.requestChapter);
+  const { completedChapterIds } = useTopicProgress(topicId);
 
   const jumpTo = (chapterId: string) => {
     requestChapter(topicId, chapterId);
@@ -38,7 +40,13 @@ export function Chapters({ topicId, current }: { topicId: string; current?: stri
               // Numbered as on the Topic screen, so "Chapter 6" means the same thing everywhere.
               number={meta.chapters.findIndex((c) => c.id === chapter.id) + 1}
               title={chapter.title}
-              state={chapter.id === current ? 'current' : 'upcoming'}
+              state={
+                chapter.id === current
+                  ? 'current'
+                  : completedChapterIds.includes(chapter.id)
+                    ? 'done'
+                    : 'upcoming'
+              }
               onPress={() => jumpTo(chapter.id)}
             />
           ))}

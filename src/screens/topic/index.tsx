@@ -9,7 +9,7 @@ import { StatStrip } from '@/components/stat-strip';
 import { CATEGORY_TEXT_TONE, TopicGlyph } from '@/components/topic-glyph';
 import { getTopicMeta } from '@/content/registry';
 import { CATEGORY_LABELS, type TopicMeta } from '@/content/schema';
-import { chapterState, useTopicProgress } from '@/hooks/use-topic-progress';
+import { chapterState, completedCount, useTopicProgress } from '@/hooks/use-topic-progress';
 
 /** Topic detail: what it is, how it scales, the three modes and the chapters (F-102). */
 export function Topic({ topicId }: { topicId: string }) {
@@ -19,10 +19,9 @@ export function Topic({ topicId }: { topicId: string }) {
 
 function TopicDetail({ meta }: { meta: TopicMeta }) {
   const progress = useTopicProgress(meta.id);
-  const completed = meta.chapters.filter((chapter) =>
-    progress.completedChapterIds.includes(chapter.id),
-  ).length;
-  const started = completed > 0 || progress.current !== undefined;
+  const completed = completedCount(meta, progress);
+  const finished = completed === meta.chapters.length;
+  const started = completed > 0 || progress.resume !== undefined;
   const topicId = meta.id;
 
   const openLesson = (chapter?: string) =>
@@ -65,11 +64,13 @@ function TopicDetail({ meta }: { meta: TopicMeta }) {
       <StatStrip items={meta.complexity} />
 
       <View className="gap-3">
+        {/* With no chapter, the lesson resumes where the learner left off. A finished topic is
+            reviewed from the start. */}
         <Button
-          label={started ? 'Continue lesson' : 'Start lesson'}
+          label={finished ? 'Review lesson' : started ? 'Continue lesson' : 'Start lesson'}
           icon="play"
           iconWeight="fill"
-          onPress={() => openLesson(progress.current?.chapterId)}
+          onPress={() => openLesson(finished ? meta.chapters[0]?.id : undefined)}
         />
         <View className="flex-row gap-3">
           <Button
@@ -109,8 +110,8 @@ function TopicDetail({ meta }: { meta: TopicMeta }) {
             title={chapter.title}
             state={chapterState(chapter.id, progress)}
             currentLabel={
-              progress.current?.chapterId === chapter.id
-                ? `Step ${progress.current.step}`
+              progress.resume?.chapterId === chapter.id
+                ? `Step ${progress.resume.step} of ${progress.resume.chapterSteps}`
                 : undefined
             }
             onPress={() => openLesson(chapter.id)}

@@ -7,9 +7,15 @@ import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { ContinueCard } from '@/components/continue-card';
 import { TopicRow } from '@/components/topic-row';
-import { TOPICS, topicsByCategory } from '@/content/registry';
+import { getTopicMeta, TOPICS, topicsByCategory } from '@/content/registry';
 import { CATEGORY_LABELS, type TopicCategory, type TopicMeta } from '@/content/schema';
-import { topicStatus, useTopicProgress } from '@/hooks/use-topic-progress';
+import {
+  completedCount,
+  topicProgress,
+  topicStatus,
+  useTopicProgress,
+} from '@/hooks/use-topic-progress';
+import { useProgress } from '@/stores/progress';
 
 import { chapterCount } from '@/utils/format';
 
@@ -60,30 +66,51 @@ function HomeHeader() {
       <AppText variant="display" accessibilityRole="header">
         Learn
       </AppText>
-      <StartCard />
+      <ContinueOrStartCard />
     </View>
   );
 }
 
-/**
- * "Start here" points at the first topic until there's progress; then it becomes the
- * Continue card (Step 6.2).
- */
-function StartCard() {
-  const first = TOPICS[0];
-  if (!first) return null;
+const openLesson = (topicId: string) =>
+  router.push({ pathname: '/topic/[topicId]/learn', params: { topicId } });
 
+/**
+ * "Continue" resumes the lesson that was open last, at the saved step (F-104). Before any
+ * progress, or once that topic is finished, it's a "Start here" card for the first topic in
+ * Home order that isn't finished yet.
+ */
+function ContinueOrStartCard() {
+  const topics = useProgress((state) => state.topics);
+  const lastTopicId = useProgress((state) => state.lastTopicId);
+
+  const last = lastTopicId ? getTopicMeta(lastTopicId) : undefined;
+  const lastProgress = last ? topicProgress(last.id, topics[last.id]) : undefined;
+  if (last && lastProgress?.resume && topicStatus(last, lastProgress).kind !== 'done') {
+    const { chapterTitle, step, chapterSteps } = lastProgress.resume;
+    return (
+      <ContinueCard
+        title={last.title}
+        position={`${chapterTitle} · step ${step} of ${chapterSteps}`}
+        progress={completedCount(last, lastProgress) / last.chapters.length}
+        onPress={() => openLesson(last.id)}
+      />
+    );
+  }
+
+  const next =
+    TOPICS.find(
+      (topic) => topicStatus(topic, topicProgress(topic.id, topics[topic.id])).kind !== 'done',
+    ) ?? TOPICS[0];
+  if (!next) return null;
   return (
     <ContinueCard
       overline="Start here"
       actionLabel="Start"
-      title={first.title}
-      position={`${chapterCount(first.chapters.length)} · ${first.summary}`}
+      title={next.title}
+      position={`${chapterCount(next.chapters.length)} · ${next.summary}`}
       progress={0}
-      accessibilityHint="Opens the first lesson"
-      onPress={() =>
-        router.push({ pathname: '/topic/[topicId]/learn', params: { topicId: first.id } })
-      }
+      accessibilityHint="Opens the lesson"
+      onPress={() => openLesson(next.id)}
     />
   );
 }

@@ -43,3 +43,44 @@ describe('progress store', () => {
     expect(parseProgress({ topics: 'all' })).toEqual(EMPTY_PROGRESS);
   });
 });
+
+describe('progress actions', () => {
+  // Loaded here so the launch tests above get a fresh module each time.
+  const { useProgress } = require('./progress') as typeof import('./progress');
+
+  beforeEach(() => useProgress.setState({ topics: {}, lastTopicId: undefined }));
+
+  it('saves the position and remembers the topic to continue', async () => {
+    useProgress.getState().savePosition('stack', { chapterId: 'lifo', offset: 3 });
+    expect(useProgress.getState()).toMatchObject({
+      lastTopicId: 'stack',
+      topics: { stack: { completedChapters: [], last: { chapterId: 'lifo', offset: 3 } } },
+    });
+    await Promise.resolve();
+    expect(JSON.parse(Storage.getItemSync(config.storage.keys.progress) ?? '{}').state).toEqual({
+      lastTopicId: 'stack',
+      topics: { stack: { completedChapters: [], last: { chapterId: 'lifo', offset: 3 } } },
+    });
+  });
+
+  it('skips the save when the position has not changed', () => {
+    const { savePosition } = useProgress.getState();
+    savePosition('stack', { chapterId: 'lifo', offset: 3 });
+    const before = useProgress.getState().topics;
+    savePosition('stack', { chapterId: 'lifo', offset: 3 });
+    expect(useProgress.getState().topics).toBe(before);
+  });
+
+  it('completes each chapter once, keeping the position', () => {
+    const { savePosition, completeChapter } = useProgress.getState();
+    savePosition('stack', { chapterId: 'lifo', offset: 7 });
+    completeChapter('stack', 'lifo');
+    completeChapter('stack', 'lifo');
+    completeChapter('queue', 'fifo');
+    expect(useProgress.getState().topics).toEqual({
+      stack: { completedChapters: ['lifo'], last: { chapterId: 'lifo', offset: 7 } },
+      queue: { completedChapters: ['fifo'] },
+    });
+    expect(useProgress.getState().lastTopicId).toBe('stack');
+  });
+});

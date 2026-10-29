@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
+import { useProgress } from '@/stores/progress';
+
 import { Topic } from '.';
 
 jest.mock('expo-router', () => ({
@@ -8,7 +10,10 @@ jest.mock('expo-router', () => ({
 }));
 
 describe('Topic', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useProgress.setState({ topics: {}, lastTopicId: undefined });
+  });
 
   it('shows the topic from content', async () => {
     await render(<Topic topicId="hash-table" />);
@@ -70,5 +75,52 @@ describe('Topic', () => {
     expect(screen.getByRole('header', { name: 'Topic not found' })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Back to Learn' }));
     expect(router.replace).toHaveBeenCalledWith('/');
+  });
+
+  it('shows saved progress: done chapters, the one to continue, and Continue', async () => {
+    useProgress.setState({
+      topics: {
+        stack: { completedChapters: ['lifo'], last: { chapterId: 'push-pop-peek', offset: 2 } },
+      },
+    });
+    await render(<Topic topicId="stack" />);
+    expect(screen.getByText('1 of 6')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Chapter 1, Last in, first out, completed' }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Chapter 2, Push, pop and peek, in progress' }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('Step 3 of 6')).toBeOnTheScreen();
+
+    // Continue resumes: no chapter, so the lesson opens at the saved step.
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue lesson' }));
+    expect(router.push).toHaveBeenLastCalledWith({
+      pathname: '/topic/[topicId]/learn',
+      params: { topicId: 'stack' },
+    });
+  });
+
+  it('offers a review from the start once every chapter is done', async () => {
+    useProgress.setState({
+      topics: {
+        stack: {
+          completedChapters: [
+            'lifo',
+            'push-pop-peek',
+            'browser-back',
+            'parentheses',
+            'implementations',
+            'overflow-underflow',
+          ],
+        },
+      },
+    });
+    await render(<Topic topicId="stack" />);
+    await fireEvent.press(screen.getByRole('button', { name: 'Review lesson' }));
+    expect(router.push).toHaveBeenLastCalledWith({
+      pathname: '/topic/[topicId]/learn',
+      params: { topicId: 'stack', chapter: 'lifo' },
+    });
   });
 });

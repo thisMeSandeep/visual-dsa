@@ -516,6 +516,9 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 - **Settings in use:** the root layout applies `theme` with `setThemePreference` (Uniwind). The lesson player starts at `defaultSpeed` and opens the code panel in `codeLanguage`; changing either in a lesson saves it as the new default (F-1102, F-1103). `hooks/use-reduced-motion.ts` combines the device setting with the `reducedMotion` override (`system` / `on` / `off`), and every animated component uses it instead of Reanimated's `useReducedMotion`. `haptics` gates `PressableScale`'s haptic, on top of `config.features.haptics` (still off, P1); the Settings row only shows when that flag is on.
 - **Settings screen** (`screens/settings`): grouped rows in the app's own style (`surface` cards, `overline` section titles) with native `@expo/ui` controls on the right: `Picker` (menu) for theme, code language, playback speed and reduced motion, `Switch` for haptics. Each control sits in a `Host` with `colorScheme` set to the app's active theme (it may differ from the device's) and `seedColor` set to `primary`.
 - Progress is keyed by **topic id and chapter id**, never by step index, so editing a lesson (adding steps) doesn't break saved progress. "Continue" stores the chapter id plus the offset within that chapter.
+- **Recording (Step 6.2):** the lesson player saves `{ chapterId, offset }` on every step (`savePosition`, which also sets `lastTopicId` and skips unchanged saves) and completes a chapter when the learner reaches its last step (`completeChapter`). Position maths is pure and tested in `engine/lesson/position.ts` (`positionAt`, `isChapterEnd`, `resumeIndex`, `startIndex`).
+- **Resuming:** a lesson opened without `chapter` or `step` resumes at the saved position. `resumeIndex` clamps the offset to the chapter (lessons can get shorter), and moves a learner who stopped on a chapter's last step on to the next chapter. A saved chapter that no longer exists means "start from the beginning".
+- **Reading:** `hooks/use-topic-progress.ts` turns the saved data into what screens show (`topicProgress`: completed ids plus a `resume` point with chapter title and "step x of y"; `topicStatus`, `chapterState`, `completedCount`, which ignores chapter ids the topic no longer has). Home's card is **Continue** for `lastTopicId` while that topic is unfinished, otherwise **Start here** for the first unfinished topic in Home order. The Topic screen's button is Start, Continue (resumes) or Review (a finished topic, from chapter 1). The chapter sheet marks finished chapters.
 
 ---
 
@@ -526,7 +529,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | `/` | Home (`screens/home`) | Tab "Learn" |
 | `/practice`, `/progress`, `/settings` | `screens/practice-hub`, `progress`, `settings` | Tabs |
 | `/topic/[topicId]` | Topic detail | Stack push |
-| `/topic/[topicId]/learn?step=N` | Lesson player | Stack push (full screen) |
+| `/topic/[topicId]/learn` (`?chapter=<id>`, `?step=N`) | Lesson player: resumes by default; `chapter` opens a chapter, `step` (1-based) opens a step and wins over both | Stack push (full screen) |
 | `/topic/[topicId]/play` | Sandbox | Stack push |
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
 | `/topic/[topicId]/chapters` | Chapter index | Form sheet |

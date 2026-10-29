@@ -335,8 +335,8 @@ feat(stores): add persisted settings and progress stores
 
 ### Step 6.2: Progress tracking and resume
 **Goal:** "Continue where you left off" (F-104, F-1001).
-- Record chapter completion and the last position (chapter id + offset).
-- Home's Continue card and the topic progress counts read real data. `learn?step=N` deep links work.
+- Record chapter completion and the last position (chapter id + offset). A chapter is complete when the learner reaches its last step.
+- Home's Continue card and the topic progress counts read real data. `learn?step=N` deep links work. A lesson opened without a chapter or step resumes; stopping on a chapter's last step resumes at the next chapter.
 
 **Done when:** you can quit mid-lesson, relaunch, and resume at the same step.
 

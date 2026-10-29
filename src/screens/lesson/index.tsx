@@ -10,10 +10,12 @@ import { config } from '@/config';
 import { getCodeSample } from '@/content/code';
 import { getTopicMeta } from '@/content/registry';
 import type { TopicMeta } from '@/content/schema';
+import { isChapterEnd, positionAt, startIndex as openingIndex } from '@/engine/lesson/position';
 import { chapterAt, type CompiledLesson } from '@/engine/lesson/types';
 import { nextSpeed } from '@/engine/player/machine';
 import { getLesson } from '@/hooks/use-lesson';
 import { useLessonNavigation } from '@/stores/lesson-navigation';
+import { useProgress } from '@/stores/progress';
 import { useSettings } from '@/stores/settings';
 import {
   playerActions,
@@ -36,7 +38,15 @@ import { CaptionText } from './caption-text';
 const { swipe } = config.player;
 
 /** Lesson player (F-201, F-202, F-203, F-205, F-401–F-403) with the code panel (F-501–F-506). */
-export function Lesson({ topicId, chapter }: { topicId: string; chapter?: string }) {
+export type LessonProps = {
+  topicId: string;
+  /** Start at this chapter's first step. */
+  chapter?: string;
+  /** Start at this step, 1-based (`learn?step=N`). Without either, the lesson resumes. */
+  step?: number;
+};
+
+export function Lesson({ topicId, chapter, step }: LessonProps) {
   const meta = getTopicMeta(topicId);
   const lesson = getLesson(topicId);
 
@@ -53,19 +63,28 @@ export function Lesson({ topicId, chapter }: { topicId: string; chapter?: string
       />
     );
   }
-  return <LessonPlayer meta={meta} lesson={lesson} startChapter={chapter} />;
+  return <LessonPlayer meta={meta} lesson={lesson} startChapter={chapter} startStep={step} />;
 }
 
 function LessonPlayer({
   meta,
   lesson,
   startChapter,
+  startStep,
 }: {
   meta: TopicMeta;
   lesson: CompiledLesson;
   startChapter?: string;
+  startStep?: number;
 }) {
-  const startIndex = lesson.chapters.find((c) => c.id === startChapter)?.firstStep ?? 0;
+  // Decided once, when the lesson opens: later saves mustn't move the player.
+  const [startIndex] = useState(() =>
+    openingIndex(lesson, {
+      ...(startStep === undefined ? {} : { step: startStep }),
+      ...(startChapter === undefined ? {} : { chapterId: startChapter }),
+      ...withSaved(useProgress.getState().topics[meta.id]?.last),
+    }),
+  );
   // Lessons start at the learner's speed; changing it here makes it their new default (F-1103).
   const defaultSpeed = useSettings((state) => state.defaultSpeed);
   const setDefaultSpeed = useSettings((state) => state.setDefaultSpeed);
@@ -81,6 +100,16 @@ function LessonPlayer({
   const canBack = useCanGoBack(player);
   const canForward = useCanGoForward(player);
   const chapter = chapterAt(lesson, index);
+
+  // Save where the learner is on every step, and complete a chapter on reaching its last step
+  // (F-104, F-1001). Positions are a chapter id plus an offset, so lesson edits don't break them.
+  useEffect(() => {
+    const position = positionAt(lesson, index);
+    if (!position) return;
+    const { savePosition, completeChapter } = useProgress.getState();
+    savePosition(meta.id, position);
+    if (isChapterEnd(lesson, index)) completeChapter(meta.id, position.chapterId);
+  }, [index, lesson, meta.id]);
 
   // A chapter picked in the chapter sheet.
   const request = useLessonNavigation((state) => state.chapterRequest);
@@ -224,3 +253,7 @@ function LessonPlayer({
     </View>
   );
 }
+
+/** The saved position as an optional field (exactOptionalPropertyTypes-friendly). */
+const withSaved = (saved: { chapterId: string; offset: number } | undefined) =>
+  saved ? { saved } : {};

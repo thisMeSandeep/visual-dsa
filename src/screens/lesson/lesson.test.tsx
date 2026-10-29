@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useLessonNavigation } from '@/stores/lesson-navigation';
+import { useProgress } from '@/stores/progress';
 import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
 
 import { Lesson } from '.';
@@ -22,6 +23,7 @@ describe('Lesson player', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useSettings.setState(DEFAULT_SETTINGS);
+    useProgress.setState({ topics: {}, lastTopicId: undefined });
   });
 
   it('opens on the first step with its caption and position', async () => {
@@ -120,6 +122,44 @@ describe('Lesson player', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Hide code' }));
     expect(screen.queryByRole('tab', { name: 'JavaScript' })).toBeNull();
+  });
+
+  it('saves where the learner is, and completes a chapter at its last step', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    expect(useProgress.getState()).toMatchObject({
+      lastTopicId: 'stack',
+      topics: { stack: { last: { chapterId: 'lifo', offset: 0 }, completedChapters: [] } },
+    });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Next step' }));
+    expect(useProgress.getState().topics.stack?.last).toEqual({ chapterId: 'lifo', offset: 1 });
+
+    // The lifo chapter ends at step 8.
+    const scrubber = screen.getByRole('adjustable');
+    for (let i = 0; i < 6; i++) {
+      await fireEvent(scrubber, 'accessibilityAction', {
+        nativeEvent: { actionName: 'increment' },
+      });
+    }
+    expect(screen.getByLabelText(/^Step 8 of \d+$/)).toBeOnTheScreen();
+    expect(useProgress.getState().topics.stack?.completedChapters).toEqual(['lifo']);
+  });
+
+  it('resumes at the saved step', async () => {
+    useProgress.setState({
+      topics: { stack: { completedChapters: [], last: { chapterId: 'push-pop-peek', offset: 2 } } },
+    });
+    await renderLesson(<Lesson topicId="stack" />);
+    expect(screen.getByLabelText(/^Step 11 of \d+$/)).toBeOnTheScreen();
+    expect(screen.getByText('Push, pop and peek')).toBeOnTheScreen();
+  });
+
+  it('opens a step from a deep link, ahead of the saved position', async () => {
+    useProgress.setState({
+      topics: { stack: { completedChapters: [], last: { chapterId: 'push-pop-peek', offset: 2 } } },
+    });
+    await renderLesson(<Lesson topicId="stack" step={2} />);
+    expect(caption('Push 23. First, check there’s room on the stack.')).toBeOnTheScreen();
   });
 
   it('explains when a topic has no lesson yet', async () => {

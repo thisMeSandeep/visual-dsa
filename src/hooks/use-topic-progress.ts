@@ -1,37 +1,76 @@
-import type { TopicStatus } from '@/components/topic-row';
-import type { ChapterState } from '@/components/chapter-row';
-import type { TopicMeta } from '@/content/schema';
+import { useMemo } from 'react';
 
-/** What a learner has done in one topic. Keyed by chapter id, never step index (ARCHITECTURE §7). */
-export type TopicProgress = {
-  completedChapterIds: readonly string[];
-  /** Where the learner stopped, if they're part-way through a chapter. */
-  current?: { chapterId: string; step: number };
+import type { ChapterState } from '@/components/chapter-row';
+import type { TopicStatus } from '@/components/topic-row';
+import type { TopicMeta } from '@/content/schema';
+import { chapterRange, resumeIndex } from '@/engine/lesson/position';
+import { chapterAt } from '@/engine/lesson/types';
+import { useProgress, type TopicProgress as SavedProgress } from '@/stores/progress';
+
+import { getLesson } from './use-lesson';
+
+/** Where the learner will pick a lesson up again. */
+export type ResumePoint = {
+  /** Step index in the compiled lesson. */
+  index: number;
+  chapterId: string;
+  chapterTitle: string;
+  /** 1-based step within the chapter, for "step 3 of 6". */
+  step: number;
+  chapterSteps: number;
 };
 
-const NOT_STARTED: TopicProgress = { completedChapterIds: [] };
+/** What a learner has done in one topic, ready for screens. */
+export type TopicProgress = {
+  completedChapterIds: readonly string[];
+  /** Set once the learner has opened the lesson (and its saved chapter still exists). */
+  resume?: ResumePoint;
+};
 
-/**
- * Progress for one topic. The progress store arrives in Step 6.2; until then every topic is
- * unstarted, so screens show real counts (0 of N) rather than invented progress.
- */
-export function useTopicProgress(_topicId: string): TopicProgress {
-  return NOT_STARTED;
+/** Saved progress → screen-ready progress, using the topic's compiled lesson for positions. */
+export function topicProgress(topicId: string, saved: SavedProgress | undefined): TopicProgress {
+  const completedChapterIds = saved?.completedChapters ?? [];
+  const lesson = getLesson(topicId);
+  const index = lesson && saved?.last ? resumeIndex(lesson, saved.last) : undefined;
+  const chapter = lesson && index !== undefined ? chapterAt(lesson, index) : undefined;
+  if (!lesson || index === undefined || !chapter) return { completedChapterIds };
+
+  const { first, last } = chapterRange(lesson, chapter);
+  return {
+    completedChapterIds,
+    resume: {
+      index,
+      chapterId: chapter.id,
+      chapterTitle: chapter.title,
+      step: index - first + 1,
+      chapterSteps: last - first + 1,
+    },
+  };
+}
+
+/** Progress for one topic, from the progress store. */
+export function useTopicProgress(topicId: string): TopicProgress {
+  const saved = useProgress((state) => state.topics[topicId]);
+  return useMemo(() => topicProgress(topicId, saved), [topicId, saved]);
+}
+
+/** How many of the topic's chapters are done (ignoring ids the lesson no longer has). */
+export function completedCount(meta: TopicMeta, progress: TopicProgress): number {
+  return meta.chapters.filter((chapter) => progress.completedChapterIds.includes(chapter.id))
+    .length;
 }
 
 /** Topic row status: done when every chapter is complete, otherwise "x of y". */
 export function topicStatus(meta: TopicMeta, progress: TopicProgress): TopicStatus {
   const total = meta.chapters.length;
-  const done = meta.chapters.filter((chapter) =>
-    progress.completedChapterIds.includes(chapter.id),
-  ).length;
+  const done = completedCount(meta, progress);
   if (done === total) return { kind: 'done' };
-  return { kind: 'progress', done, total, current: progress.current !== undefined };
+  return { kind: 'progress', done, total, current: progress.resume !== undefined };
 }
 
-/** Each chapter's state for the Topic screen's chapter list. */
+/** Each chapter's state for chapter lists: where the learner is, done, or still to come. */
 export function chapterState(chapterId: string, progress: TopicProgress): ChapterState {
-  if (progress.current?.chapterId === chapterId) return 'current';
+  if (progress.resume?.chapterId === chapterId) return 'current';
   if (progress.completedChapterIds.includes(chapterId)) return 'done';
   return 'upcoming';
 }
