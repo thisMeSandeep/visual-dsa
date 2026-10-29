@@ -1,0 +1,11 @@
+node_modules
+.expo
+dist
+bun.lock
+assets
+docs
+CLAUDE.md
+Dsa images
+.agents
+.claude
+skills-lock.json

@@ -31,8 +31,9 @@ Reference screenshots of the app that inspired this one are in `Dsa images/`. Th
    - Lesson data goes in `src/content/`.
    - No arbitrary Tailwind values (`bg-[#…]`). Lint enforces all of this.
 6. **Respect the architecture boundaries** (`ARCHITECTURE.md` §3): `src/engine/` is pure TypeScript (it may import `config/` only, with no React or React Native); `src/app/` holds routes only; `viz/` never imports `content/`.
-7. **Use skills.** Before working in an area, load the matching skill (see the "Skills used per phase" table in the plan): `expo-project-structure`, `uniwind`, `expo-router`, `expo-animation`, `expo-ui`, `expo-native-ui`, `expo-design-system`, `vercel-react-native-skills`, `eas-*`. Don't guess library APIs.
-8. **Distinctive, not generic design.** Follow `VISUAL-SPEC.md`: soft cream and charcoal neutrals (no pure white or black), cobalt for actions, orange for "look here now", green for correct, category colours on glyphs only. Use Phosphor icons with no background tiles, and Atkinson Hyperlegible Next + Mono fonts. Avoid stock looks (Lucide, Inter, gradients, emoji, shadow-on-everything).
+7. **Don't trust memory for Expo APIs.** Expo makes breaking changes every SDK. Check the SDK 58 docs (`https://docs.expo.dev/versions/v58.0.0/`, plus `https://docs.expo.dev/llms.txt`) or the matching skill before using an Expo, EAS or React Native API.
+8. **Use skills.** Before working in an area, load the matching skill (see the "Skills used per phase" table in the plan): `expo-project-structure`, `uniwind`, `expo-router`, `expo-animation`, `expo-ui`, `expo-native-ui`, `expo-design-system`, `vercel-react-native-skills`, `eas-*`. Don't guess library APIs.
+9. **Distinctive, not generic design.** Follow `VISUAL-SPEC.md`: soft cream and charcoal neutrals (no pure white or black), cobalt for actions, orange for "look here now", green for correct, category colours on glyphs only. Use Phosphor icons with no background tiles, and Atkinson Hyperlegible Next + Mono fonts. Avoid stock looks (Lucide, Inter, gradients, emoji, shadow-on-everything).
 
 ## Stack at a glance
 
@@ -40,14 +41,16 @@ Expo SDK 58 · TypeScript strict · Expo Router (`src/app`) · Uniwind (Tailwind
 
 ## Commands
 
-These exist once Step 0.1 is done:
+Run these from the project root:
 
 ```bash
 bun install                 # install dependencies
 bun run start               # start Metro; scan the QR code with Expo Go
 bun run lint                # ESLint (includes no-hard-coding and boundary rules)
 bun run typecheck           # tsc --noEmit
-bun run test                # Jest. NOT `bun test`
+bun run format              # Prettier (format:check in CI)
+bun run doctor              # expo-doctor: dependency and config health
+bun run test                # Jest (from Step 0.3). NOT `bun test`
 bun run validate:content    # Zod-check all topic content (from Step 2.2)
 bunx expo install <pkg>     # add an Expo-compatible dependency
 ```

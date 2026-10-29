@@ -56,7 +56,7 @@ This is the stack for Visual-DSA, chosen to deliver the features in [FEATURE.md]
   - **Install scripts:** Bun doesn't run dependencies' `postinstall` scripts unless the package is listed in `trustedDependencies`. If an install looks incomplete, check `bun pm untrusted` and trust only the packages that need it.
   - **Build scripts** (`scripts/*.ts`) run directly with `bun scripts/<name>.ts`, so no `tsx` or `ts-node` is needed.
   - Always add packages with `bunx expo install` (not plain `bun add`) so versions match SDK 58.
-- **Linting/formatting:** ESLint (`eslint-config-expo`) + Prettier.
+- **Linting/formatting:** ESLint (`eslint-config-expo`, flat config) + Prettier (`eslint-config-prettier` turns off rules that clash with Prettier). **ESLint is pinned to v9**, because `eslint-plugin-react` (bundled in Expo's config) doesn't support ESLint 10 yet. Revisit when it does.
 
 ## 2. Navigation: Expo Router
 
