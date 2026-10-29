@@ -1,0 +1,182 @@
+/* =================================================================================================
+ * Visual-DSA design tokens: the ONLY place colours and sizes are defined.
+ *
+ * Change a value here and the whole app (class names and the Skia canvas) follows.
+ * Spec: docs/VISUAL-SPEC.md. Rules: docs/ARCHITECTURE.md §9.
+ *
+ * Every theme block (`@variant light`, `@variant dark`) must define exactly the same variables.
+ * ============================================================================================== */
+
+/* -------------------------------------------------------------------------------------------------
+ * 1. Colours (VISUAL-SPEC §2). Used as classes: bg-primary, text-ink, border-line…
+ * ---------------------------------------------------------------------------------------------- */
+@layer theme {
+  :root {
+    @variant light {
+      /* Neutrals */
+      --color-background: #faf8f4;
+      --color-surface: #f0ece4;
+      --color-surface-raised: #fffdf9;
+      --color-line: #e5e0d6;
+      --color-line-strong: #ddd7cc;
+      --color-line-input: #8f877b;
+      --color-edge: #b5aea2;
+      --color-ink: #22201c;
+      --color-ink-2: #4a463f;
+      --color-muted: #6e685f;
+
+      /* Act */
+      --color-primary: #3554d9;
+      --color-on-primary: #ffffff;
+      --color-primary-soft: rgba(53, 84, 217, 0.09);
+      --color-primary-track: rgba(53, 84, 217, 0.18);
+
+      /* Look here now */
+      --color-signal: #e8611f;
+      --color-signal-ink: #b34815;
+      --color-signal-soft: rgba(232, 97, 31, 0.12);
+
+      /* Correct / done */
+      --color-success: #2e9457;
+      --color-success-ink: #1b7040;
+      --color-success-soft: rgba(46, 148, 87, 0.1);
+
+      /* Error */
+      --color-danger: #c7362f;
+      --color-danger-soft: rgba(199, 54, 47, 0.1);
+
+      /* Categories: glyphs and overlines only. *-ink is the text-safe variant. */
+      --color-cat-foundations: #5c6b8a;
+      --color-cat-foundations-ink: #5c6b8a;
+      --color-cat-linear: #0e9384;
+      --color-cat-linear-ink: #0b6f64;
+      --color-cat-hashing: #b57c06;
+      --color-cat-hashing-ink: #9a6600;
+      --color-cat-trees: #a3458f;
+      --color-cat-trees-ink: #a3458f;
+      --color-cat-graphs: #7650d8;
+      --color-cat-graphs-ink: #7650d8;
+      --color-cat-algorithms: #2386c8;
+      --color-cat-algorithms-ink: #1b6fa8;
+
+      /* Modes (Learn uses primary) */
+      --color-mode-sandbox: #0e9384;
+      --color-mode-sandbox-ink: #0b6f64;
+      --color-mode-sandbox-soft: rgba(14, 147, 132, 0.1);
+      --color-mode-practice: #7650d8;
+      --color-mode-practice-ink: #5b3bb8;
+      --color-mode-practice-soft: rgba(118, 80, 216, 0.1);
+    }
+
+    @variant dark {
+      /* Neutrals */
+      --color-background: #1a1917;
+      --color-surface: #24221f;
+      --color-surface-raised: #24221f;
+      --color-line: #34312c;
+      --color-line-strong: #3a3631;
+      --color-line-input: #6b655c;
+      --color-edge: #6b655c;
+      --color-ink: #eee9e0;
+      --color-ink-2: #cfc9bf;
+      --color-muted: #a29c92;
+
+      /* Act */
+      --color-primary: #8199ff;
+      --color-on-primary: #14161f;
+      --color-primary-soft: rgba(129, 153, 255, 0.16);
+      --color-primary-track: rgba(129, 153, 255, 0.24);
+
+      /* Look here now */
+      --color-signal: #ff8044;
+      --color-signal-ink: #ff8a52;
+      --color-signal-soft: rgba(255, 128, 68, 0.16);
+
+      /* Correct / done */
+      --color-success: #4cc07a;
+      --color-success-ink: #4cc07a;
+      --color-success-soft: rgba(76, 192, 122, 0.18);
+
+      /* Error */
+      --color-danger: #ff7a70;
+      --color-danger-soft: rgba(255, 122, 112, 0.18);
+
+      /* Categories */
+      --color-cat-foundations: #9aa6c2;
+      --color-cat-foundations-ink: #9aa6c2;
+      --color-cat-linear: #3cc4b2;
+      --color-cat-linear-ink: #3cc4b2;
+      --color-cat-hashing: #e5a93a;
+      --color-cat-hashing-ink: #e5a93a;
+      --color-cat-trees: #d47fc1;
+      --color-cat-trees-ink: #d47fc1;
+      --color-cat-graphs: #a48bff;
+      --color-cat-graphs-ink: #a48bff;
+      --color-cat-algorithms: #5bb3f0;
+      --color-cat-algorithms-ink: #5bb3f0;
+
+      /* Modes */
+      --color-mode-sandbox: #3cc4b2;
+      --color-mode-sandbox-ink: #3cc4b2;
+      --color-mode-sandbox-soft: rgba(60, 196, 178, 0.16);
+      --color-mode-practice: #a48bff;
+      --color-mode-practice-ink: #a48bff;
+      --color-mode-practice-soft: rgba(164, 139, 255, 0.16);
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * 2. Scales used through class names (VISUAL-SPEC §4).
+ *    Tailwind's default colours and radii are removed so only our tokens exist.
+ * ---------------------------------------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+
+  /* 4pt grid: p-1 = 4, p-2 = 8, p-3 = 12, p-4 = 16, p-6 = 24 (screen gutter), p-7 = 28 (section gap) */
+  --spacing: 4px;
+
+  --radius-*: initial;
+  --radius-sm: 10px; /* canvas cells, nodes, callouts */
+  --radius-md: 12px; /* chapter rows, inputs, context blocks */
+  --radius-lg: 16px; /* buttons, quiz tiles */
+  --radius-xl: 24px; /* cards and panels */
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * 3. Values read only from TypeScript through src/theme (Skia canvas, icons).
+ * ---------------------------------------------------------------------------------------------- */
+@theme static {
+  /* Canvas (VISUAL-SPEC §7) */
+  --viz-cell-width: 46px;
+  --viz-cell-height: 52px;
+  --viz-bucket-width: 44px;
+  --viz-bucket-height: 40px;
+  --viz-node-height: 44px;
+  --viz-gap: 8px;
+  --viz-radius: 10px;
+  --viz-border-width: 1.5px;
+  --viz-border-width-active: 2px;
+  --viz-edge-width: 1.5px;
+  --viz-dimmed-opacity: 0.4;
+
+  /* Icons (VISUAL-SPEC §5) */
+  --icon-xs: 18px; /* inside buttons */
+  --icon-sm: 20px; /* small icon buttons */
+  --icon-md: 22px; /* headers */
+  --icon-lg: 24px; /* tab bar */
+
+  /* Touch */
+  --touch-min: 44px;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Mark every colour token as used, so TypeScript can read it with useCSSVariable even when no
+ * screen uses it as a class yet (the Skia canvas reads colours this way).
+ * ---------------------------------------------------------------------------------------------- */
+@source inline("bg-background bg-surface bg-surface-raised bg-line bg-line-strong bg-line-input bg-edge bg-ink bg-ink-2 bg-muted");
+@source inline("bg-primary bg-on-primary bg-primary-soft bg-primary-track bg-signal bg-signal-ink bg-signal-soft");
+@source inline("bg-success bg-success-ink bg-success-soft bg-danger bg-danger-soft");
+@source inline("bg-cat-foundations bg-cat-foundations-ink bg-cat-linear bg-cat-linear-ink bg-cat-hashing bg-cat-hashing-ink");
+@source inline("bg-cat-trees bg-cat-trees-ink bg-cat-graphs bg-cat-graphs-ink bg-cat-algorithms bg-cat-algorithms-ink");
+@source inline("bg-mode-sandbox bg-mode-sandbox-ink bg-mode-sandbox-soft bg-mode-practice bg-mode-practice-ink bg-mode-practice-soft");

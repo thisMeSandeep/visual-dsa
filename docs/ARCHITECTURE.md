@@ -535,6 +535,8 @@ Lesson data (e.g. the input `[42, 17, 8, 23]` or the key "Sid") is **content**, 
 }
 ```
 
+- **Only our tokens exist.** `tokens.css` resets Tailwind's default colours and radii (`--color-*: initial`, `--radius-*: initial`), so `bg-red-500` simply doesn't exist. Spacing keeps Tailwind's multiplier with `--spacing: 4px`, which gives the 4pt grid (`p-6` = 24).
+- **Every colour is readable from TypeScript.** Uniwind only exposes a variable to `useCSSVariable` if some class name uses it. The `@source inline(...)` lines at the end of `tokens.css` mark every colour as used, so the Skia canvas can read colours no screen uses yet. **When you add a colour token, also add it to the `@source inline` list and to `COLOR_TOKENS` in `src/theme/index.ts`.**
 - **Screens** style with class names that reference tokens (`bg-surface text-ink rounded-lg p-6`). Arbitrary values such as `bg-[#3554D9]` or `p-[13px]` are not allowed.
 - **TypeScript** code (Skia canvas, charts, icon colours, `@expo/ui` colour props) reads tokens only through `src/theme/index.ts`. It wraps `useCSSVariable` (inside components) and `Uniwind.getCSSVariable` (outside React) and returns typed, parsed values, e.g. `useColor('signal')` and `useVizSizes()`. No other file calls those APIs, so token parsing lives in one place.
 - **Theme switching:** follows the system by default. The user override from the settings store calls `Uniwind.setTheme('light' | 'dark' | 'system')`.
