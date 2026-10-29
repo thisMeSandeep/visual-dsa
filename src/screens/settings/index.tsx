@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
+import { TAB_BAR_CLEARANCE } from '@/components/floating-tab-bar';
 import { config } from '@/config';
 import { useSettings, type ReducedMotionChoice, type ThemeChoice } from '@/stores/settings';
 import { useActiveTheme, useColor } from '@/theme';
@@ -32,7 +33,10 @@ export function Settings() {
     // The safe-area padding sits outside the scroll view, so content never scrolls under the
     // status bar.
     <View className="flex-1 bg-background pt-safe">
-      <ScrollView className="flex-1" contentContainerClassName="gap-7 px-6 pt-4 pb-6">
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName={`gap-7 px-6 pt-4 ${TAB_BAR_CLEARANCE}`}
+      >
         <AppText variant="display" accessibilityRole="header">
           Settings
         </AppText>

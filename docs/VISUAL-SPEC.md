@@ -117,7 +117,7 @@ Sizes and line heights are in points. These are the exact values in `src/theme/t
 | `body-sm` | Next | 15 / 22 | 400 (button labels 700) | ink-2 | Explanations, button labels |
 | `label` | Next | 13 / 18 | 400 | muted | Secondary lines ("4 chapters"), stat labels |
 | `overline` | Next | 12 / 16 | 500 | muted | UPPERCASE, letter-spacing 1.2, section labels |
-| `tab` | Next | 12 / 16 | 400 (active 700) | muted | Tab bar labels |
+| `tab` | Next | 12 / 16 | 400 (active 700) | muted | Small labels under icons (the floating tab bar uses `body-sm` bold for the current tab) |
 | `value-xl` | Mono | 28 / 34 | 500 | ink | Quiz answer numbers |
 | `value-lg` | Mono | 20 / 26 | 500 | ink | Canvas cell values |
 | `value` | Mono | 16 / 22 | 500 | ink | Stack items, stats (`O(1)`), callouts |
@@ -235,7 +235,7 @@ Mono number · title · trailing status. The current chapter gets a `primary-sof
 Three equal columns between two `line` hairlines. `label` on top, mono `value` below (`O(1)`, `size 4`).
 
 ### Tab bar
-Four tabs: Learn, Practice, Progress, Settings. `background` fill with a top `line` hairline. Active tab uses a `primary` fill icon and a bold label. Inactive tabs use `muted` regular icons.
+Four tabs: Learn, Practice, Progress, Settings, in a **floating capsule**: inset 16 from the sides and 12 above the bottom safe area, `surface-raised` with a hairline `line-strong` outline (like the topic cards), fully rounded, 6 padding, no shadow. The current tab takes the remaining width and holds its `primary` filled icon (22) and its name in `body-sm` bold `primary`, on a 44-tall `primary-soft` pill that slides between tabs (§8). The other tabs are 56 × 44 targets showing only a `muted` regular icon, named for screen readers. Screens run full height behind the bar, so a tab screen's scrolling content ends with `TAB_BAR_CLEARANCE` (safe area + 96), and the page colour continues behind Android's navigation buttons. In code: `<FloatingTabBar>` (`src/components/floating-tab-bar.tsx`).
 
 ### Progress
 - **Bar:** 4px, `radius-full`, `primary` on `line` (or a `primary` 18% track on tinted cards).
@@ -318,6 +318,7 @@ Built with Reanimated (see TECH-STACK.md).
 | Button press | Scale 0.97, 120ms, ease-out `cubic-bezier(0.23, 1, 0.32, 1)`. Reduced motion: opacity 0.7 instead. Rows highlight instead of scaling |
 | Sheets | Native sheet spring |
 | Screen transitions | Native stack transitions (Expo Router) |
+| Tab bar pill | On a tab switch the cobalt pill slides and resizes to the new tab, the tabs re-flow to their new widths, and the new name fades in while the old one fades out, all together: 250ms ease-in-out `cubic-bezier(0.77, 0, 0.175, 1)`. The screens themselves switch instantly; only the pill moves. Reduced motion: everything snaps. Values in `config.motion.tabBar`. |
 
 **Reduced motion:** nothing moves or scales. Elements jump to their new place, and colours and fades take 150ms. Haptics follow their own setting.
 

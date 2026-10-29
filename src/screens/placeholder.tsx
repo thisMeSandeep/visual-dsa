@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
+import { TAB_BAR_CLEARANCE } from '@/components/floating-tab-bar';
 import { IconButton } from '@/components/icon-button';
 
 export type ScreenPlaceholderProps = {
@@ -37,7 +38,8 @@ export function ScreenPlaceholder({
     <View className={`flex-1 bg-background ${sheet ? '' : 'pt-safe'}`}>
       <ScrollView
         className="flex-1"
-        contentContainerClassName={`gap-7 px-6 pb-safe-offset-6 ${sheet ? 'pt-6' : 'pt-4'}`}
+        // Tab screens use this too, so content always clears the floating tab bar.
+        contentContainerClassName={`gap-7 px-6 ${TAB_BAR_CLEARANCE} ${sheet ? 'pt-6' : 'pt-4'}`}
       >
         {back ? (
           <IconButton icon="back" label="Back" onPress={() => router.back()} className="-ml-3" />

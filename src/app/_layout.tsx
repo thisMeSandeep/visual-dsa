@@ -37,7 +37,9 @@ export default function RootLayout() {
 
   return (
     // Gestures (swipe to step, scrubbing) only work inside GestureHandlerRootView.
-    <GestureHandlerRootView style={styles.root}>
+    // The root carries the page colour too, so it shows behind Android's navigation buttons
+    // (edge to edge) instead of white.
+    <GestureHandlerRootView style={[styles.root, { backgroundColor: background }]}>
       <SafeAreaProvider>
         {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
         <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>

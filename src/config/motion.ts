@@ -39,4 +39,13 @@ export const motion = {
     /** Reduced motion: no movement, only short cross-fades. */
     reducedMotionMs: 150,
   },
+  /**
+   * Tab bar: the active pill slides to the tapped tab while the tabs re-flow and the label fades,
+   * all together. On-screen movement, so ease-in-out (expo-animation skill, tab indicator recipe).
+   * Reduced motion: everything snaps.
+   */
+  tabBar: {
+    slideMs: 250,
+    slideEasing: [0.77, 0, 0.175, 1],
+  },
 } as const;

@@ -23,6 +23,23 @@ jest.mock('react-native-reanimated', () => {
     isSharedValue: () => false,
     cubicBezier: () => 'cubic-bezier',
     useReducedMotion: () => false,
+    // Shared values and animated styles: animations jump straight to their target in tests.
+    useSharedValue: <T>(initial: T) => {
+      let current = initial;
+      return { get: () => current, set: (next: T) => void (current = next), value: initial };
+    },
+    useAnimatedStyle: <T>(build: () => T) => build(),
+    withTiming: <T>(target: T) => target,
+    Easing: { bezier: () => 'bezier' },
+    // Layout animation builders: chainable, and inert in tests.
+    ...Object.fromEntries(
+      ['LinearTransition', 'FadeIn', 'FadeOut'].map((name) => {
+        const builder: Record<string, unknown> = {};
+        for (const method of ['duration', 'easing', 'reduceMotion'])
+          builder[method] = () => builder;
+        return [name, builder];
+      }),
+    ),
   };
 });
 

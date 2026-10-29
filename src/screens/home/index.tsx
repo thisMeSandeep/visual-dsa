@@ -4,6 +4,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
+import { TAB_BAR_CLEARANCE } from '@/components/floating-tab-bar';
 import { TopicCard } from '@/components/topic-card';
 import { topicsByCategory } from '@/content/registry';
 import { CATEGORY_LABELS, type TopicCategory, type TopicMeta } from '@/content/schema';
@@ -123,7 +124,7 @@ const HomeTopicCard = memo(function HomeTopicCard({
   );
 });
 
-/** Space after the last row of cards. */
+/** Space after the last row of cards, so it scrolls clear of the floating tab bar. */
 function ListEnd() {
-  return <View className="h-6" />;
+  return <View className={TAB_BAR_CLEARANCE} />;
 }
