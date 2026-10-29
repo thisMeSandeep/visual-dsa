@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "visual-dsa",
+    "name": "Visual-DSA",
     "slug": "visual-dsa",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "visualdsa",
     "userInterfaceStyle": "automatic",

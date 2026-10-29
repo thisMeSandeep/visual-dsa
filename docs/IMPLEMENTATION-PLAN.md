@@ -44,11 +44,12 @@ chore: scaffold Expo SDK 58 app with TypeScript and src/ layout
 
 ### Step 0.2: App config for Expo Go
 **Goal:** the app is configured and runs reliably in Expo Go.
-- Configure `app.json`: name "Visual-DSA", scheme `visualdsa`, orientation `default` (portrait + landscape, F-106), and an Android edge-to-edge setup.
-- Confirm your phone's Expo Go supports SDK 58, and add a `start` script that opens with the QR code.
+- Configure `app.json`: name "Visual-DSA", scheme `visualdsa`, orientation `default` (portrait + landscape, F-106). Android edge-to-edge is always on in SDK 58, so it needs no setting.
+- Confirm your phone's Expo Go supports SDK 58. `start` runs `expo start --go`, which shows the QR code; `start:tunnel` is for when the phone and computer aren't on the same network.
+- Editor settings for Zed (`.zed/settings.json`): Prettier formats on save.
 - No `expo-dev-client` and no `eas.json` yet. EAS is set up for release builds in Step 10.3.
 
-**Done when:** the app opens in Expo Go on your phone, rotates between portrait and landscape, and deep link `visualdsa://` opens it.
+**Done when:** the app opens in Expo Go on your phone and rotates between portrait and landscape. The custom `visualdsa://` scheme only works in real builds (Expo Go uses `exp://` links), so it's checked in Step 10.3.
 
 **Commit:**
 ```
@@ -468,7 +469,7 @@ This is the first time the app leaves Expo Go.
 - App icon, splash screen and themed system bars.
 - Build an internal `preview` build and install it on your phone.
 
-**Done when:** the preview build installs from the EAS link and behaves the same as in Expo Go.
+**Done when:** the preview build installs from the EAS link, behaves the same as in Expo Go, and a `visualdsa://` deep link opens the app.
 
 **Commit:**
 ```

@@ -39,13 +39,18 @@ Reference screenshots of the app that inspired this one are in `Dsa images/`. Th
 
 Expo SDK 58 · TypeScript strict · Expo Router (`src/app`) · Uniwind (Tailwind v4) · React Native Skia + Reanimated 4 + Gesture Handler · `@expo/ui` · Zustand + `expo-sqlite/kv-store` · Zod · Shiki (build time) · Phosphor icons · Victory Native · Jest (`jest-expo`) + RNTL · Maestro on EAS (release only).
 
+## Editor
+
+The user works in **Zed** (not VS Code). Project settings live in `.zed/settings.json`. Don't add `.vscode/` files.
+
 ## Commands
 
 Run these from the project root:
 
 ```bash
 bun install                 # install dependencies
-bun run start               # start Metro; scan the QR code with Expo Go
+bun run start               # start Metro in Expo Go mode; scan the QR code
+bun run start:tunnel        # same, when the phone isn't on the same network
 bun run lint                # ESLint (includes no-hard-coding and boundary rules)
 bun run typecheck           # tsc --noEmit
 bun run format              # Prettier (format:check in CI)
