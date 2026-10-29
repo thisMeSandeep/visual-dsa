@@ -54,6 +54,10 @@ export default function RootLayout() {
               screenOptions={{
                 headerShown: false,
                 orientation: 'portrait',
+                // Shown everywhere except the lesson, which hides them (topic layout). Stating it
+                // here makes the native stack bring them back when the lesson closes.
+                statusBarHidden: false,
+                navigationBarHidden: false,
                 contentStyle: { backgroundColor: background },
               }}
             />

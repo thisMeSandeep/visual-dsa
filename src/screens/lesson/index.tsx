@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
@@ -156,9 +155,6 @@ function LessonPlayer({
 
   return (
     <View className="flex-1 bg-background pt-safe pr-safe pb-safe pl-safe">
-      {/* The canvas needs every pixel in landscape. */}
-      <StatusBar hidden />
-
       <View className="h-14 flex-row items-center gap-1 border-b-hairline border-line px-3">
         <IconButton icon="back" label="Back" onPress={() => router.back()} />
         <View className="flex-1 px-1">
