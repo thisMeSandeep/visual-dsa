@@ -252,7 +252,7 @@ The canvas follows the same tokens, which Skia reads from the theme (see section
 | Array cell | 46 × 52, value `value-lg` 20 |
 | Bucket | 44 × 40, a small `ink` dot when occupied |
 | Linked node | Auto width, height 44, name 15/700 over mono 12 detail |
-| Stack container | U-shape, 2px `line-strong`, open top, 18px bottom radius |
+| Stack container | U-shape, 2px `line-strong` (`danger` on overflow / underflow), open top, 18px bottom radius. Drawn for the full capacity so the canvas never changes height; one slot above it shows a value that didn't fit. Items are 132 × 44, 8 apart, with 10 padding. The `top →` pointer sits to the left |
 | Edge / arrow | 1.5px `edge`, rounded caps, small open arrowhead |
 | Index label | `index` style, `muted`, above cells or left of buckets |
 | Pointer label | Mono 13, `signal-ink`, with a `signal` arrow (`top →`, `j`, `j+1`) |

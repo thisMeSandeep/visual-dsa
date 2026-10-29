@@ -1,4 +1,4 @@
-import { Canvas } from '@shopify/react-native-skia';
+import { Canvas, Group } from '@shopify/react-native-skia';
 import { View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
@@ -11,6 +11,7 @@ import {
   AnimatedText,
   type DrawableContext,
 } from './drawables';
+import { fitContent } from './fit';
 import { canvasTimings } from './timing';
 import type { Drawable } from './types';
 import { usePresence } from './use-presence';
@@ -19,8 +20,15 @@ import { useVizFonts } from './use-viz-fonts';
 export type VizCanvasProps = {
   /** The current step, laid out. Ids must be stable across steps. */
   drawables: readonly Drawable[];
+  /** Size of the canvas on screen. */
   width: number;
   height: number;
+  /**
+   * Natural size of the drawables. When it's larger than the canvas, the drawing is scaled down
+   * to fit; either way it's centred. Defaults to the canvas size (no scaling).
+   */
+  contentWidth?: number;
+  contentHeight?: number;
   /** Playback speed; animations get faster with it. */
   speed?: number;
   /** Screen-reader summary of the step (Step.a11y). */
@@ -35,6 +43,8 @@ export function VizCanvas({
   drawables,
   width,
   height,
+  contentWidth = width,
+  contentHeight = height,
   speed = 1,
   accessibilityLabel,
 }: VizCanvasProps) {
@@ -44,6 +54,7 @@ export function VizCanvas({
   const reducedMotion = useReducedMotion();
   const timings = canvasTimings(speed, reducedMotion);
   const present = usePresence(drawables, timings.exit);
+  const fit = fitContent({ width, height }, { width: contentWidth, height: contentHeight });
 
   return (
     <View
@@ -54,14 +65,22 @@ export function VizCanvas({
     >
       {fonts ? (
         <Canvas style={{ width, height }}>
-          {present.map(({ item, exiting }) => (
-            <DrawableView
-              key={item.id}
-              drawable={item}
-              exiting={exiting}
-              context={{ fonts, sizes, timings, colors }}
-            />
-          ))}
+          <Group
+            transform={[
+              { translateX: fit.offsetX },
+              { translateY: fit.offsetY },
+              { scale: fit.scale },
+            ]}
+          >
+            {present.map(({ item, exiting }) => (
+              <DrawableView
+                key={item.id}
+                drawable={item}
+                exiting={exiting}
+                context={{ fonts, sizes, timings, colors }}
+              />
+            ))}
+          </Group>
         </Canvas>
       ) : null}
     </View>

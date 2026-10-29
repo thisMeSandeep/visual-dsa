@@ -227,6 +227,13 @@
   --viz-font-label: 13px; /* pointer labels: top, head, j (Mono 500) */
   --viz-font-index: 12px; /* indices and bucket numbers (Mono 400) */
   --viz-label-gap: 4px; /* space between a cell and its index or pointer label */
+  --viz-pointer-length: 16px; /* arrow from a pointer label to its element */
+  --viz-pointer-label-width: 32px; /* space reserved for a pointer label such as "top" */
+
+  /* Stack renderer (VISUAL-SPEC §7): items are --viz-node-height tall */
+  --viz-stack-item-width: 132px;
+  --viz-stack-padding: 10px; /* inside the U-shaped container */
+  --viz-stack-radius: 18px; /* container's bottom corners */
 
   /* Icons (VISUAL-SPEC §5) */
   --icon-xs: 18px; /* inside buttons */

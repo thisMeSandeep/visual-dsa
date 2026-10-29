@@ -433,7 +433,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 8. **Gestures** (P1): pinch and pan update a canvas transform. Taps are hit-tested against the layout result, which the graph editor (F-604) uses.
 9. **Accessibility:** `VizCanvas` is a single accessible image whose label is the current step's `a11y` summary, announced on step change.
 
-**Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its layout + component. Adding a topic that reuses an existing renderer needs no viz code at all.
+**Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its component. `SceneView` (`viz/scene-view.tsx`) draws any scene with the renderer it names, and shows a plain message for a renderer that doesn't exist yet. Each renderer is a pure `layout<Name>(scene, sizes)` returning drawables plus the content's natural size, wrapped in a component that hands them to `VizCanvas`. `VizCanvas` scales content down to fit its viewport (never up) and centres it (`viz/canvas/fit.ts`). Adding a topic that reuses an existing renderer needs no viz code at all. The stack renderer (Step 4.2) is the reference.
 
 **Analogy scenes** (`viz/scenes/`) are small hand-built Skia components for the real-world examples (browser back button, phone book). They receive a scene step index and animate between their own fixed states.
 

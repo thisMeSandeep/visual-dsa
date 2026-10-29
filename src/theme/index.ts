@@ -105,6 +105,11 @@ const VIZ_SIZE_VARS = {
   fontLabel: '--viz-font-label',
   fontIndex: '--viz-font-index',
   labelGap: '--viz-label-gap',
+  pointerLength: '--viz-pointer-length',
+  pointerLabelWidth: '--viz-pointer-label-width',
+  stackItemWidth: '--viz-stack-item-width',
+  stackPadding: '--viz-stack-padding',
+  stackRadius: '--viz-stack-radius',
 } as const;
 
 const ICON_SIZE_VARS = {
