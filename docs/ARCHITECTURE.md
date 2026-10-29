@@ -414,23 +414,24 @@ const store = createPlayerStore({ steps, chapters });
 ### 6.2 Viz layer
 
 ```
-Step N-1 ─┐
-          ├─▶ layout(scene, viewport) ─▶ positioned elements ─▶ useAnimatedElements ─▶ <Canvas> (Skia)
-Step N  ──┘        (pure, per renderer)       {id, x, y, w, h, state}     shared values per id
+Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ usePresence ─▶ one animated Skia
+          (pure, per renderer)    box / text /                (keeps leaving    component per id
+                                  line / path, stable ids     ids for exitMs)   (shared values)
 ```
 
-1. **Layout** (`viz/renderers/<name>/layout.ts`) is a pure function: scene + viewport size → positioned elements. Sizes, gaps and wrapping follow VISUAL-SPEC §7. Trees and graphs use their own layout algorithms (TECH-STACK §3e). Layout functions are unit-tested.
-2. **Animation** (`viz/canvas/use-animated-elements.ts`) keeps one set of Reanimated shared values per element id (x, y, opacity, colour):
-   - **present in both steps:** animate to the new position/style (spring for moves, timing for colour).
-   - **new in step N:** enter (scale 0.9 → 1 with fade).
-   - **gone in step N:** exit (fade out), then removed.
-   - Durations come from VISUAL-SPEC §8, scaled by playback speed. Reduced motion switches every transition to a 150ms cross-fade.
-3. **Drawing** (`renderer.tsx`) draws with Skia components that read the shared values directly, so there is no React re-render per frame.
-4. **Colours** come from `viz/state-style.ts`, which maps `ElementState` to theme tokens. The tokens are read with Uniwind's `useCSSVariable`, so the canvas switches theme together with the UI.
-5. **Fonts:** Skia loads the same Atkinson Hyperlegible files that `useFonts` loads for the UI.
-6. **Sizes:** cell sizes, gaps and stroke widths come from `@theme static` tokens through `src/theme`. Layout functions receive them as a parameter, so they stay pure and testable.
-6. **Gestures** (P1): pinch and pan update a canvas transform. Taps are hit-tested against the layout result, which the graph editor (F-604) uses.
-7. **Accessibility:** the canvas is a single accessible element whose label is the current step's `a11y` summary, announced on step change.
+1. **Layout** (`viz/renderers/<name>/layout.ts`, from Step 4.2) is a pure function: scene + token sizes → `Drawable[]` (`viz/canvas/types.ts`). There are four kinds: `box` (cell or node, value plus optional detail line), `text` (index, pointer name, callout), `line` (edge or arrow, with optional arrowhead) and `path` (a fixed shape such as the stack container). Sizes, gaps and wrapping follow VISUAL-SPEC §7. Trees and graphs use their own layout algorithms (TECH-STACK §3e). Layout functions are unit-tested.
+2. **Presence** (`viz/canvas/use-presence.ts`) keeps a drawable whose id disappeared for the exit duration, marked `exiting`, in its old place, so it can fade out. It returns the same state when nothing left or came back, so a caller that builds a new array every render can't loop.
+3. **Animation** (`viz/canvas/drawables.tsx`, `animated-values.ts`) gives each drawable its own Reanimated shared values (position, size, opacity, colour, stroke width) that animate whenever its target changes:
+   - **present in both steps:** move and resize with ease-in-out, and restyle colours with a cross-fade.
+   - **new:** fade in and grow from `enterScale` (0.9), around its centre.
+   - **leaving:** fade out.
+   - Durations come from `canvasTimings(speed, reducedMotion)` (`viz/canvas/timing.ts`, values in `config.motion.canvas`), divided by playback speed. Reduced motion means no movement or scaling, only 150ms fades.
+4. **Drawing:** Skia components take the shared and derived values directly as props, so every frame runs on the UI thread and React only re-renders when the step changes.
+5. **Colours** come from `viz/state-style.ts`, which maps each `ElementState` to fill, stroke and text colour tokens plus a non-colour cue (border weight, dash, dimming). The canvas reads all colour tokens with `useColors`, so it switches theme together with the UI and cross-fades when it does.
+6. **Fonts:** `useVizFonts` loads the same Atkinson Hyperlegible Mono files through Skia's `useFont`, at the `--viz-font-*` token sizes. Text is centred by measuring it.
+7. **Sizes:** cell sizes, gaps, stroke widths, dash and arrow sizes come from `@theme static` tokens through `useVizSizes()`. Layout functions receive them as a parameter, so they stay pure and testable.
+8. **Gestures** (P1): pinch and pan update a canvas transform. Taps are hit-tested against the layout result, which the graph editor (F-604) uses.
+9. **Accessibility:** `VizCanvas` is a single accessible image whose label is the current step's `a11y` summary, announced on step change.
 
 **Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its layout + component. Adding a topic that reuses an existing renderer needs no viz code at all.
 

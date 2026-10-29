@@ -290,15 +290,16 @@ Built with Reanimated (see TECH-STACK.md).
 
 | Motion | Spec |
 |---|---|
-| Step transition (1× speed) | 400ms, ease-in-out. Scales with the playback speed (0.25× to 4×). |
-| Element move / swap | Spring (damping ~18, stiffness ~180). Swaps move along a small arc so the elements don't overlap. |
-| Highlight in/out | 150ms colour/opacity fade |
-| Insert / remove | Scale 0.9 → 1 with a fade, 200ms |
+| Element move / swap / resize | 400ms at 1×, ease-in-out `cubic-bezier(0.77, 0, 0.175, 1)`. Timing, not a spring: no finger is involved (expo-animation skill). Every canvas duration is divided by the playback speed (0.25× to 4×). |
+| Highlight in/out (state colours, border weight, dimming) | 150ms ease-out `cubic-bezier(0.23, 1, 0.32, 1)` |
+| Insert / remove | Scale 0.9 → 1 with a fade in, 200ms. Removed elements fade out over 200ms, then leave. |
 | Button press | Scale 0.97, 120ms, ease-out `cubic-bezier(0.23, 1, 0.32, 1)`. Reduced motion: opacity 0.7 instead. Rows highlight instead of scaling |
 | Sheets | Native sheet spring |
 | Screen transitions | Native stack transitions (Expo Router) |
 
-**Reduced motion:** element moves become 150ms cross-fades, and springs and arcs are turned off. Haptics follow their own setting.
+**Reduced motion:** nothing moves or scales. Elements jump to their new place, and colours and fades take 150ms. Haptics follow their own setting.
+
+All canvas values live in `config.motion.canvas`.
 
 **Haptics (P1):** light on step change via swipe, medium on collision / swap / found, success notification on a correct answer.
 

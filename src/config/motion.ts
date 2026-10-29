@@ -18,4 +18,25 @@ export const motion = {
     /** How far a finger may drift before a press is cancelled. */
     pressRetentionOffset: 16,
   },
+  /**
+   * Visualisation canvas: how elements move between two steps. Durations are at 1× playback
+   * speed and divided by the current speed. No finger is involved, so these are timing curves,
+   * not springs (expo-animation skill, step 5).
+   */
+  canvas: {
+    /** Moving or resizing on screen (swap, shift, reposition). */
+    moveMs: 400,
+    moveEasing: [0.77, 0, 0.175, 1],
+    /** Colour and state changes (comparing → sorted). */
+    highlightMs: 150,
+    /** Elements appearing and leaving. */
+    enterMs: 200,
+    exitMs: 200,
+    /** Appearing elements grow from this scale; never from 0. */
+    enterScale: 0.9,
+    /** Strong ease-out for highlights, enter and exit. */
+    fadeEasing: [0.23, 1, 0.32, 1],
+    /** Reduced motion: no movement, only short cross-fades. */
+    reducedMotionMs: 150,
+  },
 } as const;

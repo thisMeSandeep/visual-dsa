@@ -134,6 +134,9 @@ function DevLinks() {
       <Link href="/dev/components" asChild>
         <Button label="Components" variant="tinted" size="compact" />
       </Link>
+      <Link href="/dev/canvas" asChild>
+        <Button label="Canvas" variant="tinted" size="compact" />
+      </Link>
     </View>
   );
 }

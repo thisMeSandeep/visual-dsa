@@ -97,6 +97,14 @@ const VIZ_SIZE_VARS = {
   borderWidthActive: '--viz-border-width-active',
   edgeWidth: '--viz-edge-width',
   dimmedOpacity: '--viz-dimmed-opacity',
+  dash: '--viz-dash',
+  dashGap: '--viz-dash-gap',
+  arrowSize: '--viz-arrow-size',
+  fontValue: '--viz-font-value',
+  fontDetail: '--viz-font-detail',
+  fontLabel: '--viz-font-label',
+  fontIndex: '--viz-font-index',
+  labelGap: '--viz-label-gap',
 } as const;
 
 const ICON_SIZE_VARS = {

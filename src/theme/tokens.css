@@ -219,6 +219,14 @@
   --viz-border-width-active: 2px;
   --viz-edge-width: 1.5px;
   --viz-dimmed-opacity: 0.4;
+  --viz-dash: 4px; /* error state: dashed border (VISUAL-SPEC §7) */
+  --viz-dash-gap: 3px;
+  --viz-arrow-size: 6px; /* arrowhead length on edges and pointers */
+  --viz-font-value: 20px; /* cell values (Mono 500) */
+  --viz-font-detail: 12px; /* second line in a node, e.g. a phone number (Mono 400) */
+  --viz-font-label: 13px; /* pointer labels: top, head, j (Mono 500) */
+  --viz-font-index: 12px; /* indices and bucket numbers (Mono 400) */
+  --viz-label-gap: 4px; /* space between a cell and its index or pointer label */
 
   /* Icons (VISUAL-SPEC §5) */
   --icon-xs: 18px; /* inside buttons */
