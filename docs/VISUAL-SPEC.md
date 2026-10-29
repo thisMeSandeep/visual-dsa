@@ -373,6 +373,7 @@ These match the concept canvas.
 | **Sandbox** | Back · title · reset → live structure with pointers → stat strip → value input + random → primary action + tinted secondary actions |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |
 | **Lesson (dark)** | Same as the lesson player, plus the docked code panel with the current line highlighted |
+| **Settings** | `display` "Settings" → sections (`overline` title, `surface` card with `radius-xl`, rows divided by `line` hairlines): Appearance (theme), Lessons (code language, playback speed), Motion and feel (reduce motion, haptics). Each row: `body` label + `label` detail on the left, a native `@expo/ui` picker or switch tinted `primary` on the right → `label` note that everything is saved on this device |
 
 ---
 

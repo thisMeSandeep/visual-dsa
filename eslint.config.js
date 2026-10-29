@@ -160,11 +160,18 @@ const hardCodedValues = [
   },
 ];
 
+/** Jest mock factories and jest.isolateModules can only load modules with require(). */
+const tests = {
+  files: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'jest.setup.ts'],
+  rules: { '@typescript-eslint/no-require-imports': 'off' },
+};
+
 module.exports = defineConfig([
   expoConfig,
   prettierConfig,
   ...boundaries,
   ...hardCodedValues,
+  tests,
   {
     // Code samples are shown to learners, not run; generated tokens are build output.
     ignores: [

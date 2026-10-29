@@ -10,16 +10,24 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaListener, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
-import { useColor } from '@/theme';
+import { useStoresHydrated } from '@/hooks/use-stores-hydrated';
+import { useSettings } from '@/stores/settings';
+import { setThemePreference, useColor } from '@/theme';
 import { FONT_FILES } from '@/theme/fonts';
 
-// Keep the splash screen up until the fonts are ready, so text never renders in a fallback font.
+// Keep the splash screen up until the fonts and saved settings are ready, so text never renders
+// in a fallback font and the saved theme is on screen from the first frame.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const background = useColor('background');
   const [fontsLoaded, fontError] = useFonts(FONT_FILES);
-  const ready = fontsLoaded || fontError !== null;
+  const hydrated = useStoresHydrated();
+  const ready = (fontsLoaded || fontError !== null) && hydrated;
+
+  // The theme chosen in Settings (F-1101).
+  const theme = useSettings((state) => state.theme);
+  useEffect(() => setThemePreference(theme), [theme]);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();

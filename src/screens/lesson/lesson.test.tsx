@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useLessonNavigation } from '@/stores/lesson-navigation';
+import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
 
 import { Lesson } from '.';
 
@@ -18,7 +19,10 @@ const renderLesson = (element: React.ReactElement) =>
   render(element, { wrapper: GestureHandlerRootView });
 
 describe('Lesson player', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useSettings.setState(DEFAULT_SETTINGS);
+  });
 
   it('opens on the first step with its caption and position', async () => {
     await renderLesson(<Lesson topicId="stack" />);
@@ -44,10 +48,19 @@ describe('Lesson player', () => {
     expect(screen.getByRole('button', { name: 'Play' })).toBeOnTheScreen();
   });
 
-  it('cycles the playback speed', async () => {
+  it('cycles the playback speed and remembers it as the default', async () => {
     await renderLesson(<Lesson topicId="stack" />);
     await fireEvent.press(screen.getByRole('button', { name: 'Playback speed' }));
     expect(screen.getByText('1.5×')).toBeOnTheScreen();
+    expect(useSettings.getState().defaultSpeed).toBe(1.5);
+  });
+
+  it('starts at the speed and code language saved in Settings', async () => {
+    useSettings.setState({ defaultSpeed: 0.5, codeLanguage: 'javascript' });
+    await renderLesson(<Lesson topicId="stack" />);
+    expect(screen.getByText('0.5×')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Show code' }));
+    expect(screen.getByRole('tab', { name: 'JavaScript', selected: true })).toBeOnTheScreen();
   });
 
   it('seeks with the scrubber’s accessibility actions', async () => {
@@ -98,6 +111,7 @@ describe('Lesson player', () => {
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'JavaScript' }));
+    expect(useSettings.getState().codeLanguage).toBe('javascript');
     expect(
       screen.getByLabelText(
         /^Current line, line \d+: +if \(this\.items\.length === this\.capacity\) \{$/,

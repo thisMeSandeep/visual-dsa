@@ -6,7 +6,7 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { AppText } from '@/components/app-text';
 import { IconButton } from '@/components/icon-button';
 import { Scrubber } from '@/components/scrubber';
-import { config, type CodeLanguage } from '@/config';
+import { config } from '@/config';
 import { getCodeSample } from '@/content/code';
 import { getTopicMeta } from '@/content/registry';
 import type { TopicMeta } from '@/content/schema';
@@ -14,6 +14,7 @@ import { chapterAt, type CompiledLesson } from '@/engine/lesson/types';
 import { nextSpeed } from '@/engine/player/machine';
 import { getLesson } from '@/hooks/use-lesson';
 import { useLessonNavigation } from '@/stores/lesson-navigation';
+import { useSettings } from '@/stores/settings';
 import {
   playerActions,
   useCanGoBack,
@@ -65,7 +66,10 @@ function LessonPlayer({
   startChapter?: string;
 }) {
   const startIndex = lesson.chapters.find((c) => c.id === startChapter)?.firstStep ?? 0;
-  const player = usePlayer(lesson.steps, startIndex);
+  // Lessons start at the learner's speed; changing it here makes it their new default (F-1103).
+  const defaultSpeed = useSettings((state) => state.defaultSpeed);
+  const setDefaultSpeed = useSettings((state) => state.setDefaultSpeed);
+  const player = usePlayer(lesson.steps, startIndex, defaultSpeed);
   const actions = playerActions(player);
 
   const step = useCurrentStep(player);
@@ -91,7 +95,9 @@ function LessonPlayer({
 
   // Code panel: docked under the canvas in portrait, beside it in landscape (F-506).
   const [codeOpen, setCodeOpen] = useState<boolean>(config.code.panelOpenByDefault);
-  const [language, setLanguage] = useState<CodeLanguage>(config.app.defaultCodeLanguage);
+  // The code language is remembered across lessons and app launches (F-1102).
+  const language = useSettings((state) => state.codeLanguage);
+  const setLanguage = useSettings((state) => state.setCodeLanguage);
   const sample = getCodeSample(meta.id, language);
   const window = useWindowDimensions();
   const landscape = window.width > window.height;
@@ -179,7 +185,11 @@ function LessonPlayer({
           label="Playback speed"
           text={`${speed}×`}
           variant="round"
-          onPress={() => actions.setSpeed(nextSpeed(speed))}
+          onPress={() => {
+            const next = nextSpeed(speed);
+            actions.setSpeed(next);
+            setDefaultSpeed(next);
+          }}
         />
         <IconButton
           label="Previous step"

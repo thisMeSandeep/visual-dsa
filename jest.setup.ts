@@ -25,3 +25,17 @@ jest.mock('react-native-reanimated', () => {
     useReducedMotion: () => false,
   };
 });
+
+// expo-sqlite's kv-store is a native SQLite database. Tests get an in-memory one with the same
+// methods the app uses; `clearSync()` resets it between tests.
+jest.mock('expo-sqlite/kv-store', () => {
+  const items = new Map<string, string>();
+  const Storage = {
+    getItemSync: (key: string) => items.get(key) ?? null,
+    setItemSync: (key: string, value: string) => void items.set(key, value),
+    setItem: async (key: string, value: string) => void items.set(key, value),
+    removeItem: async (key: string) => void items.delete(key),
+    clearSync: () => items.clear(),
+  };
+  return { __esModule: true, default: Storage, Storage, AsyncStorage: Storage };
+});

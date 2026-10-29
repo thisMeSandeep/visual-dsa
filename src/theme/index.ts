@@ -189,9 +189,18 @@ export function useGlyphStyle(): GlyphStyle {
 export const THEME_PREFERENCES = ['system', 'light', 'dark'] as const;
 export type ThemePreference = (typeof THEME_PREFERENCES)[number];
 
-/** Switch the app theme. 'system' follows the device. Persisted from Step 6.1. */
+/**
+ * Switch the app theme. 'system' follows the device. The choice is saved in the settings store;
+ * the root layout applies it.
+ */
 export function setThemePreference(preference: ThemePreference): void {
   Uniwind.setTheme(preference);
+}
+
+/** The theme on screen right now, after following the device. Native controls (@expo/ui) use it. */
+export function useActiveTheme(): 'light' | 'dark' {
+  const { theme } = useUniwind();
+  return theme === 'dark' ? 'dark' : 'light';
 }
 
 /** The user's current choice: 'system' while following the device, otherwise the forced theme. */

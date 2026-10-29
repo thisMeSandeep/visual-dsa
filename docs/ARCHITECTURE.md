@@ -142,8 +142,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │
 │   ├── stores/                     # Zustand stores
 │   │   ├── storage.ts              #   expo-sqlite/kv-store adapter for persist
-│   │   ├── settings.ts
-│   │   ├── progress.ts
+│   │   ├── settings.ts             #   theme, code language, speed, haptics, reduced motion
+│   │   ├── progress.ts             #   per-topic chapters and last position
 │   │   └── create-player-store.ts  #   factory, one store per player instance
 │   │
 │   ├── theme/                      # DESIGN TOKENS: how it looks (§9.1)
@@ -162,7 +162,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── storage.ts              #   storage keys, schema versions
 │   │   └── features.ts             #   feature flags
 │   │
-│   ├── hooks/                      # use-topic-progress (store-backed from Step 6.2)…
+│   ├── hooks/                      # use-lesson, use-reduced-motion, use-stores-hydrated,
+│   │                               # use-topic-progress (store-backed from Step 6.2)…
 │   └── utils/
 ├── global.css                      # only imports tailwind, uniwind, src/theme/tokens.css
 ├── app.json
@@ -509,9 +510,11 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | player (per instance) | Steps, machine state | No (re-created on open) |
 | sandbox (per session) | Model, history | No |
 
-- Persistence uses Zustand `persist` with an `expo-sqlite/kv-store` adapter (`stores/storage.ts`). Storage keys and schema versions come from `config.storage`.
-- Each persisted store has a `version` and a `migrate` function, so updates never wipe a learner's progress.
-- The root layout waits for hydration before hiding the splash screen.
+- Persistence uses Zustand `persist` with an `expo-sqlite/kv-store` adapter (`stores/storage.ts`). Storage keys and schema versions come from `config.storage`. Reads use the kv-store's **synchronous** `getItemSync`, so a store is hydrated as soon as it's created and the first frame already shows the saved theme. Writes are asynchronous.
+- Each persisted store has a `version` and a `migrate` function, so updates never wipe a learner's progress. Saved data is also checked with Zod on the way in (`parseSettings`, `parseProgress`): every field has a `.catch()` default, so a missing, invalid or old value falls back to its default instead of breaking the app. A schema change bumps the version and converts the old shape in `migrate`.
+- The root layout waits for hydration (`hooks/use-stores-hydrated.ts`, a `useSyncExternalStore` over each store's `persist` API) as well as fonts before hiding the splash screen.
+- **Settings in use:** the root layout applies `theme` with `setThemePreference` (Uniwind). The lesson player starts at `defaultSpeed` and opens the code panel in `codeLanguage`; changing either in a lesson saves it as the new default (F-1102, F-1103). `hooks/use-reduced-motion.ts` combines the device setting with the `reducedMotion` override (`system` / `on` / `off`), and every animated component uses it instead of Reanimated's `useReducedMotion`. `haptics` gates `PressableScale`'s haptic, on top of `config.features.haptics` (still off, P1); the Settings row only shows when that flag is on.
+- **Settings screen** (`screens/settings`): grouped rows in the app's own style (`surface` cards, `overline` section titles) with native `@expo/ui` controls on the right: `Picker` (menu) for theme, code language, playback speed and reduced motion, `Switch` for haptics. Each control sits in a `Host` with `colorScheme` set to the app's active theme (it may differ from the device's) and `seedColor` set to `primary`.
 - Progress is keyed by **topic id and chapter id**, never by step index, so editing a lesson (adding steps) doesn't break saved progress. "Continue" stores the chapter id plus the offset within that chapter.
 
 ---

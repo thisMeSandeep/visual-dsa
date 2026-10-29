@@ -1,7 +1,7 @@
 import { Canvas, Group } from '@shopify/react-native-skia';
 import { View } from 'react-native';
-import { useReducedMotion } from 'react-native-reanimated';
 
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { COLOR_TOKENS, useColors, useVizSizes } from '@/theme';
 
 import {

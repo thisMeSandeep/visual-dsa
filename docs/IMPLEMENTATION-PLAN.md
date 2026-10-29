@@ -323,7 +323,8 @@ content(stack): add stack lesson, examples and code
 - Install `expo-sqlite`. Write `stores/storage.ts` (an `expo-sqlite/kv-store` adapter for Zustand `persist`), and add `src/config/storage.ts` (keys and schema versions).
 - `settings` store (theme, code language, default speed, haptics, reduced motion) and `progress` store, both with `version` and `migrate`.
 - The splash screen waits for hydration.
-- Settings screen built with `@expo/ui` controls (Picker, Switch, Slider).
+- Settings screen built with `@expo/ui` controls: `Picker` for theme, code language, speed and reduced motion (speeds are a fixed list, so a picker rather than a slider), and `Switch` for haptics (shown once `config.features.haptics` is on).
+- The lesson player starts at the saved speed and code language, and changing either in a lesson saves it.
 
 **Done when:** settings persist across app restarts, and the theme override works.
 

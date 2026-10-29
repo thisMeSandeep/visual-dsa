@@ -1,12 +1,12 @@
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View, type ScrollViewInstance } from 'react-native';
-import { useReducedMotion } from 'react-native-reanimated';
 
 import { AppText, type TextTone } from '@/components/app-text';
 import { IconButton } from '@/components/icon-button';
 import { PressableScale } from '@/components/pressable-scale';
 import { config, type CodeLanguage } from '@/config';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 import { centredOffset } from './scroll';
 import type { CodePanelSample, CodeRole } from './types';

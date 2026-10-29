@@ -14,9 +14,17 @@ import { createPlayerStore, type PlayerStore, type PlayerStoreState } from './cr
  * Creates a player for this component and keeps it in sync with `steps`: a new trace is loaded
  * into the same player (keeping its speed). The timer stops when the component unmounts.
  */
-export function usePlayer(steps: readonly Step[], startIndex?: number): PlayerStore {
+export function usePlayer(
+  steps: readonly Step[],
+  startIndex?: number,
+  speed?: number,
+): PlayerStore {
   const [store] = useState(() =>
-    createPlayerStore({ steps, ...(startIndex === undefined ? {} : { startIndex }) }),
+    createPlayerStore({
+      steps,
+      ...(startIndex === undefined ? {} : { startIndex }),
+      ...(speed === undefined ? {} : { speed }),
+    }),
   );
 
   useEffect(() => {

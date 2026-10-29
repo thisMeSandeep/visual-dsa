@@ -1,9 +1,11 @@
 import * as Haptics from 'expo-haptics';
 import { useState, type ReactNode } from 'react';
 import { Pressable, type PressableProps } from 'react-native';
-import Animated, { css, cubicBezier, useReducedMotion } from 'react-native-reanimated';
+import Animated, { css, cubicBezier } from 'react-native-reanimated';
 
 import { config } from '@/config';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useSettings } from '@/stores/settings';
 
 const { press } = config.motion;
 
@@ -37,7 +39,7 @@ export type PressableScaleProps = Omit<PressableProps, 'children' | 'style' | 'c
   className?: string;
   /** The surface that scales: background, padding, radius and content layout. */
   contentClassName?: string;
-  /** Light haptic on press, when haptics are enabled in config.features. */
+  /** Light haptic on press, when the haptics feature is on and the learner hasn't turned it off. */
   haptic?: boolean;
 };
 
@@ -55,6 +57,7 @@ export function PressableScale({
 }: PressableScaleProps) {
   const [pressed, setPressed] = useState(false);
   const reducedMotion = useReducedMotion();
+  const hapticsOn = useSettings((state) => state.haptics);
   const pressedStyle = reducedMotion ? PRESSED_STYLE_REDUCED : PRESSED_STYLE;
 
   return (
@@ -74,7 +77,7 @@ export function PressableScale({
         onPressOut?.(event);
       }}
       onPress={(event) => {
-        if (haptic && config.features.haptics) {
+        if (haptic && config.features.haptics && hapticsOn) {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
         onPress?.(event);
