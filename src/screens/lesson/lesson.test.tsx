@@ -113,6 +113,20 @@ describe('Lesson player', () => {
     }
   });
 
+  it('hides the progress bar for more canvas, keeping a step counter, and remembers it', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    expect(screen.getByRole('adjustable')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Hide progress bar' }));
+    expect(screen.queryByRole('adjustable')).toBeNull();
+    expect(screen.getByLabelText(/^Step 1 of \d+$/)).toBeOnTheScreen();
+    expect(useSettings.getState().showScrubber).toBe(false);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Show progress bar' }));
+    expect(screen.getByRole('adjustable')).toBeOnTheScreen();
+    expect(useSettings.getState().showScrubber).toBe(true);
+  });
+
   it('can start at a chapter', async () => {
     await renderLesson(<Lesson topicId="stack" chapter="push-pop-peek" />);
     expect(

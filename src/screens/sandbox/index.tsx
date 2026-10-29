@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { CaptionText } from '@/components/caption-text';
 import { IconButton } from '@/components/icon-button';
+import { KeyboardAvoidingView } from '@/components/keyboard-avoiding-view';
 import { Scrubber } from '@/components/scrubber';
 import { StatStrip } from '@/components/stat-strip';
 import { TextField } from '@/components/text-field';
@@ -119,10 +120,8 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
   const valueRange = config.engine.valueRange;
 
   return (
-    <KeyboardAvoidingView
-      behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-background pt-safe"
-    >
+    // The controls rise with the keyboard on both platforms; the canvas shrinks to make room.
+    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-background pt-safe">
       <View className="flex-row items-center px-3">
         <IconButton icon="back" label="Back" onPress={() => router.back()} />
         <View className="flex-1 items-center">

@@ -186,6 +186,7 @@ Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
 | Chapters | `chapters` | `ListNumbers` |
 | Play / pause / step | `play`, `pause` (fill), `step-back`, `step-forward` | `Play`, `Pause`, `CaretLeft`, `CaretRight` |
 | Code panel / copy | `code`, `copy` | `Code`, `Copy` |
+| Show / hide the lesson's progress bar | `timeline` | `SlidersHorizontal` |
 | Reference sheet | `reference` | `BookOpen` |
 | Reset / undo / random | `reset`, `undo`, `random` | `ArrowCounterClockwise`, `ArrowUUpLeft`, `Shuffle` |
 | Bookmark | `bookmark` | `BookmarkSimple` |
@@ -244,7 +245,7 @@ Four tabs: Learn, Practice, Progress, Settings, in a **floating capsule**: inset
 - **Scrubber:** bar plus a 14px `primary` knob, with mono step numbers at each end.
 
 ### Inputs
-Height 52, `surface-raised` fill, 1.5px `line-input` border, `radius-md`, mono values (`value` style). The label sits above in `label` style. Focus: 2px `primary` ring. Error: 2px `danger` border with the message below in `label` style, `danger` tone. In code: `<TextField label error>` (`src/components/text-field.tsx`).
+Height 52, `surface-raised` fill, 1.5px `line-input` border, `radius-md`, mono values (`value` style). The label sits above in `label` style. Focus: 2px `primary` ring. Error: 2px `danger` border with the message below in `label` style, `danger` tone. In code: `<TextField label error>` (`src/components/text-field.tsx`). **The keyboard never covers a field or its buttons:** any screen with a text input is wrapped in `<KeyboardAvoidingView behavior="padding">` from `src/components/keyboard-avoiding-view.tsx` (react-native-keyboard-controller), so the controls rise with the keyboard and flexible content (the canvas) shrinks.
 
 ### Quiz option tile
 Height 92, `radius-lg`, `surface-raised` with a `line-strong` border. Small "Bucket" label over a mono 28 value. **Correct:** 2px `success` border, `success-soft` fill, success check badge. **Wrong:** 2px `danger` border, `danger-soft` fill, `X` badge.
@@ -377,7 +378,7 @@ These match the concept canvas.
 |---|---|
 | **Home** | `display` "Learn" with a one-line `body-sm` subtitle (+ streak chip once streaks exist, P1) → each category: `overline` name with a `label` topic count on the right, then topic cards two per row → tab bar. No Continue card: each card shows its own progress, and the Topic screen's Continue button resumes |
 | **Topic** | *(Removed in the UI rework: a topic opens its lesson directly. Summary and stats live in the reference sheet; Sandbox and Practice in the lesson's top bar.)* |
-| **Lesson player** | **Always landscape**, status bar hidden. Top bar (56, hairline below): back · topic name (`body-sm` bold) over chapter title (`label`) · speed · code · chapters · reference · sandbox · practice (ghost icon buttons) → canvas, with the code panel beside it when open → scrubber → one row: prev (step) · **play** · centred `caption` (two lines reserved) · next (step). Chapters open in a side panel |
+| **Lesson player** | **Always landscape**, status bar hidden. Top bar (56, hairline below): back · topic name (`body-sm` bold) over chapter title (`label`) · speed · code · progress-bar toggle · chapters · reference · sandbox · practice (ghost icon buttons; code and progress bar show their active state) → canvas, with the code panel beside it when open → scrubber (can be hidden for a taller canvas; the choice is remembered) → one row: prev (step) · **play** · centred `caption` (two lines reserved) · a mono `index` "34 / 54" counter when the scrubber is hidden · next (step). Chapters open in a side panel |
 | **Reference sheet** | Category glyph + topic name overline → `title` "Reference" → summary → "How it scales" stat strip (the cheat sheets come later) |
 | **Sandbox** | Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → live structure with pointers → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → stat strip → preset pills (current one solid `primary`, others tinted) → value field + round Random button → primary action → tinted secondary actions in one row |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |

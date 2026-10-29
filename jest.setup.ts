@@ -56,3 +56,8 @@ jest.mock('expo-sqlite/kv-store', () => {
   };
   return { __esModule: true, default: Storage, Storage, AsyncStorage: Storage };
 });
+
+// react-native-keyboard-controller ships its own mock (no keyboard in Jest).
+jest.mock('react-native-keyboard-controller', () =>
+  require('react-native-keyboard-controller/jest'),
+);

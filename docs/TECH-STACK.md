@@ -247,7 +247,8 @@ Phosphor is clean and minimal, but much less common than Lucide, which has becom
 | `expo-notifications` | Opt-in streak reminders (F-1003), local only | P1 |
 | `expo-speech` | Caption narration (F-210) | P2 |
 | `expo-localization` + `i18next` | Translations (F-1111) | P2 |
-| `expo-screen-orientation` | Portrait + landscape support (F-106) | P0 |
+| `expo-screen-orientation` | Not used: the native stack's per-screen `orientation` option locks the lesson to landscape and the rest to portrait (F-106) | — |
+| `react-native-keyboard-controller` | Keeps text inputs above the keyboard on both platforms, including Android's edge-to-edge keyboard (React Native's own `KeyboardAvoidingView` misses it). Included in Expo Go; `<KeyboardProvider>` in the root layout, and `components/keyboard-avoiding-view.tsx` wraps its `KeyboardAvoidingView` with `withUniwind` | P0 |
 | `expo-splash-screen`, `expo-system-ui` | Launch experience, themed system bars | P0 |
 
 ## 9. Charts

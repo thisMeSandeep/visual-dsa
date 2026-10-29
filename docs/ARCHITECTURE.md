@@ -514,7 +514,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 
 | Store | Contents | Persisted |
 |---|---|---|
-| `settings` | Theme override, code language, default speed, haptics, reduced-motion override | kv-store |
+| `settings` | Theme override, code language, default speed, haptics, lesson progress bar shown or hidden, reduced-motion override | kv-store |
 | `progress` | Per topic: completed chapters, last step, quiz scores, mastery · bookmarks · streak · revise list | kv-store |
 | player (per instance) | Steps, machine state | No (re-created on open) |
 | sandbox (per session) | Model, history | No |

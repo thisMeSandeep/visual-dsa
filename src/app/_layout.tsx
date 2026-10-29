@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaListener, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Uniwind } from 'uniwind';
 
@@ -40,21 +41,25 @@ export default function RootLayout() {
     // The root carries the page colour too, so it shows behind Android's navigation buttons
     // (edge to edge) instead of white.
     <GestureHandlerRootView style={[styles.root, { backgroundColor: background }]}>
-      <SafeAreaProvider>
-        {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
-        <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
-          <StatusBar style="auto" />
-          {/* (tabs) is the home of the app; topic/[topicId] and dev/* push on top of it. The
+      {/* Tracks the keyboard's real position on both platforms (edge to edge included), for
+          KeyboardAvoidingView from react-native-keyboard-controller. */}
+      <KeyboardProvider>
+        <SafeAreaProvider>
+          {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
+          <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
+            <StatusBar style="auto" />
+            {/* (tabs) is the home of the app; topic/[topicId] and dev/* push on top of it. The
               app is portrait; only the lesson locks itself to landscape (topic layout). */}
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              orientation: 'portrait',
-              contentStyle: { backgroundColor: background },
-            }}
-          />
-        </SafeAreaListener>
-      </SafeAreaProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                orientation: 'portrait',
+                contentStyle: { backgroundColor: background },
+              }}
+            />
+          </SafeAreaListener>
+        </SafeAreaProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

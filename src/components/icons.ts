@@ -23,6 +23,7 @@ import { ListNumbersIcon } from 'phosphor-react-native/src/icons/ListNumbers';
 import { PauseIcon } from 'phosphor-react-native/src/icons/Pause';
 import { PlayIcon } from 'phosphor-react-native/src/icons/Play';
 import { ShuffleIcon } from 'phosphor-react-native/src/icons/Shuffle';
+import { SlidersHorizontalIcon } from 'phosphor-react-native/src/icons/SlidersHorizontal';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 
 /* VISUAL-SPEC §5 */
@@ -37,6 +38,8 @@ export const ICONS = {
   pause: PauseIcon,
   chapters: ListNumbersIcon,
   code: CodeIcon,
+  /** Show or hide the lesson's scrubber (progress bar). */
+  timeline: SlidersHorizontalIcon,
   copy: CopyIcon,
   reference: BookOpenIcon,
   // Sandbox

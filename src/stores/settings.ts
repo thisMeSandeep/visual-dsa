@@ -27,6 +27,8 @@ export type SettingsValues = {
   defaultSpeed: number;
   /** Haptic feedback, when the haptics feature is on (config.features.haptics). */
   haptics: boolean;
+  /** The lesson's scrubber (progress bar). Hiding it gives the canvas more room. */
+  showScrubber: boolean;
   reducedMotion: ReducedMotionChoice;
 };
 
@@ -35,6 +37,7 @@ export const DEFAULT_SETTINGS: SettingsValues = {
   codeLanguage: config.app.defaultCodeLanguage,
   defaultSpeed: config.player.defaultSpeed,
   haptics: true,
+  showScrubber: true,
   reducedMotion: 'system',
 };
 
@@ -47,6 +50,7 @@ const SettingsSchema = z
     codeLanguage: z.enum(config.app.codeLanguages).catch(DEFAULT_SETTINGS.codeLanguage),
     defaultSpeed: z.number().refine(isOfferedSpeed).catch(DEFAULT_SETTINGS.defaultSpeed),
     haptics: z.boolean().catch(DEFAULT_SETTINGS.haptics),
+    showScrubber: z.boolean().catch(DEFAULT_SETTINGS.showScrubber),
     reducedMotion: z.enum(REDUCED_MOTION_CHOICES).catch(DEFAULT_SETTINGS.reducedMotion),
   })
   .catch(DEFAULT_SETTINGS);
@@ -61,6 +65,7 @@ export type SettingsState = SettingsValues & {
   setCodeLanguage: (language: CodeLanguage) => void;
   setDefaultSpeed: (speed: number) => void;
   setHaptics: (on: boolean) => void;
+  setShowScrubber: (show: boolean) => void;
   setReducedMotion: (choice: ReducedMotionChoice) => void;
 };
 
@@ -72,17 +77,26 @@ export const useSettings = create<SettingsState>()(
       setCodeLanguage: (codeLanguage) => set({ codeLanguage }),
       setDefaultSpeed: (defaultSpeed) => set({ defaultSpeed }),
       setHaptics: (haptics) => set({ haptics }),
+      setShowScrubber: (showScrubber) => set({ showScrubber }),
       setReducedMotion: (reducedMotion) => set({ reducedMotion }),
     }),
     {
       name: config.storage.keys.settings,
       version: config.storage.versions.settings,
       storage: kvStorage,
-      partialize: ({ theme, codeLanguage, defaultSpeed, haptics, reducedMotion }) => ({
+      partialize: ({
         theme,
         codeLanguage,
         defaultSpeed,
         haptics,
+        showScrubber,
+        reducedMotion,
+      }) => ({
+        theme,
+        codeLanguage,
+        defaultSpeed,
+        haptics,
+        showScrubber,
         reducedMotion,
       }),
       // Version 1 is the first; later versions convert older saves here before they're checked.

@@ -130,6 +130,9 @@ function LessonPlayer({
   const setLanguage = useSettings((state) => state.setCodeLanguage);
   const sample = getCodeSample(meta.id, language);
   const showCode = codeOpen && sample !== undefined;
+  // The scrubber can be hidden for a taller canvas; the choice is remembered.
+  const showScrubber = useSettings((state) => state.showScrubber);
+  const setShowScrubber = useSettings((state) => state.setShowScrubber);
   const topicRoute = (
     pathname: '/topic/[topicId]/reference' | '/topic/[topicId]/play' | '/topic/[topicId]/practice',
   ) => router.push({ pathname, params: { topicId: meta.id } });
@@ -181,6 +184,12 @@ function LessonPlayer({
           active={showCode}
           disabled={!sample}
           onPress={() => setCodeOpen((open) => !open)}
+        />
+        <IconButton
+          label={showScrubber ? 'Hide progress bar' : 'Show progress bar'}
+          icon="timeline"
+          active={showScrubber}
+          onPress={() => setShowScrubber(!showScrubber)}
         />
         <IconButton
           icon="chapters"
@@ -236,7 +245,9 @@ function LessonPlayer({
         ) : null}
       </View>
 
-      <Scrubber current={number} total={total} onSeek={actions.seek} className="px-6" />
+      {showScrubber ? (
+        <Scrubber current={number} total={total} onSeek={actions.seek} className="px-6" />
+      ) : null}
 
       <View className="flex-row items-center gap-4 px-6 pt-1 pb-3">
         <IconButton
@@ -257,6 +268,12 @@ function LessonPlayer({
         <View className="min-h-14 flex-1 justify-center">
           {step ? <CaptionText caption={step.caption} className="text-center" /> : null}
         </View>
+        {/* With the scrubber hidden, the position stays visible as a small counter. */}
+        {showScrubber ? null : (
+          <AppText variant="index" accessibilityLabel={`Step ${number} of ${total}`}>
+            {number} / {total}
+          </AppText>
+        )}
         <IconButton
           label="Next step"
           icon="step-forward"

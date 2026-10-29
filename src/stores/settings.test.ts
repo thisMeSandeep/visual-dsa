@@ -34,12 +34,19 @@ describe('settings store', () => {
   });
 
   it('saves every change, with the schema version', async () => {
-    const { setTheme, setCodeLanguage, setDefaultSpeed, setHaptics, setReducedMotion } =
-      useSettings.getState();
+    const {
+      setTheme,
+      setCodeLanguage,
+      setDefaultSpeed,
+      setHaptics,
+      setShowScrubber,
+      setReducedMotion,
+    } = useSettings.getState();
     setTheme('dark');
     setCodeLanguage('javascript');
     setDefaultSpeed(2);
     setHaptics(false);
+    setShowScrubber(false);
     setReducedMotion('on');
     await Promise.resolve();
 
@@ -49,6 +56,7 @@ describe('settings store', () => {
         codeLanguage: 'javascript',
         defaultSpeed: 2,
         haptics: false,
+        showScrubber: false,
         reducedMotion: 'on',
       },
       version: config.storage.versions.settings,
