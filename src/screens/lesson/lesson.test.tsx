@@ -81,6 +81,29 @@ describe('Lesson player', () => {
     expect(caption('Pop. First, check the stack isn’t empty.')).toBeOnTheScreen();
   });
 
+  it('shows the code with the current line following the steps', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    await fireEvent.press(screen.getByRole('button', { name: 'Show code' }));
+    expect(screen.getByRole('button', { name: 'Hide code', selected: true })).toBeOnTheScreen();
+    // The intro step runs no code, so nothing is highlighted yet.
+    expect(screen.queryByLabelText(/^Current line/)).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Next step' }));
+    expect(
+      screen.getByLabelText(/^Current line, line \d+: +if top is capacity - 1 then$/),
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'JavaScript' }));
+    expect(
+      screen.getByLabelText(
+        /^Current line, line \d+: +if \(this\.items\.length === this\.capacity\) \{$/,
+      ),
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Hide code' }));
+    expect(screen.queryByRole('tab', { name: 'JavaScript' })).toBeNull();
+  });
+
   it('explains when a topic has no lesson yet', async () => {
     await renderLesson(<Lesson topicId="queue" />);
     expect(screen.getByText(/written in a later step/)).toBeOnTheScreen();

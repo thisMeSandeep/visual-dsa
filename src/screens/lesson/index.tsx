@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 
 import { AppText } from '@/components/app-text';
 import { IconButton } from '@/components/icon-button';
 import { Scrubber } from '@/components/scrubber';
-import { config } from '@/config';
+import { config, type CodeLanguage } from '@/config';
+import { getCodeSample } from '@/content/code';
 import { getTopicMeta } from '@/content/registry';
 import type { TopicMeta } from '@/content/schema';
 import { chapterAt, type CompiledLesson } from '@/engine/lesson/types';
@@ -25,6 +26,7 @@ import {
   useStepNumber,
   useTotalSteps,
 } from '@/stores/use-player';
+import { CodePanel } from '@/viz/code-panel';
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
@@ -32,7 +34,7 @@ import { CaptionText } from './caption-text';
 
 const { swipe } = config.player;
 
-/** Lesson player (F-201, F-202, F-203, F-205, F-401–F-403). */
+/** Lesson player (F-201, F-202, F-203, F-205, F-401–F-403) with the code panel (F-501–F-506). */
 export function Lesson({ topicId, chapter }: { topicId: string; chapter?: string }) {
   const meta = getTopicMeta(topicId);
   const lesson = getLesson(topicId);
@@ -87,6 +89,14 @@ function LessonPlayer({
 
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
 
+  // Code panel: docked under the canvas in portrait, beside it in landscape (F-506).
+  const [codeOpen, setCodeOpen] = useState<boolean>(config.code.panelOpenByDefault);
+  const [language, setLanguage] = useState<CodeLanguage>(config.app.defaultCodeLanguage);
+  const sample = getCodeSample(meta.id, language);
+  const window = useWindowDimensions();
+  const landscape = window.width > window.height;
+  const showCode = codeOpen && sample !== undefined;
+
   // Swipe left for the next step, right for the previous one (a short flick is enough).
   const swipeGesture = usePanGesture({
     activeOffsetX: [-swipe.activateAfterPx, swipe.activateAfterPx],
@@ -128,25 +138,36 @@ function LessonPlayer({
         />
       </View>
 
-      <GestureDetector gesture={swipeGesture}>
-        <View
-          className="flex-1 px-6"
-          onLayout={(event) => {
-            const { width, height } = event.nativeEvent.layout;
-            setCanvas({ width, height });
-          }}
-        >
-          {step && canvas.width > 0 && canvas.height > 0 ? (
-            <SceneView
-              scene={step.scene}
-              width={canvas.width}
-              height={canvas.height}
-              speed={speed}
-              accessibilityLabel={step.a11y}
-            />
-          ) : null}
-        </View>
-      </GestureDetector>
+      <View className={landscape ? 'flex-1 flex-row gap-4 px-6' : 'flex-1 gap-3 px-6 pb-3'}>
+        <GestureDetector gesture={swipeGesture}>
+          <View
+            className="flex-1"
+            onLayout={(event) => {
+              const { width, height } = event.nativeEvent.layout;
+              setCanvas({ width, height });
+            }}
+          >
+            {step && canvas.width > 0 && canvas.height > 0 ? (
+              <SceneView
+                scene={step.scene}
+                width={canvas.width}
+                height={canvas.height}
+                speed={speed}
+                accessibilityLabel={step.a11y}
+              />
+            ) : null}
+          </View>
+        </GestureDetector>
+        {showCode ? (
+          <CodePanel
+            sample={sample}
+            language={language}
+            onLanguageChange={setLanguage}
+            lineId={step?.codeLine}
+            className={landscape ? 'w-1/2' : 'max-h-60'}
+          />
+        ) : null}
+      </View>
 
       {/* Fixed minimum height (three caption lines) so the controls don't jump between steps. */}
       <View className="min-h-21 px-6">{step ? <CaptionText caption={step.caption} /> : null}</View>
@@ -181,8 +202,14 @@ function LessonPlayer({
           disabled={!canForward}
           onPress={actions.next}
         />
-        {/* The code panel arrives in Step 5.2. */}
-        <IconButton label="Show code" icon="code" variant="round" disabled />
+        <IconButton
+          label={showCode ? 'Hide code' : 'Show code'}
+          icon="code"
+          variant="round"
+          active={showCode}
+          disabled={!sample}
+          onPress={() => setCodeOpen((open) => !open)}
+        />
       </View>
     </View>
   );

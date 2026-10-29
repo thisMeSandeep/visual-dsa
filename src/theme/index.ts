@@ -56,6 +56,12 @@ export const COLOR_TOKENS = [
   'mode-practice',
   'mode-practice-ink',
   'mode-practice-soft',
+  // Code syntax
+  'code-keyword',
+  'code-name',
+  'code-string',
+  'code-number',
+  'code-comment',
 ] as const;
 
 export type ColorToken = (typeof COLOR_TOKENS)[number];

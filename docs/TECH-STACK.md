@@ -157,7 +157,7 @@ src/content/
 ```
 
 - **Zod schemas** validate all content at build/test time, so a broken lesson fails CI, not the user.
-- **Code highlighting:** a build script runs **Shiki** over `code/` and outputs pre-tokenised JSON. At runtime the app renders coloured `<Text>` spans with no parser shipped to the device. Each step points at a line ID, which drives the synced highlight (F-501).
+- **Code highlighting:** a build script (`bun run highlight`) runs **Shiki** (a dev dependency) over `code/` and outputs pre-tokenised JSON. Tokens carry a role (keyword, string…), not Shiki's colours, so syntax colours come from `tokens.css`. At runtime the app renders coloured `<Text>` spans with no parser shipped to the device. Each step points at a line ID, which drives the synced highlight (F-501).
 - **EAS Update** can push corrected captions or quiz answers over the air without a store release.
 
 ## 7. Styling, icons & design system

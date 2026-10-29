@@ -61,7 +61,8 @@ bun run format              # Prettier (format:check in CI)
 bun run doctor              # expo-doctor: dependency and config health
 bun run test                # Jest. NOT `bun test`
 bun run test:watch          # Jest in watch mode
-bun run validate:content    # Zod-check all topic content
+bun run validate:content    # Zod-check all topic content, compile lessons, check code line ids
+bun run highlight           # re-tokenise code samples (runs on install and before start)
 bunx expo install <pkg>     # add an Expo-compatible dependency
 ```
 

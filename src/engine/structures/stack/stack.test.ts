@@ -125,7 +125,9 @@ describe('peek', () => {
   });
 
   it('fails on an empty stack', () => {
-    expect(traceStack(createStack(), { type: 'peek' }).trace.error?.code).toBe('stack.empty');
+    const { trace } = traceStack(createStack(), { type: 'peek' });
+    expect(trace.error?.code).toBe('stack.empty');
+    expect(lines(trace)).toEqual(['peek-empty']);
   });
 });
 

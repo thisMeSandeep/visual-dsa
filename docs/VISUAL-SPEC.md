@@ -81,7 +81,19 @@ The three ways into a topic each have a fixed tint, used on the Topic screen but
 | Sandbox | teal `#0E9384` | 10% tint, text `#0B6F64`, Shuffle icon |
 | Practice | violet `#7650D8` | 10% tint, text `#5B3BB8`, GraduationCap icon |
 
-### 2.5 Colour budget
+### 2.5 Code syntax colours
+
+Used **only** for code in the code panel, on the `surface` fill. Plain code (operators, variables, punctuation) is `ink`. Each colour reaches 4.5:1 on `surface` in both themes.
+
+| Token | Light | Dark | Used for |
+|---|---|---|---|
+| `code-keyword` | `#6A3FB0` | `#C3A6FF` | `if`, `return`, `class`, `this`, `new`, `true` |
+| `code-name` | `#1F5F9E` | `#8CC2F5` | Function, method and class names |
+| `code-string` | `#256B41` | `#93D6A8` | Strings |
+| `code-number` | `#9A5800` | `#F0B866` | Numbers |
+| `code-comment` | `#6E685F` | `#A29C92` | Comments |
+
+### 2.6 Colour budget
 
 - Each screen has **at most one** solid `primary` button.
 - `signal` appears only inside the visualisation canvas and the code panel, plus the streak flame. It is never used for buttons.
@@ -234,7 +246,9 @@ Height 92, `radius-lg`, `surface-raised` with a `line-strong` border. Small "Buc
 Bottom panel inset 16, `radius-xl`, `success-soft` (or `danger-soft`) fill. Heading in `success-ink` ("Correct"), then the explanation in `body-sm` `ink-2`, then a full-width primary button.
 
 ### Code panel
-`surface` block, `radius-lg`, mono 13/1.9. Line numbers in `muted`. **Current line:** `signal-soft` background, with the line number in `signal-ink`. Docked under the canvas in portrait and beside it in landscape.
+`surface` block, `radius-lg`, mono 13/1.9, syntax colours from §2.5. Line numbers in `muted`. **Current line:** `signal-soft` row with `radius-sm`, and the line number in `signal-ink`. The panel scrolls to keep the current line in the middle (no animation with reduced motion). Long lines scroll sideways instead of wrapping.
+
+The header holds the language pills on the left (selected: `primary-soft` fill, `primary` label in medium; others: `muted` label) and a ghost **Copy** button on the right, which shows a `Check` for 1.5 s after copying. The round code button in the player controls opens and closes it (active state when open). Docked under the canvas in portrait (at most 240pt tall, the canvas shrinks to fit) and beside it in landscape (half the width).
 
 ### Chips
 Pill, height 36, tinted fill (e.g. the streak chip: `signal` 12% fill, `Flame` fill icon, mono count, `muted` unit).

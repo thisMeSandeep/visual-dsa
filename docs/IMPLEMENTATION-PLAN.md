@@ -292,6 +292,7 @@ feat(engine): add lesson compiler
 - Install Shiki as a dev dependency. `scripts/highlight-code.ts` strips `@line` markers and outputs tokens and line ids per language.
 - `viz/code-panel/`: native text spans, the current line in `signal-soft`, a language switch (pseudocode and JavaScript), and copy via `expo-clipboard`.
 - The panel docks below the canvas in portrait and beside it in landscape, and can be collapsed.
+- The Stack code samples (pseudocode and JavaScript, with `@line` markers) are written here so the panel has real code to follow; `validate:content` checks every line id a lesson uses is marked in every language.
 
 **Done when:** the highlighted line follows the animation in both languages, and copy works.
 
@@ -303,7 +304,7 @@ feat(code): add Shiki code pipeline and synced code panel
 ### Step 5.3: Stack lesson content
 **Goal:** the complete Stack topic lesson (ALGORITHM-CATALOG L5).
 - The 6-chapter recipe, plus the browser back button and balanced parentheses examples (`viz/scenes/`).
-- Stack code samples in pseudocode and JavaScript with `@line` markers.
+- Review the Stack code samples from Step 5.2 against the new chapters' steps.
 
 **Done when:** the whole lesson plays from the Topic screen, and content validation passes.
 

@@ -9,6 +9,7 @@
     "@shopify/flash-list": "2.3.2",
     "@shopify/react-native-skia": "2.14.0",
     "expo": "~58.0.21",
+    "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.14",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
@@ -44,13 +45,14 @@
     "jest": "~30.5.2",
     "jest-expo": "~58.0.13",
     "prettier": "^3.9.10",
+    "shiki": "^4.5.0",
     "test-renderer": "^1.3.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "expo start --go",
-    "start:tunnel": "expo start --go --tunnel",
-    "start:ngrok": "expo start --go --tunnel ngrok",
+    "start": "bun run highlight && expo start --go",
+    "start:tunnel": "bun run highlight && expo start --go --tunnel",
+    "start:ngrok": "bun run highlight && expo start --go --tunnel ngrok",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
     "format": "prettier --write .",
@@ -58,7 +60,9 @@
     "doctor": "bunx expo-doctor",
     "test": "jest",
     "test:watch": "jest --watch",
-    "validate:content": "bun scripts/validate-content.ts"
+    "validate:content": "bun run highlight && bun scripts/validate-content.ts",
+    "highlight": "bun scripts/highlight-code.ts",
+    "postinstall": "bun run highlight"
   },
   "private": true,
   "jest": {

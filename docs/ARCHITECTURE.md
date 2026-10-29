@@ -134,8 +134,11 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │       ├── lesson.ts       #     lesson recipe
 │   │   │       ├── quiz.ts
 │   │   │       ├── reference.ts
-│   │   │       └── code/           #     put.pseudo, put.js … (with line ids)
-│   │   └── generated/              #   build output (code tokens), git-ignored
+│   │   │       └── code/           #     one sample per language: hash-table.pseudo,
+│   │   │                           #     hash-table.js (with @line markers)
+│   │   ├── code.ts                 #   getCodeSample(topicId, language)
+│   │   ├── code-types.ts           #   CodeSample, CodeRole (shared with the highlight script)
+│   │   └── generated/              #   build output (code-tokens.json), git-ignored
 │   │
 │   ├── stores/                     # Zustand stores
 │   │   ├── storage.ts              #   expo-sqlite/kv-store adapter for persist
@@ -346,7 +349,11 @@ function put(table, key, value) {
 }
 ```
 
-`scripts/highlight-code.ts` strips the markers, tokenises each file with Shiki, and writes `{ lines: Token[][], lineIds: { hash: 2, collision: 3, append: 6 } }` per language. Switching language keeps the highlight in sync, because the step's line id resolves in every language.
+Each topic with code has `content/topics/<topic>/code/` with **one file per language** in `config.app.codeLanguages` (`.pseudo` for pseudocode, `.js` for JavaScript). A file holds the whole implementation (every operation), so Copy gives the learner something complete and the panel shows the operation in context. Markers use `// @line <id>` (or `# @line <id>`). The same id may mark several lines, which then highlight together (e.g. `top = top + 1` and `items[top] = value` are both `push`). Each id belongs to one operation, so the panel never highlights the wrong method. That's why a failed `peek` reports `peek-empty`, not pop's `underflow`.
+
+`scripts/highlight-code.ts` (`bun run highlight`) strips the markers, tokenises each file with Shiki (JavaScript built in, pseudocode from a small TextMate grammar in `scripts/lib/code-tokens.ts`), and writes `src/content/generated/code-tokens.json`: topic → language → `{ source, lines, lineIds }`. Each line is a list of `[text, role]` runs. Shiki's colours are thrown away: a token's TextMate scopes give it one of six roles (`plain`, `keyword`, `name`, `string`, `number`, `comment`), and the code panel colours roles from `tokens.css`, so code follows the theme like everything else. `lineIds` maps an id to 0-based line indices, e.g. `{ 'check-full': [7], pop: [18, 19] }`. Switching language keeps the highlight in sync, because the step's line id resolves in every language.
+
+The JSON is git-ignored. It's rebuilt by `postinstall`, before every `start` script and before `validate:content`. Run `bun run highlight` after editing a sample while Metro is running. `validate:content` checks that every line id a lesson's steps use is marked in every language (`content/validate.ts`, `validateCodeLines`).
 
 ### 5.4 Lesson compiler
 
@@ -458,7 +465,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 
 ### 6.3 Code panel
 
-`viz/code-panel/` renders the pre-tokenised lines as native `<Text>` spans and highlights the line that `step.codeLine` resolves to in the selected language. It also shows live `vars` in a small watch row (F-503). It docks below the canvas in portrait and beside it in landscape (F-506).
+`viz/code-panel/` (`CodePanel`) renders the pre-tokenised lines as native `<Text>` spans and highlights the lines that `step.codeLine` resolves to in the selected language, scrolling them to the middle (`scroll.ts`). It has language pills and Copy (`expo-clipboard`, the sample's `source`). viz can't import content, so it declares the sample shape again (`types.ts`); the lesson screen passes content's `CodeSample` in, and TypeScript checks the two match. The lesson screen owns whether it's open (`config.code.panelOpenByDefault`, toggled by the code button) and the language (`config.app.defaultCodeLanguage`; the settings store keeps the choice from Step 6.1). It docks below the canvas in portrait and beside it in landscape (`useWindowDimensions`, F-506). Live `vars` in a watch row (F-503) are P1.
 
 ### 6.4 Sandbox
 
@@ -628,6 +635,7 @@ const delay = config.player.baseStepMs / speed;
 | File | Holds |
 |---|---|
 | `app.ts` | App name, deep-link scheme, code languages offered, default language, external links |
+| `code.ts` | Code panel: open by default, how long the "copied" tick shows |
 | `player.ts` | Base step duration, speed options, default speed, swipe threshold, pause at chapter end |
 | `motion.ts` | Highlight/insert/fade durations, spring configs, press scale, reduced-motion fade |
 | `engine.ts` | Max steps per trace, max input size per structure, allowed value range, default RNG seed |
@@ -656,8 +664,8 @@ Numbers that are part of an algorithm's definition (heap child index `2i + 1`, `
 
 | Script | When | Output |
 |---|---|---|
-| `scripts/highlight-code.ts` | `prebuild`, CI, and on save in dev | `src/content/generated/code-tokens.json` |
-| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, or names a glyph that doesn't exist. Checks for unknown operations (Step 5.1) and code line ids (Step 5.2) are added with those features |
+| `scripts/highlight-code.ts` (`bun run highlight`) | `postinstall`, before `start`/`start:tunnel`/`start:ngrok` and `validate:content`, and by hand after editing a sample. EAS builds run `postinstall` too | `src/content/generated/code-tokens.json` (git-ignored). Fails on an unknown file extension, a missing or second sample for a language, or a line id that isn't kebab-case |
+| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), or highlights a code line that a language's sample doesn't mark |
 
 ---
 

@@ -3,8 +3,9 @@ import type { CompiledLesson } from '@/engine/lesson/types';
 
 import { captionText } from './captions';
 import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS, type TopicId } from './registry';
+import type { CodeSample } from './code-types';
 import type { LessonRecipe } from './schema';
-import { validateLessons } from './validate';
+import { validateCodeLines, validateLessons } from './validate';
 
 /**
  * One readable line per step: caption, code line, what the canvas shows, and any pause.
@@ -97,5 +98,60 @@ describe('lesson validation', () => {
     expect(issues({ stack: wrongOperation })).toEqual([
       'segments[3]: Unknown operation "stack.shuffle"',
     ]);
+  });
+});
+
+describe('code line validation', () => {
+  const lesson = compileLesson(
+    {
+      topicId: 'stack',
+      segments: [
+        { kind: 'chapter', chapterId: 'lifo' },
+        { kind: 'setup', structure: 'stack', input: { capacity: 1 } },
+        { kind: 'trace', operation: 'stack.push', input: { value: '1' } },
+      ],
+    },
+    chapterTitles(TOPIC_METAS.stack),
+  );
+  const sample = (...ids: string[]): CodeSample => ({
+    source: '',
+    lines: [],
+    lineIds: Object.fromEntries(ids.map((id, line) => [id, [line]])),
+  });
+  const issues = (samples: Parameters<typeof validateCodeLines>[2]) =>
+    validateCodeLines('stack', lesson, samples).map((issue) => `${issue.path}: ${issue.message}`);
+
+  it('accepts samples that mark every line the lesson highlights', () => {
+    const both = sample('check-full', 'push');
+    expect(issues({ stack: { pseudocode: both, javascript: both } })).toEqual([]);
+  });
+
+  it('reports a line id missing from one language', () => {
+    expect(
+      issues({
+        stack: { pseudocode: sample('check-full', 'push'), javascript: sample('check-full') },
+      }),
+    ).toEqual(['code/javascript: No line is marked "@line push", which the lesson highlights']);
+  });
+
+  it('reports a missing sample', () => {
+    expect(issues({})).toEqual([
+      'code/pseudocode: The lesson highlights code, but there is no sample',
+      'code/javascript: The lesson highlights code, but there is no sample',
+    ]);
+  });
+
+  it('needs no code for a lesson that never highlights any', () => {
+    const talk = compileLesson(
+      {
+        topicId: 'stack',
+        segments: [
+          { kind: 'chapter', chapterId: 'lifo' },
+          { kind: 'scene', sceneId: 'plates', steps: [{ caption: 'A pile of plates.' }] },
+        ],
+      },
+      chapterTitles(TOPIC_METAS.stack),
+    );
+    expect(validateCodeLines('stack', talk, {})).toEqual([]);
   });
 });

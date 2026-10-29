@@ -1,0 +1,31 @@
+// items holds the values, bottom first.
+// top is the index of the top item,
+// or -1 when the stack is empty.
+
+function push(value)
+  if top is capacity - 1 then // @line check-full
+    error "Stack overflow" // @line overflow
+  end if
+  top = top + 1 // @line push
+  items[top] = value // @line push
+end function
+
+function pop()
+  if top is -1 then // @line check-empty
+    error "Stack underflow" // @line underflow
+  end if
+  value = items[top] // @line read-top
+  top = top - 1 // @line pop
+  return value // @line pop
+end function
+
+function peek()
+  if top is -1 then
+    error "Stack is empty" // @line peek-empty
+  end if
+  return items[top] // @line peek
+end function
+
+function clear()
+  top = -1 // @line clear
+end function

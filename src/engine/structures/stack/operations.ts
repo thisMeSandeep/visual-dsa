@@ -1,7 +1,11 @@
 /**
  * Stack operations with tracing (ALGORITHM-CATALOG L5). Each `step()` is a moment the learner
- * sees. Code line ids ('check-full', 'push'…) must match the `@line` markers in the stack's code
- * samples (ARCHITECTURE §5.3).
+ * sees. Code line ids must match the `@line` markers in the stack's code samples
+ * (ARCHITECTURE §5.3), and each id belongs to one operation so the code panel highlights the
+ * right method.
+ *
+ * Code line ids used: check-full, overflow, push (push); check-empty, underflow, read-top, pop
+ * (pop); peek-empty, peek (peek); clear (clear).
  *
  * Caption keys used: stack.push.check, stack.pushed, stack.overflow, stack.pop.check,
  * stack.pop.read, stack.popped, stack.underflow, stack.peeked, stack.empty, stack.clear.start,
@@ -99,7 +103,7 @@ export function peek(t: StackTracer): string | undefined {
     t.fail(
       'stack.empty',
       { key: 'stack.empty' },
-      { line: 'underflow', annotations: { container: 'error' } },
+      { line: 'peek-empty', annotations: { container: 'error' } },
     );
     return undefined;
   }

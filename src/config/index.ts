@@ -1,4 +1,5 @@
 import { app } from './app';
+import { code } from './code';
 import { engine } from './engine';
 import { features } from './features';
 import { motion } from './motion';
@@ -12,6 +13,7 @@ import { structures } from './structures';
  */
 export const config = Object.freeze({
   app,
+  code,
   engine,
   features,
   motion,

@@ -164,6 +164,13 @@ module.exports = defineConfig([
   ...boundaries,
   ...hardCodedValues,
   {
-    ignores: ['dist/*', '.expo/*', 'node_modules/*'],
+    // Code samples are shown to learners, not run; generated tokens are build output.
+    ignores: [
+      'dist/*',
+      '.expo/*',
+      'node_modules/*',
+      'src/content/topics/*/code/*',
+      'src/content/generated/*',
+    ],
   },
 ]);

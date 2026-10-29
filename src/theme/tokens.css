@@ -66,6 +66,13 @@
       --color-mode-practice: #7650d8;
       --color-mode-practice-ink: #5b3bb8;
       --color-mode-practice-soft: rgba(118, 80, 216, 0.1);
+
+      /* Code syntax (code panel only). Plain code uses ink. */
+      --color-code-keyword: #6a3fb0;
+      --color-code-name: #1f5f9e;
+      --color-code-string: #256b41;
+      --color-code-number: #9a5800;
+      --color-code-comment: #6e685f;
     }
 
     @variant dark {
@@ -122,6 +129,13 @@
       --color-mode-practice: #a48bff;
       --color-mode-practice-ink: #a48bff;
       --color-mode-practice-soft: rgba(164, 139, 255, 0.16);
+
+      /* Code syntax */
+      --color-code-keyword: #c3a6ff;
+      --color-code-name: #8cc2f5;
+      --color-code-string: #93d6a8;
+      --color-code-number: #f0b866;
+      --color-code-comment: #a29c92;
     }
   }
 }
@@ -270,3 +284,4 @@
 @source inline("bg-cat-foundations bg-cat-foundations-ink bg-cat-linear bg-cat-linear-ink bg-cat-hashing bg-cat-hashing-ink");
 @source inline("bg-cat-trees bg-cat-trees-ink bg-cat-graphs bg-cat-graphs-ink bg-cat-algorithms bg-cat-algorithms-ink");
 @source inline("bg-mode-sandbox bg-mode-sandbox-ink bg-mode-sandbox-soft bg-mode-practice bg-mode-practice-ink bg-mode-practice-soft");
+@source inline("bg-code-keyword bg-code-name bg-code-string bg-code-number bg-code-comment");

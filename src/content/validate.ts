@@ -4,9 +4,13 @@
  */
 import type { z } from 'zod';
 
+import { config } from '@/config';
 import { compileLesson } from '@/engine/lesson/compile';
 import { CompileError } from '@/engine/lesson/structures';
+import type { CompiledLesson } from '@/engine/lesson/types';
 
+import { CODE_SAMPLES } from './code';
+import type { CodeSamples } from './code-types';
 import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS } from './registry';
 import { LessonRecipeSchema, TopicMetaSchema, type TopicMeta } from './schema';
 
@@ -46,11 +50,13 @@ export function validateTopicMetas(metas: Record<string, unknown>): ContentIssue
 
 /**
  * Checks each lesson against the schema, then compiles it: that catches what the schema can't,
- * such as an unknown chapter or operation, or a pop the lesson's stack can't do.
+ * such as an unknown chapter or operation, or a pop the lesson's stack can't do. Then checks
+ * the code panel can highlight every step (see validateCodeLines).
  */
 export function validateLessons(
   lessons: Record<string, unknown>,
   metas: Readonly<Record<string, TopicMeta>>,
+  code: CodeSamples = CODE_SAMPLES,
 ): ContentIssue[] {
   return Object.entries(lessons).flatMap(([key, value]): ContentIssue[] => {
     const result = LessonRecipeSchema.safeParse(value);
@@ -68,13 +74,42 @@ export function validateLessons(
     const meta = metas[key];
     if (!meta) return [{ topicId: key, path: '', message: 'No topic meta with this id' }];
 
+    let lesson: CompiledLesson;
     try {
-      compileLesson(result.data, chapterTitles(meta));
-      return [];
+      lesson = compileLesson(result.data, chapterTitles(meta));
     } catch (error) {
       if (!(error instanceof CompileError)) throw error;
       return [{ topicId: key, path: error.at, message: error.reason }];
     }
+    return validateCodeLines(key, lesson, code);
+  });
+}
+
+/**
+ * Every code line a lesson's steps point at must be marked (`@line`) in the topic's code
+ * sample in every language, or the highlight would vanish when the learner switches language.
+ */
+export function validateCodeLines(
+  topicId: string,
+  lesson: CompiledLesson,
+  code: CodeSamples,
+): ContentIssue[] {
+  const used = [...new Set(lesson.steps.flatMap((step) => step.codeLine ?? []))];
+  if (used.length === 0) return [];
+
+  return config.app.codeLanguages.flatMap((language): ContentIssue[] => {
+    const path = `code/${language}`;
+    const sample = code[topicId]?.[language];
+    if (!sample) {
+      return [{ topicId, path, message: 'The lesson highlights code, but there is no sample' }];
+    }
+    return used
+      .filter((id) => !sample.lineIds[id])
+      .map((id) => ({
+        topicId,
+        path,
+        message: `No line is marked "@line ${id}", which the lesson highlights`,
+      }));
   });
 }
 

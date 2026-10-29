@@ -36,6 +36,11 @@ const TONE_CLASS = {
   'cat-algorithms-ink': 'text-cat-algorithms-ink',
   'mode-sandbox-ink': 'text-mode-sandbox-ink',
   'mode-practice-ink': 'text-mode-practice-ink',
+  'code-keyword': 'text-code-keyword',
+  'code-name': 'text-code-name',
+  'code-string': 'text-code-string',
+  'code-number': 'text-code-number',
+  'code-comment': 'text-code-comment',
 } as const;
 
 export type TextTone = keyof typeof TONE_CLASS;

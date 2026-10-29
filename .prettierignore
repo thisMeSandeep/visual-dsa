@@ -12,3 +12,6 @@ skills-lock.json
 .zed
 uniwind-types.d.ts
 expo-env.d.ts
+# Code samples keep their authored layout; generated tokens are compact JSON
+src/content/topics/*/code
+src/content/generated
