@@ -441,6 +441,7 @@ Each renderer is a reusable Skia component that draws step snapshots (see TECH-S
 | `queue` | Horizontal slots, front/rear pointers, circular view | L6 | **P0** |
 | `hash-table` | Bucket column, chains, probe arrows, tombstones | H1 | **P0** |
 | `growth-chart` | Big O curves plus the user's `n` marker | F1 | **P0** |
+| `analogy` | Hand-built real-world example scenes (browser back button, phone book), one picture per caption | L5, H1 | **P0** |
 | `code-panel` | Synced code with the current line (shared by all) | All | **P0** |
 | `tree` | Tidy-layout binary/n-ary trees, rotations | T1–T7, F2 | P1 |
 | `graph` | Nodes, weighted/directed edges, editor | G1–G8 | P1 |

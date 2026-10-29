@@ -1,14 +1,17 @@
 /**
- * Every topic the app knows about. Metas are small and loaded up front (Home lists them all);
- * lessons, quizzes and reference sheets are added here as lazy loaders when they exist.
+ * Every topic the app knows about. Metas are small and loaded up front (Home lists them all).
+ * Lessons are registered here as they're written; quizzes and reference sheets follow.
  */
-import type { TopicCategory, TopicMeta } from './schema';
+import type { LessonRecipeInput } from '@/engine/lesson/recipe';
+
+import type { LessonRecipe, TopicCategory, TopicMeta } from './schema';
 import { meta as array } from './topics/array/meta';
 import { meta as bigO } from './topics/big-o/meta';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { meta as hashTable } from './topics/hash-table/meta';
 import { meta as queue } from './topics/queue/meta';
 import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
+import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
 
 /** Topic ids in the order Home lists them. */
@@ -35,6 +38,14 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   'hash-table': hashTable,
 };
 
+/**
+ * Each written lesson under its topic id. Typed as the engine's recipe shape too, so a schema
+ * change that the compiler can't read fails the typecheck.
+ */
+export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeInput>> = {
+  stack: stackLesson,
+};
+
 /** All topics in Home order. */
 export const TOPICS: readonly TopicMeta[] = TOPIC_IDS.map((id) => TOPIC_METAS[id]);
 
@@ -54,4 +65,9 @@ export function topicsByCategory(): { category: TopicCategory; topics: TopicMeta
     groups.set(topic.category, [...(groups.get(topic.category) ?? []), topic]);
   }
   return [...groups].map(([category, topics]) => ({ category, topics }));
+}
+
+/** A topic's chapter titles by id, as the lesson compiler takes them. */
+export function chapterTitles(meta: TopicMeta): Record<string, string> {
+  return Object.fromEntries(meta.chapters.map((chapter) => [chapter.id, chapter.title]));
 }

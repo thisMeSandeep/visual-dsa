@@ -21,6 +21,9 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'stack.cleared': 'The stack is empty again.',
   'stack.already-empty': 'The stack is already empty.',
 
+  // Lessons (engine/lesson/compile.ts)
+  'lesson.predict': 'What happens next?',
+
   // Engine (engine/core)
   'engine.step-limit': 'This run is too long to show step by step. Try a smaller input.',
   'engine.too-many-items': 'That’s {count} items. The most that fits is {limit}.',

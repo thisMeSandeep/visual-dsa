@@ -4,8 +4,11 @@
  */
 import type { z } from 'zod';
 
-import { TOPIC_METAS } from './registry';
-import { TopicMetaSchema } from './schema';
+import { compileLesson } from '@/engine/lesson/compile';
+import { CompileError } from '@/engine/lesson/structures';
+
+import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS } from './registry';
+import { LessonRecipeSchema, TopicMetaSchema, type TopicMeta } from './schema';
 
 export type ContentIssue = {
   /** Which topic (or registry key) the problem is in. */
@@ -41,7 +44,41 @@ export function validateTopicMetas(metas: Record<string, unknown>): ContentIssue
   });
 }
 
+/**
+ * Checks each lesson against the schema, then compiles it: that catches what the schema can't,
+ * such as an unknown chapter or operation, or a pop the lesson's stack can't do.
+ */
+export function validateLessons(
+  lessons: Record<string, unknown>,
+  metas: Readonly<Record<string, TopicMeta>>,
+): ContentIssue[] {
+  return Object.entries(lessons).flatMap(([key, value]): ContentIssue[] => {
+    const result = LessonRecipeSchema.safeParse(value);
+    if (!result.success) return toIssues(key, result.error);
+
+    if (result.data.topicId !== key) {
+      return [
+        {
+          topicId: key,
+          path: 'topicId',
+          message: `Registered as "${key}" but its topicId is "${result.data.topicId}"`,
+        },
+      ];
+    }
+    const meta = metas[key];
+    if (!meta) return [{ topicId: key, path: '', message: 'No topic meta with this id' }];
+
+    try {
+      compileLesson(result.data, chapterTitles(meta));
+      return [];
+    } catch (error) {
+      if (!(error instanceof CompileError)) throw error;
+      return [{ topicId: key, path: error.at, message: error.reason }];
+    }
+  });
+}
+
 /** Validates all registered content. */
 export function validateContent(): ContentIssue[] {
-  return validateTopicMetas(TOPIC_METAS);
+  return [...validateTopicMetas(TOPIC_METAS), ...validateLessons(TOPIC_LESSONS, TOPIC_METAS)];
 }

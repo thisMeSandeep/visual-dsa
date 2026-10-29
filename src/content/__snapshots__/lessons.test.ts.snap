@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`the stack lesson compiles to the expected steps 1`] = `
+{
+  "chapters": [
+    "0: Last in, first out",
+    "8: Push, pop and peek",
+    "12: Overflow and underflow",
+  ],
+  "steps": [
+    "0 | A **stack** is a pile: you add to the top and take from the top. This one holds 4. | - | Empty stack, capacity 4.",
+    "1 | Push **23**. First, check there’s room on the stack. | check-full | Empty stack, capacity 4.",
+    "2 | **23** goes on top. It’s the new **top**. | push | Stack of 1 item, capacity 4. Top: 23. Bottom to top: 23.",
+    "3 | Push **8**. First, check there’s room on the stack. | check-full | Stack of 1 item, capacity 4. Top: 23. Bottom to top: 23.",
+    "4 | **8** goes on top. It’s the new **top**. | push | Stack of 2 items, capacity 4. Top: 8. Bottom to top: 23, 8.",
+    "5 | Push **42**. First, check there’s room on the stack. | check-full | Stack of 2 items, capacity 4. Top: 8. Bottom to top: 23, 8.",
+    "6 | **42** goes on top. It’s the new **top**. | push | Stack of 3 items, capacity 4. Top: 42. Bottom to top: 23, 8, 42.",
+    "7 | 42 went in last, so it comes out first. That’s **last in, first out**. | - | Stack of 3 items, capacity 4. Top: 42. Bottom to top: 23, 8, 42. | ⏸ chapter-end",
+    "8 | Pop. First, check the stack isn’t empty. | check-empty | Stack of 3 items, capacity 4. Top: 42. Bottom to top: 23, 8, 42.",
+    "9 | The **top** item is **42**. | read-top | Stack of 3 items, capacity 4. Top: 42. Bottom to top: 23, 8, 42.",
+    "10 | **42** comes off the top and is returned. | pop | Stack of 2 items, capacity 4. Top: 8. Bottom to top: 23, 8.",
+    "11 | Peek shows the **top** item, **8**, without removing it. | peek | Stack of 2 items, capacity 4. Top: 8. Bottom to top: 23, 8. | ⏸ chapter-end",
+    "12 | Push **17**. First, check there’s room on the stack. | check-full | Stack of 2 items, capacity 4. Top: 8. Bottom to top: 23, 8.",
+    "13 | **17** goes on top. It’s the new **top**. | push | Stack of 3 items, capacity 4. Top: 17. Bottom to top: 23, 8, 17.",
+    "14 | Push **5**. First, check there’s room on the stack. | check-full | Stack of 3 items, capacity 4. Top: 17. Bottom to top: 23, 8, 17.",
+    "15 | **5** goes on top. It’s the new **top**. | push | Stack of 4 items, capacity 4. Top: 5. Bottom to top: 23, 8, 17, 5.",
+    "16 | Push **9**. First, check there’s room on the stack. | check-full | Stack of 4 items, capacity 4. Top: 5. Bottom to top: 23, 8, 17, 5.",
+    "17 | The stack is full (4 items), so **9** doesn’t fit. That’s an **overflow**. | overflow | Stack of 4 items, capacity 4. Top: 5. Bottom to top: 23, 8, 17, 5. 9 does not fit. Error.",
+    "18 | Clear removes all 4 items at once. | clear | Stack of 4 items, capacity 4. Top: 5. Bottom to top: 23, 8, 17, 5.",
+    "19 | The stack is empty again. | clear | Empty stack, capacity 4.",
+    "20 | Pop. First, check the stack isn’t empty. | check-empty | Empty stack, capacity 4.",
+    "21 | The stack is empty, so there’s nothing to pop. That’s an **underflow**. | underflow | Empty stack, capacity 4. Error. | ⏸ chapter-end",
+  ],
+}
+`;

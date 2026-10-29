@@ -266,15 +266,16 @@ interface LessonRecipe {
 
 type LessonSegment =
   | { kind: 'chapter'; chapterId: string }                         // chapter boundary
-  | { kind: 'trace'; operation: string; input: unknown;            // run real engine code
-      captions?: Record<number, string>; from?: 'previous' | 'fresh' }
+  | { kind: 'setup'; structure: string; input?: unknown }          // create or reset a structure
+  | { kind: 'trace'; operation: string; input?: unknown;           // run real engine code
+      captions?: Record<string, string> }                          // keyed by step number
   | { kind: 'scene'; sceneId: string; steps: { caption: string }[] } // analogy scene
   | { kind: 'say'; caption: string }                               // caption over the current scene
-  | { kind: 'interactive'; prompt: string; expect: InteractiveExpectation }
+  | { kind: 'interactive'; prompt: string; expect?: InteractiveExpectation }
   | { kind: 'predict'; questionId: string };                       // inline prediction
 ```
 
-All content is validated by the Zod schemas in `content/schema.ts`.
+All content is validated by the Zod schemas in `content/schema.ts`. The engine can't import content, so `engine/lesson/recipe.ts` declares the same recipe shape as `RecipeSegment`. `TOPIC_LESSONS` in `content/registry.ts` is typed as both, so the typecheck fails if the two drift apart.
 
 ---
 
@@ -352,16 +353,23 @@ function put(table, key, value) {
 `engine/lesson/compile.ts` turns a `LessonRecipe` into a flat `CompiledLesson`:
 
 ```ts
+compileLesson(recipe: LessonRecipeInput, chapterTitles: Record<string, string>): CompiledLesson
+
 interface CompiledLesson {
+  topicId: string;
   steps: Step[];
   chapters: { id: string; title: string; firstStep: number }[];
 }
 ```
 
-- `trace` segments run the **real** operation on the current model and append its steps, with authored captions overriding the engine's template captions where given.
-- `scene` segments append steps from hand-built analogy scenes (the browser back stack).
-- `say` segments repeat the current scene with a new caption.
-- Compilation is fast (milliseconds), so it runs on device the first time a lesson opens and is memoised. Compiled lessons are snapshot-tested, so any change to an algorithm that changes a lesson shows up in review.
+- `setup` segments create (or reset) a structure from its input, e.g. `{ structure: 'stack', input: { capacity: 4 } }`. They add no steps. The structure stays until the next `setup`, across chapters.
+- `trace` segments (`'<structure>.<operation>'`) run the **real** operation on that structure's current model and append its steps. Authored `captions`, keyed by step number within the trace, replace the engine's template captions.
+- `say` segments repeat the current structure at rest with a new caption, keeping the last counters. `interactive` does the same with `pause: 'interactive'`, and `predict` with `pause: 'predict'` and the `lesson.predict` caption.
+- `scene` segments append one step per caption, drawn by the `analogy` renderer from hand-built scenes (`meta: { sceneId, sceneStep }`).
+- The last step of each chapter gets `pause: 'chapter-end'`, unless it already pauses for input.
+- The structures a recipe can use are registered in `engine/lesson/structures.ts` (`STRUCTURES`), each with `create`, `toScene`, `describe` and its operations. Recipe input is untrusted, so each one is checked there.
+- Anything wrong throws a `CompileError` with `at` (e.g. `segments[4]`) and a `reason`: an unknown chapter, structure or operation, a chapter that's repeated or empty, a step before any `setup`, a caption for a step the trace doesn't have, or bad input. `bun run validate:content` compiles every registered lesson, so these fail before release.
+- Compilation is fast (milliseconds), so `getLesson()` runs it on device the first time a lesson opens and memoises the result. `content/lessons.test.ts` snapshots a readable outline of every lesson (caption, code line, screen-reader text and pause per step), so any change to an algorithm that changes a lesson shows up in review.
 
 ### 5.5 Player state machine
 
@@ -444,7 +452,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 ### 6.2b Lesson screen (Step 4.4)
 
 - **Captions:** the engine emits caption keys with params. `content/captions.ts` holds the text for each key, with `{param}` placeholders and `**bold**` for key terms. `captionText` fills a template, and `CaptionText` (`screens/lesson`) draws the bold runs with `<Strong>`. Authored lesson text is used as it is. A test checks that every key a lesson uses has text, with no placeholder left unfilled.
-- **Lessons:** `getLesson(topicId)` (`hooks/use-lesson.ts`) returns a `CompiledLesson` (`engine/lesson/types.ts`: steps plus chapters with their first step), built once and cached. Until Step 5.1 it serves a hard-coded Stack lesson (`engine/lesson/stack-demo.ts`). It's made of real stack traces under the topic's own chapter ids, with a `chapter-end` pause on each chapter's last step. Step 5.1 replaces it with recipes compiled from content.
+- **Lessons:** `getLesson(topicId)` (`hooks/use-lesson.ts`) returns a `CompiledLesson` (`engine/lesson/types.ts`: steps plus chapters with their first step), compiled from the topic's recipe in `TOPIC_LESSONS` (§5.4) the first time it's asked for, then cached. Topics without a recipe return `undefined`, and the player says the lesson comes later.
 - **Gestures (Gesture Handler 3 hook API):** swipe the canvas left/right to step (`usePanGesture`, values in `config.player.swipe`: a 48pt swipe or a fast flick). Drag or tap the scrubber to seek. The scrubber is also an `adjustable` control for screen readers. The app root is wrapped in `GestureHandlerRootView`.
 - **Chapter sheet → lesson:** the sheet is its own route. A chapter pick goes through a small shared store (`stores/lesson-navigation.ts`): the sheet records `{ topicId, chapterId }` and closes, and the open lesson seeks to that chapter's first step and clears the request. This doesn't rely on how route params merge when a sheet is dismissed. The lesson opens the sheet with `current=<chapterId>` so the current chapter is highlighted.
 

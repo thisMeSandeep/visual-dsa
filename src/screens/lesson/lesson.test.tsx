@@ -11,6 +11,7 @@ jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }
 jest.mock('@/viz/scene-view', () => ({ SceneView: () => null }));
 
 const caption = (text: string) => screen.getByText(text);
+const INTRO = 'A stack is a pile: you add to the top and take from the top. This one holds 4.';
 
 /** The app renders inside GestureHandlerRootView; so do these tests. */
 const renderLesson = (element: React.ReactElement) =>
@@ -21,7 +22,7 @@ describe('Lesson player', () => {
 
   it('opens on the first step with its caption and position', async () => {
     await renderLesson(<Lesson topicId="stack" />);
-    expect(caption('Push 23. First, check there’s room on the stack.')).toBeOnTheScreen();
+    expect(caption(INTRO)).toBeOnTheScreen();
     expect(screen.getByText('Last in, first out')).toBeOnTheScreen();
     expect(screen.getByLabelText(/^Step 1 of \d+$/)).toBeOnTheScreen();
   });
@@ -29,10 +30,10 @@ describe('Lesson player', () => {
   it('steps forward and back', async () => {
     await renderLesson(<Lesson topicId="stack" />);
     await fireEvent.press(screen.getByRole('button', { name: 'Next step' }));
-    expect(caption('23 goes on top. It’s the new top.')).toBeOnTheScreen();
+    expect(caption('Push 23. First, check there’s room on the stack.')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Previous step' }));
-    expect(caption('Push 23. First, check there’s room on the stack.')).toBeOnTheScreen();
+    expect(caption(INTRO)).toBeOnTheScreen();
   });
 
   it('switches between play and pause', async () => {

@@ -84,7 +84,8 @@ export type TopicMeta = z.infer<typeof TopicMetaSchema>;
 export type Chapter = z.infer<typeof ChapterSchema>;
 
 /* ------------------------------------------------------------------------------------------------
- * Lesson recipe: the steps a lesson is compiled from (engine/lesson, Step 5.1).
+ * Lesson recipe: the steps a lesson is compiled from (engine/lesson/compile.ts). The engine
+ * declares the same shape as RecipeSegment; content/registry.ts checks the two still match.
  * ---------------------------------------------------------------------------------------------- */
 
 const StepIndexSchema = z.string().regex(/^\d+$/, 'Caption keys are step numbers');
@@ -92,16 +93,21 @@ const StepIndexSchema = z.string().regex(/^\d+$/, 'Caption keys are step numbers
 export const LessonSegmentSchema = z.discriminatedUnion('kind', [
   /** Starts a chapter; every following step belongs to it. */
   z.strictObject({ kind: z.literal('chapter'), chapterId: IdSchema }),
-  /** Runs a real engine operation and adds its steps. */
+  /** Creates (or resets) a structure, e.g. an empty stack of capacity 4. Adds no steps. */
+  z.strictObject({
+    kind: z.literal('setup'),
+    /** e.g. "stack". The compiler checks the structure exists and the input fits it. */
+    structure: IdSchema,
+    input: z.unknown().optional(),
+  }),
+  /** Runs a real engine operation on the structure set up earlier and adds its steps. */
   z.strictObject({
     kind: z.literal('trace'),
     /** e.g. "hash-table.put" */
     operation: z.string().regex(/^[a-z0-9-]+\.[a-zA-Z]+$/, 'Use "<structure>.<operation>"'),
-    input: z.unknown(),
+    input: z.unknown().optional(),
     /** Authored captions that replace the engine's, keyed by step number within the trace. */
     captions: z.record(StepIndexSchema, TextSchema).optional(),
-    /** Continue from the previous segment's structure, or start fresh. */
-    from: z.enum(['previous', 'fresh']).optional(),
   }),
   /** A hand-built analogy scene (browser back button, phone book). */
   z.strictObject({
@@ -112,7 +118,11 @@ export const LessonSegmentSchema = z.discriminatedUnion('kind', [
   /** A caption over the current scene. */
   z.strictObject({ kind: z.literal('say'), caption: TextSchema }),
   /** The learner has to act before the lesson continues (F-208). */
-  z.strictObject({ kind: z.literal('interactive'), prompt: TextSchema, expect: z.unknown() }),
+  z.strictObject({
+    kind: z.literal('interactive'),
+    prompt: TextSchema,
+    expect: z.unknown().optional(),
+  }),
   /** An inline predict-the-next-step question (F-702). */
   z.strictObject({ kind: z.literal('predict'), questionId: IdSchema }),
 ]);

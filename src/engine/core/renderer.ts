@@ -10,6 +10,8 @@ export const RENDERER_IDS = [
   'queue',
   'hash-table',
   'growth-chart',
+  /** Hand-built real-world example scenes (browser back button, phone book). */
+  'analogy',
   // P1
   'tree',
   'graph',

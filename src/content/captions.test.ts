@@ -1,6 +1,9 @@
-import { buildStackDemoLesson } from '@/engine/lesson/stack-demo';
+import { compileLesson } from '@/engine/lesson/compile';
 
 import { CAPTIONS, captionSegments, captionText } from './captions';
+import { chapterTitles } from './registry';
+import { lesson as stackRecipe } from './topics/stack/lesson';
+import { meta as stackMeta } from './topics/stack/meta';
 
 describe('captionText', () => {
   it('fills params into a template', () => {
@@ -41,8 +44,9 @@ describe('captionSegments', () => {
 });
 
 describe('caption catalogue', () => {
+  const lesson = compileLesson(stackRecipe, chapterTitles(stackMeta));
+
   it('has text for every caption the stack lesson uses', () => {
-    const lesson = buildStackDemoLesson({});
     const keys = new Set(
       lesson.steps.flatMap((step) => ('key' in step.caption ? [step.caption.key] : [])),
     );
@@ -50,7 +54,6 @@ describe('caption catalogue', () => {
   });
 
   it('leaves no placeholder unfilled in the stack lesson', () => {
-    const lesson = buildStackDemoLesson({});
     for (const step of lesson.steps) expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
   });
 });
