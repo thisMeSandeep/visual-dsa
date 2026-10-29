@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { CaptionText } from '@/components/caption-text';
 import { IconButton } from '@/components/icon-button';
 import { KeyboardAvoidingView } from '@/components/keyboard-avoiding-view';
+import { PressableScale } from '@/components/pressable-scale';
 import { Scrubber } from '@/components/scrubber';
-import { StatStrip } from '@/components/stat-strip';
 import { TextField } from '@/components/text-field';
 import { config } from '@/config';
 import { getTopicMeta, isTopicId, TOPIC_SANDBOXES } from '@/content/registry';
@@ -119,8 +119,13 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
   const [primary, ...secondary] = sandbox.operations;
   const valueRange = config.engine.valueRange;
 
+  const stats = sandbox.stats.map((stat) => ({
+    label: stat.label,
+    value: String(step?.scene.meta?.[stat.key] ?? '–'),
+  }));
+
   return (
-    // The controls rise with the keyboard on both platforms; the canvas shrinks to make room.
+    // The dock rises with the keyboard on both platforms; the canvas shrinks to make room.
     <KeyboardAvoidingView behavior="padding" className="flex-1 bg-background pt-safe">
       <View className="flex-row items-center px-3">
         <IconButton icon="back" label="Back" onPress={() => router.back()} />
@@ -145,57 +150,85 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
         />
       </View>
 
-      <View
-        className="flex-1 px-6"
-        onLayout={(event) => {
-          const { width, height } = event.nativeEvent.layout;
-          setCanvas({ width, height });
-        }}
-      >
-        {step && canvas.width > 0 && canvas.height > 0 ? (
-          <SceneView
-            scene={step.scene}
-            width={canvas.width}
-            height={canvas.height}
-            speed={defaultSpeed}
-            accessibilityLabel={step.a11y}
-          />
-        ) : null}
+      {/* The canvas: most of the screen, in a soft panel with the stats pinned to its corner. */}
+      <View className="flex-1 px-4 pt-2">
+        <View className="flex-1 overflow-hidden rounded-xl bg-surface">
+          <View className="flex-row flex-wrap gap-2 px-3 pt-3">
+            {stats.map((stat) => (
+              <View
+                key={stat.label}
+                accessible
+                accessibilityLabel={`${stat.label}: ${stat.value}`}
+                className="h-7 flex-row items-center gap-1.5 rounded-full border-hairline border-line bg-surface-raised px-3"
+              >
+                <AppText variant="label">{stat.label}</AppText>
+                <AppText variant="index" tone="ink">
+                  {stat.value}
+                </AppText>
+              </View>
+            ))}
+          </View>
+          <View
+            className="flex-1 p-3"
+            onLayout={(event) => {
+              const { width, height } = event.nativeEvent.layout;
+              setCanvas({ width, height });
+            }}
+          >
+            {step && canvas.width > 0 && canvas.height > 0 ? (
+              <SceneView
+                scene={step.scene}
+                width={canvas.width}
+                height={canvas.height}
+                speed={defaultSpeed}
+                accessibilityLabel={step.a11y}
+              />
+            ) : null}
+          </View>
+        </View>
       </View>
 
-      <View className="gap-4 px-6 pb-safe-offset-4">
-        {/* Two caption lines, so the controls don't jump between steps. */}
-        <View className="min-h-14">{step ? <CaptionText caption={step.caption} /> : null}</View>
+      <View className="gap-2 px-6 pt-3">
+        {/* Two caption lines, so the dock doesn't jump between steps. */}
+        <View className="min-h-14 justify-center">
+          {step ? <CaptionText caption={step.caption} /> : null}
+        </View>
         {total > 1 ? <Scrubber current={number} total={total} onSeek={actions.seek} /> : null}
+      </View>
 
-        <StatStrip
-          items={sandbox.stats.map((stat) => ({
-            label: stat.label,
-            value: String(step?.scene.meta?.[stat.key] ?? '–'),
-          }))}
-        />
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-2"
-        >
-          {sandbox.presets.map((option) => (
-            <Button
-              key={option.id}
-              label={option.label}
-              variant={option.id === preset.id ? 'primary' : 'tinted'}
-              size="pill"
-              accessibilityHint="Loads this starting state"
-              onPress={() => choosePreset(option)}
-            />
-          ))}
-        </ScrollView>
+      {/* The dock: every control in one card. */}
+      <View className="mx-4 mt-3 mb-safe-offset-3 gap-3 rounded-xl border-hairline border-line-strong bg-surface-raised p-3">
+        <View accessibilityRole="tablist" className="flex-row gap-1 rounded-full bg-surface p-1">
+          {sandbox.presets.map((option) => {
+            const selected = option.id === preset.id;
+            return (
+              <PressableScale
+                key={option.id}
+                accessibilityRole="tab"
+                accessibilityState={{ selected }}
+                accessibilityHint="Loads this starting state"
+                onPress={() => choosePreset(option)}
+                className="flex-1"
+                contentClassName={`h-9 items-center justify-center rounded-full px-2 ${selected ? 'bg-primary-soft' : ''}`}
+              >
+                <AppText
+                  variant="label"
+                  weight={selected ? 'bold' : 'medium'}
+                  tone={selected ? 'primary' : 'ink-2'}
+                  numberOfLines={1}
+                >
+                  {option.label}
+                </AppText>
+              </PressableScale>
+            );
+          })}
+        </View>
 
         {primary?.input === 'value' ? (
-          <View className="flex-row items-end gap-3">
+          <View className="flex-row items-start gap-2">
             <TextField
               label={`Value (${valueRange.min}–${valueRange.max})`}
+              labelHidden
               value={text}
               onChangeText={(next) => {
                 setText(next);
@@ -205,24 +238,26 @@ function Playground({ meta, sandbox }: { meta: TopicMeta; sandbox: SandboxConfig
               keyboardType="number-pad"
               returnKeyType="done"
               onSubmitEditing={() => run(primary)}
-              placeholder={String(valueRange.max)}
+              placeholder={`Value ${valueRange.min}–${valueRange.max}`}
+              accessory={
+                <IconButton
+                  icon="random"
+                  label="Random value"
+                  onPress={() => {
+                    setText(String(rng.int(valueRange.min, valueRange.max)));
+                    setProblem(undefined);
+                  }}
+                />
+              }
               className="flex-1"
             />
-            <IconButton
-              icon="random"
-              label="Random value"
-              variant="round"
-              className={problem ? 'mb-6' : 'mb-0.5'}
-              onPress={() => {
-                setText(String(rng.int(valueRange.min, valueRange.max)));
-                setProblem(undefined);
-              }}
-            />
+            <Button label={primary.label} size="compact" onPress={() => run(primary)} />
           </View>
+        ) : primary ? (
+          <Button label={primary.label} size="compact" onPress={() => run(primary)} />
         ) : null}
 
-        {primary ? <Button label={primary.label} onPress={() => run(primary)} /> : null}
-        <View className="flex-row gap-3">
+        <View className="flex-row gap-2">
           {secondary.map((operation) => (
             <Button
               key={operation.id}

@@ -16,6 +16,7 @@ const renderSandbox = (topicId = 'stack') =>
 const stat = (label: string, value: string) => screen.getByLabelText(`${label}: ${value}`);
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const valueField = () => screen.getByLabelText(/^Value/);
+const preset = (name: string) => fireEvent.press(screen.getByRole('tab', { name }));
 
 /** Plays the current trace to its last step. */
 const playToEnd = () =>
@@ -39,6 +40,7 @@ describe('Sandbox', () => {
     expect(stat('Capacity', '5')).toBeOnTheScreen();
     expect(stat('Top', '42')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled();
+    expect(screen.getByRole('tab', { name: 'A few items', selected: true })).toBeOnTheScreen();
   });
 
   it('pushes a typed value, plays the steps, and can undo it', async () => {
@@ -83,7 +85,7 @@ describe('Sandbox', () => {
 
   it('loads a preset and shows an underflow as a canvas step', async () => {
     await renderSandbox();
-    await press('Empty');
+    await preset('Empty');
     expect(screen.getByText('An empty stack. Try Pop to see an underflow.')).toBeOnTheScreen();
     expect(stat('Size', '0')).toBeOnTheScreen();
     expect(stat('Top', '–')).toBeOnTheScreen();
@@ -97,7 +99,7 @@ describe('Sandbox', () => {
 
   it('resets to the loaded preset', async () => {
     await renderSandbox();
-    await press('Full');
+    await preset('Full');
     await press('Pop');
     await playToEnd();
     expect(stat('Size', '4')).toBeOnTheScreen();
