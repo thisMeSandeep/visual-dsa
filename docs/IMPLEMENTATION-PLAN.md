@@ -1,0 +1,540 @@
+# IMPLEMENTATION PLAN
+
+A step-by-step build plan for Visual-DSA. It follows [ARCHITECTURE.md](./ARCHITECTURE.md), uses the stack in [TECH-STACK.md](./TECH-STACK.md) and the look in [VISUAL-SPEC.md](./VISUAL-SPEC.md), and delivers the features in [FEATURE.md](./FEATURE.md) and the topics in [ALGORITHM-CATALOG.md](./ALGORITHM-CATALOG.md).
+
+## How to use this plan
+
+- **One step = one reviewable change.** Each step ends in a working app (or a passing test suite) and a suggested commit message.
+- **You commit.** After each step, review the changes and commit them yourself with the message given (adjusted if the step changed). Nothing is committed automatically.
+- **Order matters.** Phases build on each other. The first end-to-end milestone (an animated Stack lesson) arrives at the end of Phase 4, so the riskiest part, the engine-to-canvas pipeline, is proven early.
+- **Feature IDs** (F-xxx) link each step to FEATURE.md.
+- **Testing happens in Expo Go on your phone.** Every "Done when" check means running `bun run start`, scanning the QR code, and checking it on the device. There are no simulators or development builds. Each library is checked against Expo Go when it's installed (TECH-STACK §1).
+- **No hard-coded values.** Colours, fonts and sizes come from `src/theme/tokens.css`, and tunable constants come from `src/config/`. Lint enforces this from Step 0.3 onward (ARCHITECTURE §9).
+- **Before Step 0.1:** the project folder is not a Git repository yet. Run `git init` once before your first commit.
+
+### Skills used per phase
+| Steps | Skills |
+|---|---|
+| 0.1–0.3 | `expo-overview`, `expo-project-structure` |
+| 1.1–1.2 | `uniwind`, `expo-design-system` |
+| 1.3–1.4, 2.3 | `expo-design-system`, `expo-native-ui`, `expo-ui`, `vercel-react-native-skills` |
+| 2.1 | `expo-router` |
+| 4.1–4.4, 10.1 | `expo-animation`, `vercel-react-native-skills` |
+| 6.1 | `expo-ui` (settings controls) |
+| 9.5 | `dataviz` (growth chart) |
+| 10.3–10.6 | `eas-app-stores`, `eas-update`, `eas-observe`, `eas-workflows` |
+
+---
+
+## Phase 0: Project setup
+
+### Step 0.1: Scaffold the Expo app
+**Goal:** a clean Expo SDK 58 TypeScript app with the `src/` layout.
+- Create the app with `bun create expo-app` (SDK 58) in the project root, keeping `docs/` and `Dsa images/`.
+- Move routes to `src/app/`, set the `@/*` → `src/*` path alias, and turn on TypeScript `strict`.
+- Remove the template's demo screens and assets.
+- Add ESLint (`eslint-config-expo`) and Prettier, plus `lint`, `typecheck` and `format` scripts.
+
+**Done when:** the app opens to a blank screen in Expo Go on your phone, and `bun run lint` and `bun run typecheck` pass.
+
+**Commit:**
+```
+chore: scaffold Expo SDK 58 app with TypeScript and src/ layout
+```
+
+### Step 0.2: App config for Expo Go
+**Goal:** the app is configured and runs reliably in Expo Go.
+- Configure `app.json`: name "Visual-DSA", scheme `visualdsa`, orientation `default` (portrait + landscape, F-106), and an Android edge-to-edge setup.
+- Confirm your phone's Expo Go supports SDK 58, and add a `start` script that opens with the QR code.
+- No `expo-dev-client` and no `eas.json` yet. EAS is set up for release builds in Step 10.3.
+
+**Done when:** the app opens in Expo Go on your phone, rotates between portrait and landscape, and deep link `visualdsa://` opens it.
+
+**Commit:**
+```
+chore: configure app.json for Expo Go development
+```
+
+### Step 0.3: Folder skeleton, config module, lint rules and Jest
+**Goal:** the architecture's folders and rules exist before any code goes in them.
+- Create `src/{screens,components,viz,engine,content,stores,theme,config,hooks,utils}` and `scripts/` (ARCHITECTURE §3).
+- Create `src/config/` with the `config` object and its first files (`app.ts`, `features.ts`). The other config files are added in the step that first needs them.
+- ESLint import boundaries: `engine/` may import only `config/`, not React, React Native or other app folders; `viz/` must not import `content/`; only UI folders may import `theme/` (ARCHITECTURE §3).
+- ESLint no-hard-coding rules (ARCHITECTURE §9.3): no colour literals outside `src/theme/`, no arbitrary Tailwind values, and `no-magic-numbers` outside `config/`, `theme/`, `content/` and tests.
+- Set up Jest with `jest-expo` and React Native Testing Library, with one smoke test, and a `test` script. Run it with `bun run test`; `bun test` would start Bun's own runner instead.
+
+**Done when:** `bun run test` passes, and lint fails on each of these: importing `react` in `src/engine/`, a `#3554D9` literal in a component, and a magic number in a screen.
+
+**Commit:**
+```
+chore: add folder skeleton, config module, lint rules and Jest
+```
+
+---
+
+## Phase 1: Design foundation
+
+### Step 1.1: Uniwind and colour tokens
+**Goal:** every colour from VISUAL-SPEC §2 is available as a token, in light and dark.
+- Install and configure Uniwind (free) with Tailwind CSS v4: Metro plugin, and a `global.css` that only imports Tailwind, Uniwind and `src/theme/tokens.css`.
+- In `tokens.css`, define the neutral, semantic, category and mode colours as `@variant light` / `@variant dark` blocks with the same variable names, including the `*-soft` tints (VISUAL-SPEC §2).
+- Add the spacing and radius tokens (`@theme`), and the TS-only sizes (`@theme static`).
+- `src/theme/index.ts`: typed token access (`useColor`, `useVizSizes`…) wrapping `useCSSVariable` / `Uniwind.getCSSVariable`.
+- Theme override via `Uniwind.setTheme` (system / light / dark), held in memory for now; it gets persisted in Step 6.1.
+
+**Done when:** a test screen switches every token between light and dark in Expo Go, and changing one hex value in `tokens.css` updates the app with no code change.
+
+**Commit:**
+```
+feat(theme): add Uniwind with Visual-DSA colour tokens
+```
+
+### Step 1.2: Fonts and type scale
+**Goal:** Atkinson Hyperlegible everywhere, with the VISUAL-SPEC §3 type scale.
+- Install `@expo-google-fonts/atkinson-hyperlegible-next` and `@expo-google-fonts/atkinson-hyperlegible-mono` (Next 400/500/700, Mono 400/500).
+- Load the fonts at runtime with `useFonts` in the root layout (no config plugin, so it works in Expo Go), and keep the splash screen up until they're ready.
+- Add `--font-*` tokens (one per weight, matching the registered family names) and the type-scale tokens to `tokens.css`, giving text styles `display`, `title`, `caption-lg`, `body`, `label`, `overline`, `value`, `code`…
+
+**Done when:** the test screen shows each text style in the right font, with tabular figures in Mono.
+
+**Commit:**
+```
+feat(theme): load Atkinson Hyperlegible fonts and type scale
+```
+
+### Step 1.3: Icons and topic glyphs
+**Goal:** one consistent way to draw icons.
+- Install `phosphor-react-native`. Create `components/icons.ts`, which re-exports each icon from its own file (TECH-STACK §7b).
+- Build the `<Icon>` wrapper with a size scale (18/20/22/24), token colours, and regular/fill weights.
+- Build the custom topic glyphs (array, linked list, stack, queue, hash table, Big O curve) on the 24 grid in their category colours.
+
+**Done when:** all icons and glyphs render in both themes, and the bundle includes only the icons we import.
+
+**Commit:**
+```
+feat(ui): add Phosphor icon wrapper and topic glyphs
+```
+
+### Step 1.4: Base components
+**Goal:** the shared components from VISUAL-SPEC §6.
+- Button (primary, primary tinted, mode, pill, round icon, step, play), with press scale and haptics.
+- Chip, ProgressBar (bar and segmented), StatStrip, TopicRow, ChapterRow, ContinueCard, Scrubber (visual only), FeedbackPanel.
+- A dev-only `/dev/components` route that shows every component in both themes.
+
+**Done when:** the components page matches the concept canvas in both themes, and all touch targets are at least 44pt.
+
+**Commit:**
+```
+feat(ui): add base components from the visual spec
+```
+
+---
+
+## Phase 2: Navigation and content shell
+
+### Step 2.1: Routes and tabs
+**Goal:** the full route map from ARCHITECTURE §8, with placeholder screens.
+- `(tabs)` layout: Learn, Practice, Progress, Settings, with Phosphor tab icons (fill when active).
+- `topic/[topicId]` stack: index, learn, play, practice. The chapters and reference routes open as form sheets.
+- Route files only read params and render a screen from `src/screens/`.
+
+**Done when:** every route opens, the back gestures work, and the sheets present natively.
+
+**Commit:**
+```
+feat(nav): add tab and topic routes with placeholder screens
+```
+
+### Step 2.2: Content schemas, registry and validator
+**Goal:** topics are typed, validated data.
+- Install Zod. Write `content/schema.ts` for TopicMeta, LessonRecipe, Quiz and Reference (ARCHITECTURE §4.3).
+- Add `meta.ts` for the 7 MVP topics (titles, categories, chapters, complexity strips).
+- Add `content/registry.ts` with lazy loaders, and `scripts/validate-content.ts` with a `validate:content` script.
+
+**Done when:** `bun run validate:content` passes, and fails on a deliberately broken meta file.
+
+**Commit:**
+```
+feat(content): add content schemas, topic registry and validator
+```
+
+### Step 2.3: Home and Topic screens
+**Goal:** real Home and Topic detail screens built from content (F-101, F-102).
+- Home: "Learn" title, streak chip (static), Continue card (placeholder), topics grouped by category using TopicRow with glyphs.
+- Topic detail: category overline, title, summary, stat strip, Continue lesson / Sandbox / Practice buttons, chapter list.
+- Use FlashList where lists can grow.
+
+**Done when:** you can go from Home to any MVP topic's detail screen, and both screens match the concept canvas.
+
+**Commit:**
+```
+feat(screens): build Home and Topic detail screens
+```
+
+---
+
+## Phase 3: Engine core
+
+### Step 3.1: Types, tracer, limits and RNG
+**Goal:** the engine foundation from ARCHITECTURE §4–5.
+- `engine/core/types.ts`: Scene, SceneElement, ElementState, Step, Caption, Trace.
+- `engine/core/tracer.ts`: holds the model, calls `toScene` on each `step()`, counts comparisons/swaps/reads/writes, and records line ids, vars and captions.
+- `engine/core/limits.ts` (2,000 steps per trace, size caps) and `engine/core/rng.ts` (seeded).
+- Unit tests for all of the above.
+
+**Done when:** the tests pass, the engine has no React imports, and the same seed always produces the same trace.
+
+**Commit:**
+```
+feat(engine): add scene/step types, tracer, limits and seeded RNG
+```
+
+### Step 3.2: Player state machine
+**Goal:** pure playback rules (ARCHITECTURE §5.5).
+- `engine/player/machine.ts`: states `paused`, `playing`, `awaiting-input` and `ended`; actions `play`, `pause`, `next`, `prev`, `seek`, `setSpeed`, `tick` and `answer`.
+- Unit tests for bounds, pause points and speed changes.
+
+**Done when:** every transition in the diagram is covered by a test.
+
+**Commit:**
+```
+feat(engine): add player state machine
+```
+
+### Step 3.3: Stack structure
+**Goal:** the first real structure. Stack is the simplest, so it proves the pattern.
+- `engine/structures/stack/`: model, `push`/`pop`/`peek`/`clear` with tracing, `toScene`, `describe`, plus overflow and underflow as error steps.
+- Tests check the results and the trace shape (step count, states, line ids).
+
+**Done when:** the tests pass, including overflow, underflow and an empty stack.
+
+**Commit:**
+```
+feat(engine): implement traced stack operations
+```
+
+---
+
+## Phase 4: Visualisation vertical slice (Stack)
+
+### Step 4.1: Skia canvas and id-based animation
+**Goal:** the viz pipeline from ARCHITECTURE §6.2.
+- Install `@shopify/react-native-skia`, `react-native-reanimated`, `react-native-worklets` and `react-native-gesture-handler`.
+- `viz/canvas/`: `VizCanvas` plus `useAnimatedElements` (shared values per element id; enter, exit, move and restyle).
+- `viz/state-style.ts`: maps ElementState to token names, resolved through `src/theme`.
+- Add `src/config/motion.ts` (durations, springs, reduced-motion fade) and use it for every transition.
+- Load the Atkinson fonts into Skia, and respect reduced motion.
+
+**Done when:** a demo scene animates smoothly between two snapshots in Expo Go on your phone. Expo Go runs in development mode, so final frame-rate checks happen on a release build in Step 10.4.
+
+**Commit:**
+```
+feat(viz): add Skia canvas with id-based step animation
+```
+
+### Step 4.2: Stack renderer
+**Goal:** draw stack scenes exactly as in VISUAL-SPEC §7.
+- `viz/renderers/stack/layout.ts` (pure, with tests) and `renderer.tsx`: U-container, items, `top` pointer, state colours.
+- Register it in `viz/renderers/registry.ts`.
+
+**Done when:** a push/pop trace renders and animates correctly, including the error state.
+
+**Commit:**
+```
+feat(viz): add stack renderer
+```
+
+### Step 4.3: Player store
+**Goal:** per-instance playback state (ARCHITECTURE §6.1).
+- Install Zustand. Add `src/config/player.ts` (base step duration, speeds, default speed, swipe threshold).
+- Write `stores/create-player-store.ts`, which wraps the machine and runs the step timer at `config.player.baseStepMs / speed`.
+- Add selector hooks for the current step, status and progress.
+
+**Done when:** play, pause, speed and seek drive the canvas, and two stores run independently.
+
+**Commit:**
+```
+feat(player): add per-instance player store with step timer
+```
+
+### Step 4.4: Lesson player screen
+**Goal:** the lesson screen from the concept canvas (F-201, F-202, F-205, F-401, F-402, F-403).
+- Header (close, title/chapter, chapters button), canvas, `caption-lg` caption with bold terms, scrubber, controls (speed, previous, play/pause, next, code placeholder).
+- Swipe left/right to step, and a chapters sheet that jumps to a chapter.
+- Wire it to a hard-coded Stack trace.
+
+**Done when:** a Stack trace plays end to end with play, pause, step, scrub and speed controls. ✅ **Milestone: first animated lesson.**
+
+**Commit:**
+```
+feat(lesson): build lesson player screen
+```
+
+---
+
+## Phase 5: Lessons and code
+
+### Step 5.1: Lesson compiler
+**Goal:** lessons are recipes compiled into steps (ARCHITECTURE §5.4).
+- `engine/lesson/compile.ts`: handles chapter, trace, say, scene and interactive segments, and captions that override the engine's.
+- Compiled-lesson snapshot tests, and memoisation on device.
+
+**Done when:** a recipe compiles into the right steps and chapter index, and snapshots catch changes.
+
+**Commit:**
+```
+feat(engine): add lesson compiler
+```
+
+### Step 5.2: Code pipeline and code panel
+**Goal:** a synced code highlight (F-501, F-502 MVP, F-505, F-506).
+- Install Shiki as a dev dependency. `scripts/highlight-code.ts` strips `@line` markers and outputs tokens and line ids per language.
+- `viz/code-panel/`: native text spans, the current line in `signal-soft`, a language switch (pseudocode and JavaScript), and copy via `expo-clipboard`.
+- The panel docks below the canvas in portrait and beside it in landscape, and can be collapsed.
+
+**Done when:** the highlighted line follows the animation in both languages, and copy works.
+
+**Commit:**
+```
+feat(code): add Shiki code pipeline and synced code panel
+```
+
+### Step 5.3: Stack lesson content
+**Goal:** the complete Stack topic lesson (ALGORITHM-CATALOG L5).
+- The 6-chapter recipe, plus the browser back button and balanced parentheses examples (`viz/scenes/`).
+- Stack code samples in pseudocode and JavaScript with `@line` markers.
+
+**Done when:** the whole lesson plays from the Topic screen, and content validation passes.
+
+**Commit:**
+```
+content(stack): add stack lesson, examples and code
+```
+
+---
+
+## Phase 6: Persistence and progress
+
+### Step 6.1: Persisted stores and Settings
+**Goal:** settings and progress survive restarts (F-1101–F-1104, F-1108).
+- Install `expo-sqlite`. Write `stores/storage.ts` (an `expo-sqlite/kv-store` adapter for Zustand `persist`), and add `src/config/storage.ts` (keys and schema versions).
+- `settings` store (theme, code language, default speed, haptics, reduced motion) and `progress` store, both with `version` and `migrate`.
+- The splash screen waits for hydration.
+- Settings screen built with `@expo/ui` controls (Picker, Switch, Slider).
+
+**Done when:** settings persist across app restarts, and the theme override works.
+
+**Commit:**
+```
+feat(stores): add persisted settings and progress stores
+```
+
+### Step 6.2: Progress tracking and resume
+**Goal:** "Continue where you left off" (F-104, F-1001).
+- Record chapter completion and the last position (chapter id + offset).
+- Home's Continue card and the topic progress counts read real data. `learn?step=N` deep links work.
+
+**Done when:** you can quit mid-lesson, relaunch, and resume at the same step.
+
+**Commit:**
+```
+feat(progress): track lesson progress and resume where you left off
+```
+
+---
+
+## Phase 7: Sandbox
+
+### Step 7.1: Sandbox framework with Stack
+**Goal:** Play mode (F-601, F-602, F-603, F-606).
+- `SandboxSession`: current model, history, undo and reset (ARCHITECTURE §6.4).
+- Sandbox screen: canvas, stat strip, value input (Zod-validated), random value, operation buttons, and presets from content.
+- Errors (overflow, underflow) are shown as canvas error steps.
+
+**Done when:** you can push, pop, peek, undo, reset and load every preset, and invalid input is explained.
+
+**Commit:**
+```
+feat(sandbox): add sandbox sessions with stack operations
+```
+
+---
+
+## Phase 8: Practice
+
+### Step 8.1: Topic quizzes
+**Goal:** practice questions with explanations (F-701, F-704, F-705, F-706).
+- Question types: multiple choice, true/false, complexity.
+- Quiz screen: segmented progress, option tiles, feedback panel (correct and wrong states), and a "see in lesson" link.
+- Scores go to the progress store, and wrong answers go to the revise list on the Practice tab.
+- Write the Stack quiz (at least 8 questions).
+
+**Done when:** a full Stack quiz runs, its score is saved, and missed questions appear in the revise list.
+
+**Commit:**
+```
+feat(practice): add topic quizzes with explanations and revise list
+```
+
+### Step 8.2: Predict the next step *(P1, can move to after the MVP)*
+**Goal:** pause the animation and ask what happens next (F-702).
+- The player enters `awaiting-input` at `predict` steps. The learner taps an element or option, and the answer is checked against the next step's scene.
+- Add predict questions inline in the Stack lesson and in its quiz.
+
+**Done when:** a predict question pauses playback, checks the answer, and continues.
+
+**Commit:**
+```
+feat(practice): add predict-the-next-step questions
+```
+
+---
+
+## Phase 9: Remaining MVP topics
+
+Each topic step includes: the engine structure with tests → renderer (if new) with layout tests → lesson recipe and code → sandbox operations and presets → quiz (at least 8 questions). Follow ARCHITECTURE §13.
+
+### Step 9.1: Queue
+- Engine: enqueue, dequeue, front and circular buffer. Renderer: `queue` with front/rear pointers and a wrap-around view. Lesson L6, including the printer queue example.
+
+**Commit:**
+```
+feat(queue): add queue engine, renderer, lesson, sandbox and quiz
+```
+
+### Step 9.2: Array
+- Engine: get, set, push, insert, removeAt, search, dynamic resize. Renderer: `array` with indices, shifting and pointer labels. Lesson L1.
+
+**Commit:**
+```
+feat(array): add array engine, renderer, lesson, sandbox and quiz
+```
+
+### Step 9.3: Linked lists (singly and doubly)
+- Engine: insert at head/tail/after/before, delete, search, reverse, and backward traversal. Renderer: `linked-list` with single and double arrows and a tail-pointer toggle. Lessons L2 and L3.
+
+**Commit:**
+```
+feat(linked-list): add singly and doubly linked lists with lessons and quizzes
+```
+
+### Step 9.4: Hash table
+- Engine: put, get, remove, chaining, linear probing, tombstones, load factor and resize, plus selectable hash functions. Renderer: `hash-table` with buckets, chains, probe arrows and tombstones. Lesson H1 (10 chapters), including the phone book example.
+
+**Commit:**
+```
+feat(hash-table): add hash table with chaining, probing, lesson and quiz
+```
+
+### Step 9.5: Big O
+- Install Victory Native. Renderer: `growth-chart` with the user's `n` marker. Sandbox: the `n` slider and sample functions with live step counts. Lesson F1.
+
+**Commit:**
+```
+feat(big-o): add growth chart, Big O lesson, sandbox and quiz
+```
+
+### Step 9.6: Reference sheets
+- Reference sheet for every MVP topic: tabs, complexity table, key concepts and pitfalls (F-801–F-803). It opens from the topic and lesson screens.
+
+**Commit:**
+```
+feat(reference): add reference sheets for MVP topics
+```
+
+---
+
+## Phase 10: Polish and release
+
+### Step 10.1: Counters and legend
+- Live operation counters on the canvas (F-902), the state legend sheet, and the inline legend for states in the current step (F-306).
+
+**Commit:**
+```
+feat(lesson): add operation counters and state legend
+```
+
+### Step 10.2: Accessibility and landscape pass
+- Screen-reader announcements of each step's `a11y` summary, Dynamic Type, reduced motion, a contrast check against VISUAL-SPEC §9, touch targets, and landscape layouts for every screen (F-106, F-1104, F-1105).
+
+**Commit:**
+```
+fix(a11y): accessibility and landscape layout pass
+```
+
+### Step 10.3: EAS setup and first preview build
+This is the first time the app leaves Expo Go.
+- Add `eas.json` with `preview` and `production` profiles, then link the project with `eas init`.
+- App icon, splash screen and themed system bars.
+- Build an internal `preview` build and install it on your phone.
+
+**Done when:** the preview build installs from the EAS link and behaves the same as in Expo Go.
+
+**Commit:**
+```
+chore(release): add EAS config, app icon and splash
+```
+
+### Step 10.4: Performance on a release build
+- Add EAS Observe (it needs a real build, so it isn't available in Expo Go).
+- Profile the lessons on the preview build against the ARCHITECTURE §12 budgets, and fix any hot spots.
+
+**Commit:**
+```
+perf: add EAS Observe and tune canvas performance
+```
+
+### Step 10.5: CI and E2E tests
+- EAS Workflows: on each PR run lint, typecheck, Jest and content validation. On merge, build a preview and run Maestro in the cloud (open a topic → play the lesson → open the sandbox → take the quiz). No local simulator is needed. Details in TESTING.md.
+
+**Commit:**
+```
+ci: add EAS workflows with lint, tests and Maestro E2E
+```
+
+### Step 10.6: Release candidate
+- EAS Update channels (`preview`, `production`), store listing metadata, and the build shared with testers.
+
+**Done when:** testers can install the build, and an over-the-air update reaches it. ✅ **Milestone: MVP release candidate.**
+
+**Commit:**
+```
+chore(release): add update channels and store metadata
+```
+
+---
+
+## After the MVP
+
+The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Phase 9.
+
+### v1.1: Searching, sorting and comparison
+| Step | Work | Commit |
+|---|---|---|
+| 11.1 | Binary search (A1) on the array renderer | `feat(binary-search): add binary search lesson, sandbox and quiz` |
+| 11.2 | Bubble, selection and insertion sort (A2–A4) | `feat(sorting): add bubble, selection and insertion sort` |
+| 11.3 | Merge and quick sort (A5, A6) | `feat(sorting): add merge sort and quick sort` |
+| 11.4 | Compare mode and race mode (F-901, F-904) | `feat(compare): add side-by-side compare and race modes` |
+| 11.5 | Two pointers and sliding window (A9, A10) | `feat(patterns): add two pointers and sliding window` |
+| 11.6 | Recursion with the call-stack renderer (F2, F-504) | `feat(recursion): add recursion lesson and call stack view` |
+| 11.7 | Python, Java and C++ code, live variables, haptics (F-502, F-503, F-307) | `feat(code): add more languages, live variables and haptics` |
+
+### v1.2: Trees
+| Step | Work | Commit |
+|---|---|---|
+| 12.1 | `tree` renderer with tidy layout, plus pan and zoom (F-303, F-304) | `feat(viz): add tree renderer with pan and zoom` |
+| 12.2 | Traversals and BST (T1, T2) | `feat(trees): add traversals and binary search tree` |
+| 12.3 | Heap and priority queue (T3) | `feat(heap): add heap and priority queue` |
+| 12.4 | AVL rotations (T4) | `feat(avl): add AVL tree with rotations` |
+| 12.5 | Circular list and deque (L4, L7) | `feat(linear): add circular linked list and deque` |
+
+### v1.3: Graphs
+| Step | Work | Commit |
+|---|---|---|
+| 13.1 | `graph` renderer and graph editor (F-604) | `feat(viz): add graph renderer and editor` |
+| 13.2 | Graph basics, BFS, DFS (G1–G3) | `feat(graphs): add graph basics, BFS and DFS` |
+| 13.3 | Topological sort and Dijkstra with the table renderer (G4, G5) | `feat(graphs): add topological sort and Dijkstra` |
+| 13.4 | Streaks, bookmarks and reminders (F-1002, F-1003) | `feat(progress): add streaks, bookmarks and reminders` |
+
+### Later (P2)
+Trie, Red-Black and segment trees; MST, union-find and Bellman-Ford; heap, counting and radix sort; backtracking, DP and greedy; narration, shareable scenarios, achievements, stats dashboard, cloud sync and localisation. These will be planned in detail when v1.3 ships.
