@@ -18,6 +18,7 @@ jest.mock('react-native-reanimated', () => {
     __esModule: true,
     default: Animated,
     ...Animated,
+    css: { create: <T>(styles: T) => styles },
     cubicBezier: () => 'cubic-bezier',
     useReducedMotion: () => false,
   };

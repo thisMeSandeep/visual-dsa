@@ -1,8 +1,8 @@
 import '../../global.css';
 
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { Stack } from 'expo-router/stack';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaListener, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -30,6 +30,7 @@ export default function RootLayout() {
       {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
       <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
         <StatusBar style="auto" />
+        {/* (tabs) is the home of the app; topic/[topicId] and dev/* push on top of it. */}
         <Stack
           screenOptions={{ headerShown: false, contentStyle: { backgroundColor: background } }}
         />

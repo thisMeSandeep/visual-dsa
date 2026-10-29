@@ -10,6 +10,5 @@
     "JavaScript": { "formatter": "prettier" },
     "JSON": { "formatter": "prettier" },
     "CSS": { "formatter": "prettier" }
-  },
-  "file_scan_exclusions": ["**/.git", "**/node_modules", "**/.expo", "**/dist"]
+  }
 }

@@ -79,6 +79,7 @@ src/app/
 ```
 
 - Typed routes, deep links for free (needed later for sharing scenarios, F-607), native stack transitions.
+- Tabs use JS `Tabs` (`expo-router/js-tabs`) with our Phosphor icons rather than `NativeTabs`. See ARCHITECTURE §8 for the reasoning and typed-route setup.
 - The chapter index (F-203) and reference sheet (F-801) open as **form sheets / modals**.
 
 ## 3. Visualisation engine (the core of the app)

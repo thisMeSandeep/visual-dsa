@@ -75,13 +75,17 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │       └── reference.tsx       #   form sheet
 │   │
 │   ├── screens/                    # screen bodies rendered by routes
-│   │   ├── home/
+│   │   ├── home/                   #   Learn tab
+│   │   ├── practice-hub/           #   Practice tab (quizzes, revise list)
+│   │   ├── progress/
+│   │   ├── settings/
 │   │   ├── topic/
 │   │   ├── lesson/                 #   player layout, caption, controls
 │   │   ├── sandbox/                #   operation bar, inputs per structure
-│   │   ├── practice/
-│   │   ├── progress/
-│   │   └── settings/
+│   │   ├── practice/               #   one topic's quiz
+│   │   ├── chapters/               #   form sheet
+│   │   ├── reference/              #   form sheet
+│   │   └── dev/                    #   dev-only showcases (tokens, components)
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
 │   │   ├── app-text.tsx            #   ALL text: variant / weight / tone props
@@ -460,16 +464,23 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 
 | Route | Screen | Presentation |
 |---|---|---|
-| `/` | Home | Tab |
-| `/practice`, `/progress`, `/settings` | Tabs | Tab |
+| `/` | Home (`screens/home`) | Tab "Learn" |
+| `/practice`, `/progress`, `/settings` | `screens/practice-hub`, `progress`, `settings` | Tabs |
 | `/topic/[topicId]` | Topic detail | Stack push |
 | `/topic/[topicId]/learn?step=N` | Lesson player | Stack push (full screen) |
 | `/topic/[topicId]/play` | Sandbox | Stack push |
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
 | `/topic/[topicId]/chapters` | Chapter index | Form sheet |
 | `/topic/[topicId]/reference` | Reference sheet | Form sheet |
+| `/dev/tokens`, `/dev/components` | Dev-only showcases | Stack push; production redirects to `/` |
 
 Deep links come for free from Expo Router, e.g. `visualdsa://topic/hash-table/learn?step=6`. These are needed later for shared scenarios (F-607).
+
+**Implementation notes (Step 2.1):**
+- **Entry points:** `Stack` from `expo-router/stack`, and `Tabs` from `expo-router/js-tabs`. The root `Tabs` export is deprecated in SDK 58.
+- **The tab bar is JS `Tabs`, not `NativeTabs`.** NativeTabs only accepts SF Symbols, Material symbols, images or font icons. Our tab bar uses Phosphor icons (filled when active) on both platforms, rendered with `<Icon>` and `<AppText variant="tab">`. Tab switches don't animate.
+- **Sheets:** chapters and reference use `presentation: 'formSheet'` with a grabber and detents from `config.navigation.sheet`.
+- **Typed routes:** `bun run start` generates `.expo/types/router.d.ts`, so typecheck then rejects unknown paths. Use the object form `{ pathname: '/topic/[topicId]/learn', params: { topicId } }`. `expo-env.d.ts` is committed (not ignored) so Expo's global types load on every machine.
 
 ---
 
@@ -574,6 +585,7 @@ const delay = config.player.baseStepMs / speed;
 | `motion.ts` | Highlight/insert/fade durations, spring configs, press scale, reduced-motion fade |
 | `engine.ts` | Max steps per trace, max input size per structure, allowed value range, default RNG seed |
 | `sandbox.ts` | Default capacities, undo history depth, preset sizes |
+| `navigation.ts` | Form-sheet detents and grabber |
 | `practice.ts` | Questions per quiz, revise-list limit |
 | `storage.ts` | Storage keys and schema versions per store |
 | `features.ts` | Feature flags (compare mode, narration, haptics…) |
@@ -645,6 +657,7 @@ Techniques: layout is memoised per step; per-element shared values are reused ac
 | Player store | One store per instance | Global store | Compare mode needs two players at once |
 | Progress keys | Topic + chapter ids | Step indices | Lessons can change without breaking saved progress |
 | Drawing | Skia canvas | Views or SVG per element | Scales to large trees/graphs at 60fps |
+| Tab bar | JS `Tabs` with Phosphor icons | `NativeTabs` | NativeTabs can't render our SVG icon set. JS tabs keep one consistent design on iOS and Android |
 | Dev environment | Expo Go on a real phone | Development builds, simulators | Fast setup and testing on real hardware. Every library must be included in Expo Go |
 | Storage | `expo-sqlite/kv-store` | MMKV | Included in Expo Go. MMKV needs a development build |
 | Design tokens | One `tokens.css`, read by both class names and TS | Colours in TS theme files | One file to edit. Works for Uniwind classes and the Skia canvas |

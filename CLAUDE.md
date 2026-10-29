@@ -54,7 +54,7 @@ bun install                 # install dependencies
 bun run start               # start Metro in Expo Go mode; scan the QR code
 bun run start:tunnel        # same, when the phone isn't on the same network
 bun run lint                # ESLint (includes no-hard-coding and boundary rules)
-bun run typecheck           # tsc --noEmit
+bun run typecheck           # tsc --noEmit (run `bun run start` once first so typed routes exist)
 bun run format              # Prettier (format:check in CI)
 bun run doctor              # expo-doctor: dependency and config health
 bun run test                # Jest. NOT `bun test`
