@@ -52,14 +52,16 @@ Run these from the project root:
 ```bash
 bun install                 # install dependencies
 bun run start               # start Metro in Expo Go mode; scan the QR code
-bun run start:tunnel        # same, when the phone isn't on the same network
+bun run start:tunnel        # the user's usual command: phone and Mac are on different networks.
+                            # SDK 58's Expo tunnel (*.on.expo.app); needs `bunx expo login`
+bun run start:ngrok         # fallback tunnel through ngrok (@expo/ngrok is a dev dependency)
 bun run lint                # ESLint (includes no-hard-coding and boundary rules)
 bun run typecheck           # tsc --noEmit (run `bun run start` once first so typed routes exist)
 bun run format              # Prettier (format:check in CI)
 bun run doctor              # expo-doctor: dependency and config health
 bun run test                # Jest. NOT `bun test`
 bun run test:watch          # Jest in watch mode
-bun run validate:content    # Zod-check all topic content (from Step 2.2)
+bun run validate:content    # Zod-check all topic content
 bunx expo install <pkg>     # add an Expo-compatible dependency
 ```
 

@@ -8,7 +8,7 @@ A step-by-step build plan for Visual-DSA. It follows [ARCHITECTURE.md](./ARCHITE
 - **You commit.** After each step, review the changes and commit them yourself with the message given (adjusted if the step changed). Nothing is committed automatically.
 - **Order matters.** Phases build on each other. The first end-to-end milestone (an animated Stack lesson) arrives at the end of Phase 4, so the riskiest part, the engine-to-canvas pipeline, is proven early.
 - **Feature IDs** (F-xxx) link each step to FEATURE.md.
-- **Testing happens in Expo Go on your phone.** Every "Done when" check means running `bun run start`, scanning the QR code, and checking it on the device. There are no simulators or development builds. Each library is checked against Expo Go when it's installed (TECH-STACK §1).
+- **Testing happens in Expo Go on your phone.** Every "Done when" check means running `bun run start` (or `bun run start:tunnel` when the phone is on another network), scanning the QR code, and checking it on the device. There are no simulators or development builds. Each library is checked against Expo Go when it's installed (TECH-STACK §1).
 - **No hard-coded values.** Colours, fonts and sizes come from `src/theme/tokens.css`, and tunable constants come from `src/config/`. Lint enforces this from Step 0.3 onward (ARCHITECTURE §9).
 - **Before Step 0.1:** the project folder is not a Git repository yet. Run `git init` once before your first commit.
 

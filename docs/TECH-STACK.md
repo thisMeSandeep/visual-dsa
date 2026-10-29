@@ -46,6 +46,7 @@ This is the stack for Visual-DSA, chosen to deliver the features in [FEATURE.md]
 
 - The New Architecture (Fabric + JSI) is the default and is required by Reanimated 4 and Skia 2.
 - **Development and testing happen in Expo Go** on a physical phone: run `bun run start` and scan the QR code. There are no simulators and no development builds.
+  - **Phone on a different network from the Mac:** use `bun run start:tunnel`. In SDK 58, `--tunnel` uses Expo's own tunnel (`*.on.expo.app`), which needs `bunx expo login`. `bun run start:ngrok` is the fallback through ngrok. `@expo/ngrok` is a dev dependency so the CLI never prompts for a global install.
   - **Rule:** every dependency must already be included in Expo Go for SDK 58. Before adding a library, confirm it's in Expo Go (Expo SDK reference, `bunx expo install`). That rules out custom native code and config plugins that need a rebuild.
   - **Stack check:** Skia, Reanimated + worklets, Gesture Handler, `react-native-svg` (used by Phosphor), the expo-* modules, and `@expo/ui` universal components (SDK 56+) are expected to work in Expo Go. Uniwind's free version works in Expo Go (Pro does not). Each library is confirmed in Expo Go in the step that installs it.
   - **What changed because of Expo Go:** MMKV is replaced by `expo-sqlite/kv-store`. Fonts are loaded at runtime with `useFonts` instead of the `expo-font` config plugin. EAS Observe and Maestro E2E move to release builds.
@@ -269,6 +270,7 @@ The full strategy goes in `TESTING.md`. Tools:
 - React Native Testing Library v14 renders with the `test-renderer` package, and its `render` is awaited (`await render(<Home />)`).
 - `tsconfig.json` sets `"types": ["jest"]`, because TypeScript 6 no longer includes `@types/*` packages automatically.
 - Tests sit next to the code they test (`home.test.tsx` beside `index.tsx`), never inside `src/app/` (every file there becomes a route).
+- **Two TypeScript projects:** the app (`tsconfig.json`, Jest types) and `scripts/` (`scripts/tsconfig.json`, Node types). `bun run typecheck` checks both, so app code can't accidentally use Node-only globals.
 - **Reanimated in Jest** (`jest.setup.ts`): Reanimated 4.7's official mock imports the real package, whose native initializer throws under Jest. So `jest.setup.ts` mocks only the Reanimated APIs the app uses (`Animated.View`, `cubicBezier`, `useReducedMotion`…). **When code starts using a new Reanimated API, add it to that mock.** Worklets uses its official mock.
 
 ## 11. Build, release & CI/CD

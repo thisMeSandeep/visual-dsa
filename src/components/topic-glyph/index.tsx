@@ -1,15 +1,14 @@
 import Svg, { Path } from 'react-native-svg';
 
+import type { TopicCategory } from '@/content/schema';
 import { useColor, useGlyphStyle, type ColorToken } from '@/theme';
 
 import { GLYPHS, GLYPH_VIEWBOX, type GlyphName } from './glyphs';
 
 export { GLYPH_NAMES, type GlyphName } from './glyphs';
+export type { TopicCategory };
 
-/** Topic categories (ALGORITHM-CATALOG §1). Each has its own glyph colour. */
-export type TopicCategory =
-  'foundations' | 'linear' | 'hashing' | 'trees' | 'graphs' | 'algorithms';
-
+/** Each topic category's glyph colour (VISUAL-SPEC §2.3). */
 const CATEGORY_TONE: Record<TopicCategory, ColorToken> = {
   foundations: 'cat-foundations',
   linear: 'cat-linear',

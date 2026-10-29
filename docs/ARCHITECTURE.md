@@ -54,6 +54,7 @@ The project follows the Expo project-structure conventions: app code lives under
 ```
 ├── assets/                         # app icon, splash, static images
 ├── scripts/
+│   ├── tsconfig.json               # scripts get Node types; checked by `bun run typecheck`
 │   ├── highlight-code.ts           # Shiki → pre-tokenised code JSON
 │   └── validate-content.ts         # Zod-checks every topic, run in CI
 ├── src/
@@ -113,7 +114,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   └── state-style.ts          #   element state → colour tokens
 │   │
 │   ├── engine/                     # PURE TypeScript: no React / RN imports
-│   │   ├── core/                   #   types, tracer, scene builders, rng, limits
+│   │   ├── core/                   #   types, tracer, scene builders, rng, limits,
+│   │   │                           #   renderer.ts (RENDERER_IDS)
 │   │   ├── structures/             #   array/, linked-list/, stack/, queue/, hash-table/
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts
@@ -123,7 +125,9 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │
 │   ├── content/                    # DATA: no logic beyond small helpers
 │   │   ├── schema.ts               #   Zod schemas for every content type
-│   │   ├── registry.ts             #   topic id → lazy loader
+│   │   ├── registry.ts             #   TOPIC_IDS (Home order), metas, lookups;
+│   │   │                           #   lazy loaders for lessons/quizzes as they arrive
+│   │   ├── validate.ts             #   shared by the CLI and the content tests
 │   │   ├── topics/
 │   │   │   └── hash-table/
 │   │   │       ├── meta.ts         #     title, category, chapters, renderer
@@ -244,9 +248,11 @@ interface Trace {
 
 ```ts
 interface TopicMeta {
-  id: string;                        // 'hash-table'
+  id: string;                        // 'hash-table' (kebab-case)
   title: string;
+  summary: string;                   // one sentence for the Topic screen
   category: 'foundations' | 'linear' | 'hashing' | 'trees' | 'graphs' | 'algorithms';
+  glyph: string;                     // topic glyph name (components/topic-glyph/glyphs.ts)
   priority: 'P0' | 'P1' | 'P2';
   renderer: RendererId;
   chapters: { id: string; title: string }[];
@@ -609,7 +615,7 @@ Numbers that are part of an algorithm's definition (heap child index `2i + 1`, `
 | Script | When | Output |
 |---|---|---|
 | `scripts/highlight-code.ts` | `prebuild`, CI, and on save in dev | `src/content/generated/code-tokens.json` |
-| `scripts/validate-content.ts` | CI and pre-commit | Fails if any topic breaks a Zod schema, references an unknown operation, or uses an unknown code line id |
+| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, or names a glyph that doesn't exist. Checks for unknown operations (Step 5.1) and code line ids (Step 5.2) are added with those features |
 
 ---
 
