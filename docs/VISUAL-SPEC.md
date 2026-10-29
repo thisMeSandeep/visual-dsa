@@ -103,7 +103,7 @@ Used **only** for code in the code panel, on the `surface` fill. Plain code (ope
 
 ## 3. Typography
 
-**Atkinson Hyperlegible Next** for all UI text. **Atkinson Hyperlegible Mono** for values, indices, pointers, code, counters and Big-O notation.
+**Manrope** for all UI text. **JetBrains Mono** for values, indices, pointers, code, counters and Big-O notation. (Atkinson Hyperlegible was the first choice; on a real phone its wide, rounded letters looked heavy, so the UI rework switched to this sleeker pairing.)
 
 Sizes and line heights are in points. These are the exact values in `src/theme/tokens.css` (`--text-*`).
 
@@ -356,7 +356,7 @@ Dark theme: `ink` 14.5:1, `muted` 6.4:1, `primary` text 6.6:1, `on-primary` on `
 - **Screens** use class names such as `bg-background text-ink`, `bg-primary text-on-primary`, `text-muted`.
 - **Soft tints** (`*-soft`) are defined as their own tokens (pre-mixed colours or colour-with-alpha), so components never compute alpha themselves.
 - **Skia canvas** reads the same variables with `useCSSVariable` and passes them into Reanimated shared values. When the theme changes, the canvas colours update in step with the UI.
-- **Fonts** are registered once per weight. Map `font-sans` to Atkinson Hyperlegible Next and `font-mono` to Atkinson Hyperlegible Mono.
+- **Fonts** are registered once per weight under role names (`app-sans`, `app-sans-medium`, `app-sans-bold`, `app-mono`, `app-mono-medium`). `src/theme/fonts.ts` decides which typeface fills each role; it is the only file that names a font.
 - **Icons** all go through the `<Icon>` wrapper (TECH-STACK.md §7b), which takes a token colour, never a hex value.
 
 ---

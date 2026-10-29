@@ -32,7 +32,7 @@ This is the stack for Visual-DSA, chosen to deliver the features in [FEATURE.md]
 | Charts | **Victory Native** (Skia-based) | F-903 |
 | Styling | **Uniwind** (Tailwind CSS v4), with theme tokens as CSS variables | F-1101, F-1104, F-1106 |
 | Icons | **Phosphor** (`phosphor-react-native`) | Whole app |
-| Fonts | **Atkinson Hyperlegible Next** (UI) + **Atkinson Hyperlegible Mono** (code & values), via `@expo-google-fonts` | Whole app |
+| Fonts | **Manrope** (UI) + **JetBrains Mono** (code & values), via `@expo-google-fonts` | Whole app |
 | Device APIs | `expo-haptics`, `expo-clipboard`, `expo-notifications`, `expo-speech`, `expo-localization` | F-307, F-505, F-1003, F-210, F-1111 |
 | Testing | **Jest** (`jest-expo`) + **React Native Testing Library** + **Maestro** | See TESTING.md |
 | Build & release | **EAS Build / Submit / Update / Workflows** | CI/CD, OTA lesson fixes |
@@ -227,13 +227,14 @@ Phosphor is clean and minimal, but much less common than Lucide, which has becom
 - **Maintenance note:** the last release was April 2026. Icons are static SVGs and the peer dependencies are loose, so this is low risk. Check it still installs when the Expo SDK is upgraded.
 
 ### 7c. Fonts & accessibility
-- **Fonts: Atkinson Hyperlegible Next** for all UI text (headings, buttons, captions) and **Atkinson Hyperlegible Mono** for code, array values, index labels and pointer labels.
-  - **Why:** the Braille Institute designed this family so that characters people often confuse look clearly different (0/O, 1/l/I, 5/S, 8/B). In a DSA app, values, indices and code are the main content. It's also distinctive without being loud, and few apps use it.
-  - **Why one family:** a matching mono keeps the look consistent and means fewer font files to load. It also supports accessibility features F-1105 and F-1106.
-  - **Packages:** `@expo-google-fonts/atkinson-hyperlegible-next` and `@expo-google-fonts/atkinson-hyperlegible-mono`, loaded at runtime with `useFonts` in the root layout. The `expo-font` config plugin isn't used because Expo Go can't apply config plugins. Only the weights we use are loaded (Next: 400/500/700, Mono: 400/500).
-  - **Skia canvas:** the canvas loads the **same font files** through Skia's own font loader, so values and labels drawn on the canvas use the same typeface as the rest of the UI.
-  - **Uniwind:** the font families are defined as `--font-*` tokens in `tokens.css`. In React Native each weight is its own font family, so each weight gets its own token. The token value must exactly match the registered family name (e.g. `AtkinsonHyperlegibleNext_700Bold`).
-  - **Rejected on purpose:** Inter, Geist, Space Grotesk, Poppins and DM Sans, because they're the usual defaults in generated apps. The alternatives considered were Bricolage + Hanken + Martian Mono, Schibsted + Newsreader + Plex Mono, and IBM Plex.
+- **Fonts: Manrope** for all UI text (headings, buttons, captions) and **JetBrains Mono** for code, array values, index labels and pointer labels.
+  - **Why:** a sleek, modern geometric sans that stays calm at caption size and crisp at title size, with clear numerals. JetBrains Mono is designed for reading code, and it keeps easily confused characters apart (0/O, 1/l/I), which matters because values, indices and code are the main content.
+  - **History:** the first choice was Atkinson Hyperlegible Next + Mono, picked for legibility. On a real phone its wide, rounded letters looked heavy and clunky, so the UI rework switched. Candidates compared on device: Manrope + JetBrains Mono, Geist (rejected as the default of many generated apps), IBM Plex, Red Hat Text + Mono and DM Sans + DM Mono.
+  - **Packages:** `@expo-google-fonts/manrope` and `@expo-google-fonts/jetbrains-mono`, loaded at runtime with `useFonts` in the root layout. The `expo-font` config plugin isn't used because Expo Go can't apply config plugins. Only the weights we use are loaded (Manrope 400/500/700, JetBrains Mono 400/500).
+  - **One place to change:** fonts are registered under role names (`app-sans`, `app-sans-medium`, `app-sans-bold`, `app-mono`, `app-mono-medium`) in `src/theme/fonts.ts`, the only file that names a typeface. Changing fonts means installing the packages and changing its five imports.
+  - **Skia canvas:** the canvas loads the **same font files** through Skia's own font loader (by role, e.g. `FONT_FILES['app-mono-medium']`), so values and labels drawn on the canvas use the same typeface as the rest of the UI.
+  - **Uniwind:** the `--font-*` tokens in `tokens.css` hold the role names. In React Native each weight is its own font family, so each weight gets its own token.
+  - **Rejected on purpose:** Inter, Geist, Space Grotesk and Poppins, because they're the usual defaults in generated apps.
 - Light/dark theme follows the system, with a user override (F-1101).
 - Colour-blind-safe state palette paired with icons/patterns (F-1106).
 

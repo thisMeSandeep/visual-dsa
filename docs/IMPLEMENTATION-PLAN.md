@@ -91,7 +91,7 @@ feat(theme): add Uniwind with Visual-DSA colour tokens
 ```
 
 ### Step 1.2: Fonts and type scale
-**Goal:** Atkinson Hyperlegible everywhere, with the VISUAL-SPEC §3 type scale.
+**Goal:** Atkinson Hyperlegible everywhere, with the VISUAL-SPEC §3 type scale. *(Done. The UI rework later switched to Manrope + JetBrains Mono, registered under role names so `src/theme/fonts.ts` is the only file that names a font.)*
 - Install `@expo-google-fonts/atkinson-hyperlegible-next` and `@expo-google-fonts/atkinson-hyperlegible-mono` (Next 400/500/700, Mono 400/500).
 - Load the fonts at runtime with `useFonts` in the root layout (no config plugin, so it works in Expo Go), and keep the splash screen up until they're ready.
 - Add `--font-*` tokens (one per weight, matching the registered family names) and the type-scale tokens to `tokens.css`, giving text styles `display`, `title`, `caption`, `body`, `label`, `overline`, `value`, `code`…, used through an `<AppText>` component (variant, weight and tone props)

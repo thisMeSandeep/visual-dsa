@@ -157,14 +157,15 @@
   --radius-xl: 24px; /* cards and panels */
 
   /* Fonts (VISUAL-SPEC §3). React Native needs one family per weight, so weight is picked by
-     family (font-sans-bold), never by font-weight. Names must match the keys in src/theme/fonts.ts. */
+     family (font-sans-bold), never by font-weight. These are role names, the keys in
+     src/theme/fonts.ts; which typeface fills each role is chosen there, not here. */
   --font-*: initial;
   --font-weight-*: initial;
-  --font-sans: 'AtkinsonHyperlegibleNext_400Regular';
-  --font-sans-medium: 'AtkinsonHyperlegibleNext_500Medium';
-  --font-sans-bold: 'AtkinsonHyperlegibleNext_700Bold';
-  --font-mono: 'AtkinsonHyperlegibleMono_400Regular';
-  --font-mono-medium: 'AtkinsonHyperlegibleMono_500Medium';
+  --font-sans: 'app-sans';
+  --font-sans-medium: 'app-sans-medium';
+  --font-sans-bold: 'app-sans-bold';
+  --font-mono: 'app-mono';
+  --font-mono-medium: 'app-mono-medium';
 
   /* Type scale (VISUAL-SPEC §3). Each size carries its line height and letter spacing.
      Use through <AppText variant="…">, which also sets the font family and colour. */

@@ -6,15 +6,15 @@ import { FONT_FILES } from '@/theme/fonts';
 export type VizFonts = Record<'value' | 'detail' | 'label' | 'index', SkFont>;
 
 /**
- * The canvas's fonts: the same Atkinson Hyperlegible Mono files the UI uses (loaded through Skia,
+ * The canvas's fonts: the same mono files the UI uses (loaded through Skia,
  * which needs its own font objects), at the --viz-font-* token sizes. Null until all are loaded.
  */
 export function useVizFonts(): VizFonts | null {
   const sizes = useVizSizes();
-  const value = useFont(FONT_FILES.AtkinsonHyperlegibleMono_500Medium, sizes.fontValue);
-  const detail = useFont(FONT_FILES.AtkinsonHyperlegibleMono_400Regular, sizes.fontDetail);
-  const label = useFont(FONT_FILES.AtkinsonHyperlegibleMono_500Medium, sizes.fontLabel);
-  const index = useFont(FONT_FILES.AtkinsonHyperlegibleMono_400Regular, sizes.fontIndex);
+  const value = useFont(FONT_FILES['app-mono-medium'], sizes.fontValue);
+  const detail = useFont(FONT_FILES['app-mono'], sizes.fontDetail);
+  const label = useFont(FONT_FILES['app-mono-medium'], sizes.fontLabel);
+  const index = useFont(FONT_FILES['app-mono'], sizes.fontIndex);
 
   if (!value || !detail || !label || !index) return null;
   return { value, detail, label, index };

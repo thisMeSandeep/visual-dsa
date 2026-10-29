@@ -453,7 +453,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
    - Durations come from `canvasTimings(speed, reducedMotion)` (`viz/canvas/timing.ts`, values in `config.motion.canvas`), divided by playback speed. Reduced motion means no movement or scaling, only 150ms fades.
 4. **Drawing:** Skia components take the shared and derived values directly as props, so every frame runs on the UI thread and React only re-renders when the step changes.
 5. **Colours** come from `viz/state-style.ts`, which maps each `ElementState` to fill, stroke and text colour tokens plus a non-colour cue (border weight, dash, dimming). The canvas reads all colour tokens with `useColors`, so it switches theme together with the UI and cross-fades when it does.
-6. **Fonts:** `useVizFonts` loads the same Atkinson Hyperlegible Mono files through Skia's `useFont`, at the `--viz-font-*` token sizes. Text is centred by measuring it.
+6. **Fonts:** `useVizFonts` loads the same mono files (`FONT_FILES['app-mono']`, `FONT_FILES['app-mono-medium']`) through Skia's `useFont`, at the `--viz-font-*` token sizes. Text is centred by measuring it.
 7. **Sizes:** cell sizes, gaps, stroke widths, dash and arrow sizes come from `@theme static` tokens through `useVizSizes()`. Layout functions receive them as a parameter, so they stay pure and testable.
 8. **Gestures** (P1): pinch and pan update a canvas transform. Taps are hit-tested against the layout result, which the graph editor (F-604) uses.
 9. **Accessibility:** `VizCanvas` is a single accessible image whose label is the current step's `a11y` summary, announced on step change.
@@ -598,9 +598,9 @@ Lesson data (e.g. the input `[42, 17, 8, 23]` or the key "Sid") is **content**, 
 
 /* 2. Tokens used through class names: font-sans, text-caption, p-6, rounded-lg */
 @theme {
-  --font-sans: 'AtkinsonHyperlegibleNext_400Regular';
-  --font-sans-bold: 'AtkinsonHyperlegibleNext_700Bold';
-  --font-mono: 'AtkinsonHyperlegibleMono_400Regular';
+  --font-sans: 'app-sans';            /* role names; src/theme/fonts.ts picks the typeface */
+  --font-sans-bold: 'app-sans-bold';
+  --font-mono: 'app-mono';
   --text-caption: 19px;
   --radius-lg: 16px;
   /* …type scale, spacing, radii from VISUAL-SPEC §3–4 */
