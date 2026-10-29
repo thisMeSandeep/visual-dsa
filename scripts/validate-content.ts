@@ -10,7 +10,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { GLYPH_NAMES } from '@/components/topic-glyph/glyphs';
-import { TOPIC_IDS, TOPIC_LESSONS, TOPIC_METAS } from '@/content/registry';
+import { TOPIC_IDS, TOPIC_LESSONS, TOPIC_METAS, TOPIC_QUIZZES } from '@/content/registry';
 import { validateContent, type ContentIssue } from '@/content/validate';
 import { SCENES } from '@/viz/scenes';
 
@@ -55,5 +55,6 @@ if (issues.length > 0) {
 }
 
 console.log(
-  `✓ ${TOPIC_IDS.length} topics valid, ${Object.keys(TOPIC_LESSONS).length} lesson(s) compiled`,
+  `✓ ${TOPIC_IDS.length} topics valid, ${Object.keys(TOPIC_LESSONS).length} lesson(s) compiled, ` +
+    `${Object.keys(TOPIC_QUIZZES).length} quiz(zes) checked`,
 );

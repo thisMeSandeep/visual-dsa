@@ -39,6 +39,7 @@ describe('progress store', () => {
         stack: { completedChapters: [], last: undefined },
         queue: { completedChapters: ['fifo'] },
       },
+      revise: [],
     });
     expect(parseProgress({ topics: 'all' })).toEqual(EMPTY_PROGRESS);
   });
@@ -48,7 +49,7 @@ describe('progress actions', () => {
   // Loaded here so the launch tests above get a fresh module each time.
   const { useProgress } = require('./progress') as typeof import('./progress');
 
-  beforeEach(() => useProgress.setState({ topics: {}, lastTopicId: undefined }));
+  beforeEach(() => useProgress.setState({ topics: {}, lastTopicId: undefined, revise: [] }));
 
   it('saves the position and remembers the topic to continue', async () => {
     useProgress.getState().savePosition('stack', { chapterId: 'lifo', offset: 3 });
@@ -60,6 +61,7 @@ describe('progress actions', () => {
     expect(JSON.parse(Storage.getItemSync(config.storage.keys.progress) ?? '{}').state).toEqual({
       lastTopicId: 'stack',
       topics: { stack: { completedChapters: [], last: { chapterId: 'lifo', offset: 3 } } },
+      revise: [],
     });
   });
 
@@ -82,5 +84,25 @@ describe('progress actions', () => {
       queue: { completedChapters: ['fifo'] },
     });
     expect(useProgress.getState().lastTopicId).toBe('stack');
+  });
+
+  it('puts a wrong answer on the revise list once, and takes it off when answered right', () => {
+    const { recordAnswer } = useProgress.getState();
+    recordAnswer('stack', 'pop-returns', false);
+    recordAnswer('stack', 'pop-returns', false);
+    recordAnswer('stack', 'push-cost', true);
+    expect(useProgress.getState().revise).toEqual([
+      { topicId: 'stack', questionId: 'pop-returns' },
+    ]);
+
+    recordAnswer('stack', 'pop-returns', true);
+    expect(useProgress.getState().revise).toEqual([]);
+  });
+
+  it('saves a quiz score, keeping the best', () => {
+    const { recordQuizScore } = useProgress.getState();
+    recordQuizScore('stack', 7, 10);
+    recordQuizScore('stack', 5, 10);
+    expect(useProgress.getState().topics.stack?.quiz).toEqual({ last: 5, best: 7, total: 10 });
   });
 });

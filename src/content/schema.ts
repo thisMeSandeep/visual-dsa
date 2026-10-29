@@ -207,8 +207,10 @@ const questionBase = {
   prompt: TextSchema,
   /** Shown after answering: why the answer is right (F-705). */
   explanation: TextSchema,
-  /** Chapter to revisit, linked from the feedback panel. */
+  /** Chapter to revisit, linked from the feedback panel ("See in lesson"). */
   chapterId: IdSchema.optional(),
+  /** A short mono block shown under the question, e.g. "bottom → top: 7 4 2". */
+  context: TextSchema.optional(),
 };
 
 const withOptions = {

@@ -11,8 +11,20 @@ import type { CompiledLesson } from '@/engine/lesson/types';
 
 import { CODE_SAMPLES } from './code';
 import type { CodeSamples } from './code-types';
-import { chapterTitles, TOPIC_LESSONS, TOPIC_METAS, TOPIC_SANDBOXES } from './registry';
-import { LessonRecipeSchema, SandboxToolsSchema, TopicMetaSchema, type TopicMeta } from './schema';
+import {
+  chapterTitles,
+  TOPIC_LESSONS,
+  TOPIC_METAS,
+  TOPIC_QUIZZES,
+  TOPIC_SANDBOXES,
+} from './registry';
+import {
+  LessonRecipeSchema,
+  QuizSchema,
+  SandboxToolsSchema,
+  TopicMetaSchema,
+  type TopicMeta,
+} from './schema';
 
 export type ContentIssue = {
   /** Which topic (or registry key) the problem is in. */
@@ -154,11 +166,48 @@ export function validateSandboxes(sandboxes: Record<string, unknown>): ContentIs
   });
 }
 
+/**
+ * Checks each quiz against the schema, that it's registered under its topic, and that every
+ * "See in lesson" chapter is one of the topic's chapters.
+ */
+export function validateQuizzes(
+  quizzes: Record<string, unknown>,
+  metas: Readonly<Record<string, TopicMeta>>,
+): ContentIssue[] {
+  return Object.entries(quizzes).flatMap(([key, value]): ContentIssue[] => {
+    const result = QuizSchema.safeParse(value);
+    if (!result.success) return toIssues(key, result.error);
+    const quiz = result.data;
+    if (quiz.topicId !== key) {
+      return [
+        {
+          topicId: key,
+          path: 'topicId',
+          message: `Registered as "${key}" but its topicId is "${quiz.topicId}"`,
+        },
+      ];
+    }
+    const chapters = new Set(metas[key]?.chapters.map((chapter) => chapter.id));
+    return quiz.questions.flatMap((question, index) =>
+      question.chapterId === undefined || chapters.has(question.chapterId)
+        ? []
+        : [
+            {
+              topicId: key,
+              path: `questions.${index}.chapterId`,
+              message: `No chapter "${question.chapterId}" in this topic`,
+            },
+          ],
+    );
+  });
+}
+
 /** Validates all registered content. */
 export function validateContent(): ContentIssue[] {
   return [
     ...validateTopicMetas(TOPIC_METAS),
     ...validateLessons(TOPIC_LESSONS, TOPIC_METAS),
     ...validateSandboxes(TOPIC_SANDBOXES),
+    ...validateQuizzes(TOPIC_QUIZZES, TOPIC_METAS),
   ];
 }

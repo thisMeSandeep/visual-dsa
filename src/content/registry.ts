@@ -4,7 +4,7 @@
  */
 import type { LessonRecipeInput } from '@/engine/lesson/recipe';
 
-import type { LessonRecipe, SandboxConfig, TopicCategory, TopicMeta } from './schema';
+import type { LessonRecipe, Quiz, SandboxConfig, TopicCategory, TopicMeta } from './schema';
 import { meta as array } from './topics/array/meta';
 import { meta as bigO } from './topics/big-o/meta';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
@@ -13,6 +13,7 @@ import { meta as queue } from './topics/queue/meta';
 import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
 import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
+import { quiz as stackQuiz } from './topics/stack/quiz';
 import { sandbox as stackSandbox } from './topics/stack/sandbox';
 
 /** Topic ids in the order Home lists them. */
@@ -50,6 +51,11 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
 /** Each topic's Play mode (one or more tools), under its topic id. */
 export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>> = {
   stack: stackSandbox,
+};
+
+/** Each topic's quiz, under its topic id. */
+export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
+  stack: stackQuiz,
 };
 
 /** All topics in Home order. */

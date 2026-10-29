@@ -81,7 +81,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── settings/
 │   │   ├── lesson/                 #   landscape player, chapter panel
 │   │   ├── sandbox/                #   Play mode screen, value-input.ts (Zod + engine limits)
-│   │   ├── practice/               #   one topic's quiz
+│   │   ├── practice/               #   topic quiz, revise session, quiz runner + session
 │   │   ├── reference/              #   form sheet: summary + complexity
 │   │   └── dev/                    #   dev-only showcases (tokens, components)
 │   │
@@ -509,6 +509,12 @@ type SandboxSession<Model> = {
 
 Each answer is written to the progress store. Wrong answers are added to the revise list (F-706).
 
+**Built in Step 8.1:**
+- Content: `content/topics/<topic>/quiz.ts` (`QuizSchema`; questions may have a mono `context` and a `chapterId` for "See in lesson"), registered in `TOPIC_QUIZZES`. `content/quiz.ts` has the small helpers: `choicesOf` (true/false questions offer True and False), `answerOf`, `isCorrect`, and the kind labels.
+- Session: `screens/practice/quiz-session.ts` is a pure run through a question list (current question, the choice made, score, missed); `QuizRunner` (`quiz-runner.tsx`) draws it and the results view, and is shared by the topic quiz and the revise session.
+- Progress: `recordAnswer` puts a wrong answer on the revise list (once) and takes it off when the question is later answered right; `recordQuizScore` saves the last and best score of a topic quiz. Both are additive fields with defaults, so no version bump.
+- Screens: `/topic/[id]/practice` (from the lesson's top bar and the Practice tab), `/revise` (the missed questions across topics, fixed when it opens), and the Practice tab (revise card, then each topic's quiz with its best score). "See in lesson" opens the lesson at the question's chapter.
+
 ---
 
 ## 7. State and persistence
@@ -516,7 +522,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | Store | Contents | Persisted |
 |---|---|---|
 | `settings` | Theme override, code language, default speed, haptics, lesson progress bar shown or hidden, reduced-motion override | kv-store |
-| `progress` | Per topic: completed chapters, last step, quiz scores, mastery · bookmarks · streak · revise list | kv-store |
+| `progress` | Per topic: completed chapters, last position, quiz score (last, best, total) · the revise list (topic + question ids) · later: mastery, bookmarks, streak | kv-store |
 | player (per instance) | Steps, machine state | No (re-created on open) |
 | sandbox (per session) | Model, history | No |
 
@@ -542,6 +548,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | `/topic/[topicId]/learn` (`?chapter=<id>`, `?step=N`) | Lesson player: resumes by default; `chapter` opens a chapter, `step` (1-based) opens a step and wins over both | Stack push, full screen, **landscape** |
 | `/topic/[topicId]/play` | Sandbox | Stack push |
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
+| `/revise` | Revise session: the missed questions, across topics | Stack push |
 | `/topic/[topicId]/reference` | Reference sheet (summary, complexity) | Form sheet, landscape (it opens over the lesson) |
 | `/dev/tokens`, `/dev/components` | Dev-only showcases | Stack push; production redirects to `/` |
 
@@ -659,7 +666,7 @@ const delay = config.player.baseStepMs / speed;
 | `sandbox.ts` | Undo history depth (capacities and presets are content, in each topic's `sandbox.ts`) |
 | `navigation.ts` | Form-sheet detents and grabber |
 | `structures.ts` | Per-structure defaults, e.g. stack capacity |
-| `practice.ts` | Questions per quiz, revise-list limit |
+| `practice.ts` | Longest answer shown as a big tile (else a list), revise questions previewed on the Practice tab |
 | `storage.ts` | Storage keys and schema versions per store |
 | `features.ts` | Feature flags (compare mode, narration, haptics…) |
 
@@ -682,7 +689,7 @@ Numbers that are part of an algorithm's definition (heap child index `2i + 1`, `
 | Script | When | Output |
 |---|---|---|
 | `scripts/highlight-code.ts` (`bun run highlight`) | `postinstall`, before `start`/`start:tunnel`/`start:ngrok` and `validate:content`, and by hand after editing a sample. EAS builds run `postinstall` too | `src/content/generated/code-tokens.json` (git-ignored). Fails on an unknown file extension, a missing or second sample for a language, or a line id that isn't kebab-case |
-| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a sandbox whose structure, operations or presets don't work, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), highlights a code line that a language's sample doesn't mark, or has a `scene` segment whose scene doesn't exist or whose caption count doesn't match the scene's steps |
+| `scripts/validate-content.ts` (`bun run validate:content`) | CI and pre-commit | Fails if any topic breaks a Zod schema, is registered under the wrong id, has a folder that isn't registered, names a glyph that doesn't exist, has a sandbox whose structure, operations or presets don't work, has a quiz under the wrong topic or a question linking to a chapter the topic doesn't have, has a lesson that doesn't compile (unknown chapter, structure or operation, bad input), highlights a code line that a language's sample doesn't mark, or has a `scene` segment whose scene doesn't exist or whose caption count doesn't match the scene's steps |
 
 ---
 

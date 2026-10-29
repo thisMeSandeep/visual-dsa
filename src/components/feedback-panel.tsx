@@ -29,6 +29,9 @@ export type FeedbackPanelProps = {
   explanation: string;
   actionLabel: string;
   onAction?: () => void;
+  /** An optional second action beside the main one, e.g. "See in lesson". */
+  secondaryLabel?: string;
+  onSecondary?: () => void;
 };
 
 /**
@@ -41,6 +44,8 @@ export function FeedbackPanel({
   explanation,
   actionLabel,
   onAction,
+  secondaryLabel,
+  onSecondary,
 }: FeedbackPanelProps) {
   const spec = RESULTS[result];
 
@@ -55,7 +60,20 @@ export function FeedbackPanel({
         </View>
         <AppText variant="body-sm">{explanation}</AppText>
       </View>
-      <Button label={actionLabel} onPress={onAction} />
+      {secondaryLabel ? (
+        <View className="flex-row gap-3">
+          <Button
+            label={secondaryLabel}
+            variant="tinted"
+            size="compact"
+            className="flex-1"
+            onPress={onSecondary}
+          />
+          <Button label={actionLabel} size="compact" className="flex-1" onPress={onAction} />
+        </View>
+      ) : (
+        <Button label={actionLabel} onPress={onAction} />
+      )}
     </View>
   );
 }
