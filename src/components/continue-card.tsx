@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { AppText } from './app-text';
@@ -16,6 +17,8 @@ export type ContinueCardProps = {
   overline?: string;
   /** "Resume" when resuming, "Start" before any progress. */
   actionLabel?: string;
+  /** The topic's line drawing, shown beside the title. */
+  art?: ReactNode;
   /** What happens on press, for screen readers. */
   accessibilityHint?: string;
   onPress?: () => void;
@@ -33,6 +36,7 @@ export function ContinueCard({
   overline = 'Continue',
   actionLabel = 'Resume',
   accessibilityHint = 'Resumes the lesson where you left off',
+  art,
   onPress,
 }: ContinueCardProps) {
   return (
@@ -42,12 +46,17 @@ export function ContinueCard({
       accessibilityHint={accessibilityHint}
       contentClassName="gap-5 rounded-xl bg-primary-soft p-6"
     >
-      <View className="gap-1.5">
-        <AppText variant="overline" weight="bold" tone="primary">
-          {overline}
-        </AppText>
-        <AppText variant="headline">{title}</AppText>
-        <AppText variant="label">{position}</AppText>
+      <View className="flex-row items-start gap-4">
+        <View className="flex-1 gap-1.5">
+          <AppText variant="overline" weight="bold" tone="primary">
+            {overline}
+          </AppText>
+          <AppText variant="headline">{title}</AppText>
+          <AppText variant="label" numberOfLines={2}>
+            {position}
+          </AppText>
+        </View>
+        {art ? <View className="aspect-8/5 w-28">{art}</View> : null}
       </View>
       <View className="flex-row items-center gap-4">
         <ProgressBar value={progress} track="tinted" className="flex-1" />

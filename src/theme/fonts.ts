@@ -25,3 +25,10 @@ export const FONT_FILES = {
 };
 
 export type FontRole = keyof typeof FONT_FILES;
+
+/**
+ * Mono font for text inside react-native-svg drawings (topic art labels). On Android,
+ * react-native-svg places the letters of a runtime-loaded font wrongly (they overlap: "Sid"
+ * draws as "S1d"), so drawings use the system mono there. iOS draws ours correctly.
+ */
+export const SVG_MONO_FONT: string = process.env.EXPO_OS === 'android' ? 'monospace' : 'app-mono';

@@ -10,7 +10,7 @@ export { GLYPH_NAMES, type GlyphName } from './glyphs';
 export type { TopicCategory };
 
 /** Each topic category's glyph colour (VISUAL-SPEC §2.3). */
-const CATEGORY_TONE: Record<TopicCategory, ColorToken> = {
+export const CATEGORY_TONE: Record<TopicCategory, ColorToken> = {
   foundations: 'cat-foundations',
   linear: 'cat-linear',
   hashing: 'cat-hashing',

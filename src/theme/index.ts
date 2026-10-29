@@ -139,9 +139,15 @@ const GLYPH_VARS = {
   strokeWidth: '--glyph-stroke',
 } as const;
 
+const ART_VARS = {
+  strokeWidth: '--art-stroke',
+  fontSize: '--art-font',
+} as const;
+
 export type VizSizes = Record<keyof typeof VIZ_SIZE_VARS, number>;
 export type IconSize = keyof typeof ICON_SIZE_VARS;
 export type GlyphStyle = Record<keyof typeof GLYPH_VARS, number>;
+export type ArtStyle = Record<keyof typeof ART_VARS, number>;
 
 /** Turns `46`, `'46px'` or `'0.4'` into a number. Missing or unparsable values become 0. */
 function toNumber(value: string | number | undefined): number {
@@ -180,6 +186,12 @@ export function useIconStyle(): Record<keyof typeof ICON_STYLE_VARS, number> {
 export function useGlyphStyle(): GlyphStyle {
   const values = useCSSVariable(Object.values(GLYPH_VARS)) as (string | number | undefined)[];
   return readSizes(GLYPH_VARS, values);
+}
+
+/** Stroke and text size for the topic line drawings (components/topic-art). */
+export function useArtStyle(): ArtStyle {
+  const values = useCSSVariable(Object.values(ART_VARS)) as (string | number | undefined)[];
+  return readSizes(ART_VARS, values);
 }
 
 /* ------------------------------------------------------------------------------------------------

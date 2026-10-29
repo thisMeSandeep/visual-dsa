@@ -1,60 +1,70 @@
 import { FlashList } from '@shopify/flash-list';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { memo, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
-import { Button } from '@/components/button';
-import { ContinueCard } from '@/components/continue-card';
-import { TopicRow } from '@/components/topic-row';
-import { getTopicMeta, TOPICS, topicsByCategory } from '@/content/registry';
+import { TopicCard } from '@/components/topic-card';
+import { topicsByCategory } from '@/content/registry';
 import { CATEGORY_LABELS, type TopicCategory, type TopicMeta } from '@/content/schema';
-import {
-  completedCount,
-  topicProgress,
-  topicStatus,
-  useTopicProgress,
-} from '@/hooks/use-topic-progress';
-import { useProgress } from '@/stores/progress';
+import { topicStatus, useTopicProgress } from '@/hooks/use-topic-progress';
 
 import { chapterCount } from '@/utils/format';
 
-/* Home is one virtualized list (Vercel list rules): typed items, recycled per type. */
+/*
+ * Home is one virtualized grid (Vercel list rules): typed items, recycled per type. Topic cards
+ * sit two to a row; section headers span both columns.
+ */
+const COLUMNS = 2;
+
 type HomeItem =
-  | { type: 'section'; key: string; category: TopicCategory }
-  | { type: 'topic'; key: string; topic: TopicMeta };
+  | { type: 'section'; key: string; category: TopicCategory; count: number }
+  | { type: 'topic'; key: string; topic: TopicMeta; column: number };
 
 function buildItems(): HomeItem[] {
   return topicsByCategory().flatMap(({ category, topics }) => [
-    { type: 'section' as const, key: `section-${category}`, category },
-    ...topics.map((topic) => ({ type: 'topic' as const, key: topic.id, topic })),
+    { type: 'section' as const, key: `section-${category}`, category, count: topics.length },
+    ...topics.map((topic, index) => ({
+      type: 'topic' as const,
+      key: topic.id,
+      topic,
+      column: index % COLUMNS,
+    })),
   ]);
 }
 
 /** Built once: topics are static content. */
 const HOME_ITEMS = buildItems();
 
-/** Learn tab: where to start or continue, then every topic grouped by category (F-101, F-104). */
+/**
+ * Learn tab: every topic as a card, grouped by category (F-101). Each card shows its progress;
+ * the Topic screen's Continue button resumes a lesson (F-104).
+ */
 export function Home() {
   const openTopic = useCallback((topicId: string) => {
     router.push({ pathname: '/topic/[topicId]', params: { topicId } });
   }, []);
 
   return (
-    <View testID="home-screen" className="flex-1 bg-background">
+    // The safe-area padding sits outside the list, so cards never scroll under the status bar.
+    <View testID="home-screen" className="flex-1 bg-background pt-safe">
       <FlashList
         data={HOME_ITEMS}
+        numColumns={COLUMNS}
         keyExtractor={(item) => item.key}
         getItemType={(item) => item.type}
+        overrideItemLayout={(layout, item) => {
+          if (item.type === 'section') layout.span = COLUMNS;
+        }}
         renderItem={({ item }) =>
           item.type === 'section' ? (
-            <SectionHeader category={item.category} />
+            <SectionHeader category={item.category} count={item.count} />
           ) : (
-            <HomeTopicRow topic={item.topic} onOpen={openTopic} />
+            <HomeTopicCard topic={item.topic} column={item.column} onOpen={openTopic} />
           )
         }
         ListHeaderComponent={HomeHeader}
-        ListFooterComponent={__DEV__ ? DevLinks : null}
+        ListFooterComponent={ListEnd}
       />
     </View>
   );
@@ -62,74 +72,36 @@ export function Home() {
 
 function HomeHeader() {
   return (
-    <View className="gap-7 px-6 pt-safe-offset-4">
+    <View className="gap-1 px-6 pt-4">
       <AppText variant="display" accessibilityRole="header">
         Learn
       </AppText>
-      <ContinueOrStartCard />
+      <AppText variant="body-sm">Data structures and algorithms, step by step.</AppText>
     </View>
   );
 }
 
-const openLesson = (topicId: string) =>
-  router.push({ pathname: '/topic/[topicId]/learn', params: { topicId } });
-
-/**
- * "Continue" resumes the lesson that was open last, at the saved step (F-104). Before any
- * progress, or once that topic is finished, it's a "Start here" card for the first topic in
- * Home order that isn't finished yet.
- */
-function ContinueOrStartCard() {
-  const topics = useProgress((state) => state.topics);
-  const lastTopicId = useProgress((state) => state.lastTopicId);
-
-  const last = lastTopicId ? getTopicMeta(lastTopicId) : undefined;
-  const lastProgress = last ? topicProgress(last.id, topics[last.id]) : undefined;
-  if (last && lastProgress?.resume && topicStatus(last, lastProgress).kind !== 'done') {
-    const { chapterTitle, step, chapterSteps } = lastProgress.resume;
-    return (
-      <ContinueCard
-        title={last.title}
-        position={`${chapterTitle} · step ${step} of ${chapterSteps}`}
-        progress={completedCount(last, lastProgress) / last.chapters.length}
-        onPress={() => openLesson(last.id)}
-      />
-    );
-  }
-
-  const next =
-    TOPICS.find(
-      (topic) => topicStatus(topic, topicProgress(topic.id, topics[topic.id])).kind !== 'done',
-    ) ?? TOPICS[0];
-  if (!next) return null;
+function SectionHeader({ category, count }: { category: TopicCategory; count: number }) {
   return (
-    <ContinueCard
-      overline="Start here"
-      actionLabel="Start"
-      title={next.title}
-      position={`${chapterCount(next.chapters.length)} · ${next.summary}`}
-      progress={0}
-      accessibilityHint="Opens the lesson"
-      onPress={() => openLesson(next.id)}
-    />
-  );
-}
-
-function SectionHeader({ category }: { category: TopicCategory }) {
-  return (
-    <View className="px-6 pt-7 pb-1.5">
+    <View className="flex-row items-baseline justify-between px-6 pt-8 pb-3">
       <AppText variant="overline" accessibilityRole="header">
         {CATEGORY_LABELS[category]}
       </AppText>
+      <AppText variant="label">{count === 1 ? '1 topic' : `${count} topics`}</AppText>
     </View>
   );
 }
 
-const HomeTopicRow = memo(function HomeTopicRow({
+/** Half the gap between the two columns sits on each card's inner side. */
+const COLUMN_PADDING = ['pl-6 pr-1.5', 'pl-1.5 pr-6'] as const;
+
+const HomeTopicCard = memo(function HomeTopicCard({
   topic,
+  column,
   onOpen,
 }: {
   topic: TopicMeta;
+  column: number;
   onOpen: (topicId: string) => void;
 }) {
   const progress = useTopicProgress(topic.id);
@@ -137,8 +109,9 @@ const HomeTopicRow = memo(function HomeTopicRow({
   const open = useCallback(() => onOpen(topic.id), [onOpen, topic.id]);
 
   return (
-    <View className="px-6">
-      <TopicRow
+    <View className={`pb-3 ${COLUMN_PADDING[column] ?? COLUMN_PADDING[0]}`}>
+      <TopicCard
+        topicId={topic.id}
         title={topic.title}
         subtitle={chapterCount(topic.chapters.length)}
         glyph={topic.glyph}
@@ -150,23 +123,7 @@ const HomeTopicRow = memo(function HomeTopicRow({
   );
 });
 
-/** Development-only shortcuts to the design showcases. */
-function DevLinks() {
-  return (
-    <View className="gap-3 px-6 pt-7 pb-6">
-      <AppText variant="overline">Development</AppText>
-      <Link href="/dev/tokens" asChild>
-        <Button label="Design tokens" variant="tinted" size="compact" />
-      </Link>
-      <Link href="/dev/components" asChild>
-        <Button label="Components" variant="tinted" size="compact" />
-      </Link>
-      <Link href="/dev/canvas" asChild>
-        <Button label="Canvas" variant="tinted" size="compact" />
-      </Link>
-      <Link href="/dev/stack" asChild>
-        <Button label="Stack player" variant="tinted" size="compact" />
-      </Link>
-    </View>
-  );
+/** Space after the last row of cards. */
+function ListEnd() {
+  return <View className="h-6" />;
 }

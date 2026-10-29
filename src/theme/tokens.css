@@ -142,11 +142,13 @@
 
 /* -------------------------------------------------------------------------------------------------
  * 2. Scales used through class names (VISUAL-SPEC §4).
- *    Tailwind's default colours and radii are removed so only our tokens exist.
+ *    Tailwind's default radii are removed so only our tokens exist.
+ *
+ *    Colours are NOT reset here: `--color-*: initial` also removes the theme colours above, and
+ *    then Uniwind generates no colour classes at all (bg-primary, text-ink… silently do nothing).
+ *    Tailwind's default palette (bg-red-500, text-white…) is banned by lint instead.
  * ---------------------------------------------------------------------------------------------- */
 @theme {
-  --color-*: initial;
-
   /* 4pt grid: p-1 = 4, p-2 = 8, p-3 = 12, p-4 = 16, p-6 = 24 (screen gutter), p-7 = 28 (section gap) */
   --spacing: 4px;
 
@@ -270,6 +272,10 @@
   --glyph-size-sm: 18px; /* next to a category overline */
   --glyph-stroke: 1.7px;
 
+  /* Topic art: the line drawings on Home's topic cards and the Continue card (160 × 100 grid) */
+  --art-stroke: 1.1px;
+  --art-font: 9px; /* index and label text inside a drawing (mono) */
+
   /* Touch */
   --touch-min: 44px;
 }
@@ -281,6 +287,15 @@
 /* 1.5pt outline: step buttons, inputs, quiz tiles, canvas cells (VISUAL-SPEC §6–7) */
 @utility border-control {
   border-width: 1.5px;
+}
+
+/* One physical pixel: card outlines (VISUAL-SPEC §6 "Topic card") */
+@utility border-hairline {
+  border-width: hairlineWidth();
+}
+
+@utility border-t-hairline {
+  border-top-width: hairlineWidth();
 }
 
 /* -------------------------------------------------------------------------------------------------

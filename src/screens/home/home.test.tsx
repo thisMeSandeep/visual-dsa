@@ -17,19 +17,10 @@ describe('Home', () => {
     useProgress.setState({ topics: {}, lastTopicId: undefined });
   });
 
-  it('shows the Learn title and a Start card for the first topic', async () => {
+  it('shows the Learn title, with no Start or Continue card', async () => {
     await render(<Home />);
     expect(screen.getByRole('header', { name: 'Learn' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: /^Start here: Big O Notation/ })).toBeOnTheScreen();
-  });
-
-  it('starts the first lesson from the Start card', async () => {
-    await render(<Home />);
-    await fireEvent.press(screen.getByRole('button', { name: /^Start here: Big O Notation/ }));
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/topic/[topicId]/learn',
-      params: { topicId: 'big-o' },
-    });
+    expect(screen.queryByRole('button', { name: /^(Start here|Continue):/ })).toBeNull();
   });
 
   it('lists topics under their category, with real (zero) progress', async () => {
@@ -50,42 +41,25 @@ describe('Home', () => {
     });
   });
 
-  it('continues the last lesson at the saved step', async () => {
+  it('shows saved progress on each card', async () => {
     useProgress.setState({
-      lastTopicId: 'stack',
       topics: {
         stack: { completedChapters: ['lifo'], last: { chapterId: 'push-pop-peek', offset: 2 } },
       },
     });
     await render(<Home />);
-    const card = screen.getByRole('button', {
-      name: 'Continue: Stack, Push, pop and peek · step 3 of 6',
-    });
     expect(
       screen.getByRole('button', { name: 'Stack, 6 chapters, 1 of 6 chapters done' }),
     ).toBeOnTheScreen();
-
-    await fireEvent.press(card);
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/topic/[topicId]/learn',
-      params: { topicId: 'stack' },
-    });
+    expect(screen.getByText('1/6')).toBeOnTheScreen();
   });
 
-  it('goes back to a Start card once the last topic is finished', async () => {
+  it('marks a finished topic', async () => {
     const stack = getTopicMeta('stack')!;
     useProgress.setState({
-      lastTopicId: 'stack',
-      topics: {
-        stack: {
-          completedChapters: stack.chapters.map((chapter) => chapter.id),
-          last: { chapterId: 'overflow-underflow', offset: 9 },
-        },
-      },
+      topics: { stack: { completedChapters: stack.chapters.map((chapter) => chapter.id) } },
     });
     await render(<Home />);
-    expect(screen.queryByRole('button', { name: /^Continue:/ })).toBeNull();
-    expect(screen.getByRole('button', { name: /^Start here: Big O Notation/ })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Stack, 6 chapters, completed' })).toBeOnTheScreen();
   });
 });

@@ -32,23 +32,25 @@ export function ScreenPlaceholder({
   children,
 }: ScreenPlaceholderProps) {
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName={
-        sheet ? 'gap-7 px-6 pt-6 pb-safe-offset-6' : 'gap-7 px-6 pt-safe-offset-4 pb-safe-offset-6'
-      }
-    >
-      {back ? (
-        <IconButton icon="back" label="Back" onPress={() => router.back()} className="-ml-3" />
-      ) : null}
-      <View className="gap-2">
-        {overline ? <AppText variant="overline">{overline}</AppText> : null}
-        <AppText variant="display" accessibilityRole="header">
-          {title}
-        </AppText>
-        <AppText variant="body-sm">{note}</AppText>
-      </View>
-      {children ? <View className="gap-3">{children}</View> : null}
-    </ScrollView>
+    // On a full screen the safe-area padding sits outside the scroll view, so content never
+    // scrolls under the status bar. A sheet starts below it already.
+    <View className={`flex-1 bg-background ${sheet ? '' : 'pt-safe'}`}>
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName={`gap-7 px-6 pb-safe-offset-6 ${sheet ? 'pt-6' : 'pt-4'}`}
+      >
+        {back ? (
+          <IconButton icon="back" label="Back" onPress={() => router.back()} className="-ml-3" />
+        ) : null}
+        <View className="gap-2">
+          {overline ? <AppText variant="overline">{overline}</AppText> : null}
+          <AppText variant="display" accessibilityRole="header">
+            {title}
+          </AppText>
+          <AppText variant="body-sm">{note}</AppText>
+        </View>
+        {children ? <View className="gap-3">{children}</View> : null}
+      </ScrollView>
+    </View>
   );
 }

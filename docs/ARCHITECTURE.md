@@ -97,7 +97,9 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── icons.ts                #   icon registry by meaning
 │   │   ├── chip.tsx · progress-bar.tsx · scrubber.tsx · stat-strip.tsx
 │   │   ├── text-field.tsx · caption-text.tsx
-│   │   ├── topic-row.tsx · chapter-row.tsx · continue-card.tsx · feedback-panel.tsx
+│   │   ├── topic-card.tsx · topic-row.tsx · chapter-row.tsx · continue-card.tsx
+│   │   ├── feedback-panel.tsx
+│   │   ├── topic-art/              #   per-topic line drawings for Home's cards
 │   │   └── topic-glyph/            #   custom category glyphs
 │   │
 │   ├── viz/                        # visualisation layer (React + Skia)
@@ -524,7 +526,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 - Progress is keyed by **topic id and chapter id**, never by step index, so editing a lesson (adding steps) doesn't break saved progress. "Continue" stores the chapter id plus the offset within that chapter.
 - **Recording (Step 6.2):** the lesson player saves `{ chapterId, offset }` on every step (`savePosition`, which also sets `lastTopicId` and skips unchanged saves) and completes a chapter when the learner reaches its last step (`completeChapter`). Position maths is pure and tested in `engine/lesson/position.ts` (`positionAt`, `isChapterEnd`, `resumeIndex`, `startIndex`).
 - **Resuming:** a lesson opened without `chapter` or `step` resumes at the saved position. `resumeIndex` clamps the offset to the chapter (lessons can get shorter), and moves a learner who stopped on a chapter's last step on to the next chapter. A saved chapter that no longer exists means "start from the beginning".
-- **Reading:** `hooks/use-topic-progress.ts` turns the saved data into what screens show (`topicProgress`: completed ids plus a `resume` point with chapter title and "step x of y"; `topicStatus`, `chapterState`, `completedCount`, which ignores chapter ids the topic no longer has). Home's card is **Continue** for `lastTopicId` while that topic is unfinished, otherwise **Start here** for the first unfinished topic in Home order. The Topic screen's button is Start, Continue (resumes) or Review (a finished topic, from chapter 1). The chapter sheet marks finished chapters.
+- **Reading:** `hooks/use-topic-progress.ts` turns the saved data into what screens show (`topicProgress`: completed ids plus a `resume` point with chapter title and "step x of y"; `topicStatus`, `chapterState`, `completedCount`, which ignores chapter ids the topic no longer has). Home's topic cards show each topic's progress (the Continue card was removed in the UI rework; `lastTopicId` is still saved for a future resume shortcut). The Topic screen's button is Start, Continue (resumes) or Review (a finished topic, from chapter 1). The chapter sheet marks finished chapters.
 
 ---
 
@@ -616,7 +618,7 @@ Lesson data (e.g. the input `[42, 17, 8, 23]` or the key "Sid") is **content**, 
 }
 ```
 
-- **Only our tokens exist.** `tokens.css` resets Tailwind's default colours and radii (`--color-*: initial`, `--radius-*: initial`), so `bg-red-500` simply doesn't exist. Spacing keeps Tailwind's multiplier with `--spacing: 4px`, which gives the 4pt grid (`p-6` = 24).
+- **Only our tokens exist.** `tokens.css` resets Tailwind's default radii (`--radius-*: initial`). Colours can't be reset the same way: `--color-*: initial` also removes the theme colours, and Uniwind then generates no colour classes at all (this silently broke every `bg-*`/`text-*` colour class until the UI rework). Instead, lint rejects Tailwind's default palette (`bg-red-500`, `text-white`). Spacing keeps Tailwind's multiplier with `--spacing: 4px`, which gives the 4pt grid (`p-6` = 24).
 - **Every colour is readable from TypeScript.** Uniwind only exposes a variable to `useCSSVariable` if some class name uses it. The `@source inline(...)` lines at the end of `tokens.css` mark every colour as used, so the Skia canvas can read colours no screen uses yet. **When you add a colour token, also add it to the `@source inline` list and to `COLOR_TOKENS` in `src/theme/index.ts`.**
 - **Screens** style with class names that reference tokens (`bg-surface text-ink rounded-lg p-6`). Arbitrary values such as `bg-[#3554D9]` or `p-[13px]` are not allowed.
 - **TypeScript** code (Skia canvas, charts, icon colours, `@expo/ui` colour props) reads tokens only through `src/theme/index.ts`. It wraps `useCSSVariable` (inside components) and `Uniwind.getCSSVariable` (outside React) and returns typed, parsed values, e.g. `useColor('signal')` and `useVizSizes()`. No other file calls those APIs, so token parsing lives in one place.

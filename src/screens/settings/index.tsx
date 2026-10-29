@@ -29,82 +29,87 @@ export function Settings() {
   const settings = useSettings();
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="gap-7 px-6 pt-safe-offset-4 pb-safe-offset-6"
-    >
-      <AppText variant="display" accessibilityRole="header">
-        Settings
-      </AppText>
+    // The safe-area padding sits outside the scroll view, so content never scrolls under the
+    // status bar.
+    <View className="flex-1 bg-background pt-safe">
+      <ScrollView className="flex-1" contentContainerClassName="gap-7 px-6 pt-4 pb-6">
+        <AppText variant="display" accessibilityRole="header">
+          Settings
+        </AppText>
 
-      <Section title="Appearance">
-        <Row label="Theme" last>
-          <Picker
-            testID="setting-theme"
-            selectedValue={settings.theme}
-            onValueChange={settings.setTheme}
-          >
-            {Object.entries(THEME_LABELS).map(([value, label]) => (
-              <Picker.Item key={value} value={value as ThemeChoice} label={label} />
-            ))}
-          </Picker>
-        </Row>
-      </Section>
-
-      <Section title="Lessons">
-        <Row label="Code language" detail="The code panel opens in this language">
-          <Picker
-            testID="setting-code-language"
-            selectedValue={settings.codeLanguage}
-            onValueChange={settings.setCodeLanguage}
-          >
-            {config.app.codeLanguages.map((language) => (
-              <Picker.Item key={language} value={language} label={CODE_LANGUAGE_LABELS[language]} />
-            ))}
-          </Picker>
-        </Row>
-        <Row label="Playback speed" detail="Lessons start at this speed" last>
-          <Picker
-            testID="setting-speed"
-            selectedValue={settings.defaultSpeed}
-            onValueChange={settings.setDefaultSpeed}
-          >
-            {config.player.speeds.map((speed) => (
-              <Picker.Item key={speed} value={speed} label={`${speed}×`} />
-            ))}
-          </Picker>
-        </Row>
-      </Section>
-
-      <Section title="Motion and feel">
-        <Row
-          label="Reduce motion"
-          detail="Fade between steps instead of moving"
-          last={!config.features.haptics}
-        >
-          <Picker
-            testID="setting-reduced-motion"
-            selectedValue={settings.reducedMotion}
-            onValueChange={settings.setReducedMotion}
-          >
-            {Object.entries(REDUCED_MOTION_LABELS).map(([value, label]) => (
-              <Picker.Item key={value} value={value as ReducedMotionChoice} label={label} />
-            ))}
-          </Picker>
-        </Row>
-        {config.features.haptics ? (
-          <Row label="Haptics" detail="A light tap when you press a button" last>
-            <Switch
-              testID="setting-haptics"
-              value={settings.haptics}
-              onValueChange={settings.setHaptics}
-            />
+        <Section title="Appearance">
+          <Row label="Theme" last>
+            <Picker
+              testID="setting-theme"
+              selectedValue={settings.theme}
+              onValueChange={settings.setTheme}
+            >
+              {Object.entries(THEME_LABELS).map(([value, label]) => (
+                <Picker.Item key={value} value={value as ThemeChoice} label={label} />
+              ))}
+            </Picker>
           </Row>
-        ) : null}
-      </Section>
+        </Section>
 
-      <AppText variant="label">Settings and progress are saved on this device only.</AppText>
-    </ScrollView>
+        <Section title="Lessons">
+          <Row label="Code language" detail="The code panel opens in this language">
+            <Picker
+              testID="setting-code-language"
+              selectedValue={settings.codeLanguage}
+              onValueChange={settings.setCodeLanguage}
+            >
+              {config.app.codeLanguages.map((language) => (
+                <Picker.Item
+                  key={language}
+                  value={language}
+                  label={CODE_LANGUAGE_LABELS[language]}
+                />
+              ))}
+            </Picker>
+          </Row>
+          <Row label="Playback speed" detail="Lessons start at this speed" last>
+            <Picker
+              testID="setting-speed"
+              selectedValue={settings.defaultSpeed}
+              onValueChange={settings.setDefaultSpeed}
+            >
+              {config.player.speeds.map((speed) => (
+                <Picker.Item key={speed} value={speed} label={`${speed}×`} />
+              ))}
+            </Picker>
+          </Row>
+        </Section>
+
+        <Section title="Motion and feel">
+          <Row
+            label="Reduce motion"
+            detail="Fade between steps instead of moving"
+            last={!config.features.haptics}
+          >
+            <Picker
+              testID="setting-reduced-motion"
+              selectedValue={settings.reducedMotion}
+              onValueChange={settings.setReducedMotion}
+            >
+              {Object.entries(REDUCED_MOTION_LABELS).map(([value, label]) => (
+                <Picker.Item key={value} value={value as ReducedMotionChoice} label={label} />
+              ))}
+            </Picker>
+          </Row>
+          {config.features.haptics ? (
+            <Row label="Haptics" detail="A light tap when you press a button" last>
+              <Switch
+                testID="setting-haptics"
+                value={settings.haptics}
+                onValueChange={settings.setHaptics}
+              />
+            </Row>
+          ) : null}
+        </Section>
+
+        <AppText variant="label">Settings and progress are saved on this device only.</AppText>
+      </ScrollView>
+    </View>
   );
 }
 

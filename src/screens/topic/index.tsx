@@ -31,94 +31,97 @@ function TopicDetail({ meta }: { meta: TopicMeta }) {
     });
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="gap-7 px-6 pt-safe-offset-2 pb-safe-offset-6"
-    >
-      <View className="-mx-3 flex-row items-center justify-between">
-        <IconButton icon="back" label="Back" onPress={() => router.back()} />
-        <IconButton
-          icon="reference"
-          label="Reference sheet"
-          onPress={() =>
-            router.push({ pathname: '/topic/[topicId]/reference', params: { topicId } })
-          }
-        />
-      </View>
-
-      <View className="gap-2.5">
-        <View className="flex-row items-center gap-2">
-          <TopicGlyph glyph={meta.glyph} category={meta.category} size="sm" />
-          <AppText variant="overline" weight="bold" tone={CATEGORY_TEXT_TONE[meta.category]}>
-            {CATEGORY_LABELS[meta.category]}
-          </AppText>
-        </View>
-        <AppText variant="display" accessibilityRole="header">
-          {meta.title}
-        </AppText>
-        <AppText variant="body" tone="ink-2">
-          {meta.summary}
-        </AppText>
-      </View>
-
-      <StatStrip items={meta.complexity} />
-
-      <View className="gap-3">
-        {/* With no chapter, the lesson resumes where the learner left off. A finished topic is
-            reviewed from the start. */}
-        <Button
-          label={finished ? 'Review lesson' : started ? 'Continue lesson' : 'Start lesson'}
-          icon="play"
-          iconWeight="fill"
-          onPress={() => openLesson(finished ? meta.chapters[0]?.id : undefined)}
-        />
-        <View className="flex-row gap-3">
-          <Button
-            label="Sandbox"
-            variant="sandbox"
-            size="compact"
-            icon="random"
-            className="flex-1"
-            onPress={() => router.push({ pathname: '/topic/[topicId]/play', params: { topicId } })}
-          />
-          <Button
-            label="Practice"
-            variant="practice"
-            size="compact"
-            icon="practice"
-            className="flex-1"
+    // The safe-area padding sits outside the scroll view, so content never scrolls under the
+    // status bar.
+    <View className="flex-1 bg-background pt-safe">
+      <ScrollView className="flex-1" contentContainerClassName="gap-7 px-6 pt-2 pb-safe-offset-6">
+        <View className="-mx-3 flex-row items-center justify-between">
+          <IconButton icon="back" label="Back" onPress={() => router.back()} />
+          <IconButton
+            icon="reference"
+            label="Reference sheet"
             onPress={() =>
-              router.push({ pathname: '/topic/[topicId]/practice', params: { topicId } })
+              router.push({ pathname: '/topic/[topicId]/reference', params: { topicId } })
             }
           />
         </View>
-      </View>
 
-      <View>
-        <View className="flex-row items-baseline justify-between pb-1.5">
-          <AppText variant="overline" accessibilityRole="header">
-            Chapters
+        <View className="gap-2.5">
+          <View className="flex-row items-center gap-2">
+            <TopicGlyph glyph={meta.glyph} category={meta.category} size="sm" />
+            <AppText variant="overline" weight="bold" tone={CATEGORY_TEXT_TONE[meta.category]}>
+              {CATEGORY_LABELS[meta.category]}
+            </AppText>
+          </View>
+          <AppText variant="display" accessibilityRole="header">
+            {meta.title}
           </AppText>
-          <AppText variant="index">
-            {completed} of {meta.chapters.length}
+          <AppText variant="body" tone="ink-2">
+            {meta.summary}
           </AppText>
         </View>
-        {meta.chapters.map((chapter, index) => (
-          <ChapterRow
-            key={chapter.id}
-            number={index + 1}
-            title={chapter.title}
-            state={chapterState(chapter.id, progress)}
-            currentLabel={
-              progress.resume?.chapterId === chapter.id
-                ? `Step ${progress.resume.step} of ${progress.resume.chapterSteps}`
-                : undefined
-            }
-            onPress={() => openLesson(chapter.id)}
+
+        <StatStrip items={meta.complexity} />
+
+        <View className="gap-3">
+          {/* With no chapter, the lesson resumes where the learner left off. A finished topic is
+            reviewed from the start. */}
+          <Button
+            label={finished ? 'Review lesson' : started ? 'Continue lesson' : 'Start lesson'}
+            icon="play"
+            iconWeight="fill"
+            onPress={() => openLesson(finished ? meta.chapters[0]?.id : undefined)}
           />
-        ))}
-      </View>
-    </ScrollView>
+          <View className="flex-row gap-3">
+            <Button
+              label="Sandbox"
+              variant="sandbox"
+              size="compact"
+              icon="random"
+              className="flex-1"
+              onPress={() =>
+                router.push({ pathname: '/topic/[topicId]/play', params: { topicId } })
+              }
+            />
+            <Button
+              label="Practice"
+              variant="practice"
+              size="compact"
+              icon="practice"
+              className="flex-1"
+              onPress={() =>
+                router.push({ pathname: '/topic/[topicId]/practice', params: { topicId } })
+              }
+            />
+          </View>
+        </View>
+
+        <View>
+          <View className="flex-row items-baseline justify-between pb-1.5">
+            <AppText variant="overline" accessibilityRole="header">
+              Chapters
+            </AppText>
+            <AppText variant="index">
+              {completed} of {meta.chapters.length}
+            </AppText>
+          </View>
+          {meta.chapters.map((chapter, index) => (
+            <ChapterRow
+              key={chapter.id}
+              number={index + 1}
+              title={chapter.title}
+              state={chapterState(chapter.id, progress)}
+              currentLabel={
+                progress.resume?.chapterId === chapter.id
+                  ? `Step ${progress.resume.step} of ${progress.resume.chapterSteps}`
+                  : undefined
+              }
+              onPress={() => openLesson(chapter.id)}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 

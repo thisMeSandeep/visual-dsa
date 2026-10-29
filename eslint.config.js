@@ -96,6 +96,12 @@ const boundaries = [
 const HEX_COLOR = '/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/';
 const FN_COLOR = '/(rgb|rgba|hsl|hsla)\\(/';
 const ARBITRARY_CLASS = '/[a-z0-9]-\\[[^\\]]+\\]/';
+/**
+ * Tailwind's default palette (bg-red-500, text-white, border-black…). tokens.css can't reset it
+ * without also removing our theme colours, so lint keeps it out instead.
+ */
+const DEFAULT_PALETTE_CLASS =
+  '/(^|\\s|:)(bg|text|border(-[trblxy])?|ring|outline|fill|stroke|divide|decoration|shadow|accent|caret|placeholder|from|via|to)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}(\\/[0-9]+)?($|\\s)|(^|\\s|:)(bg|text|border|fill|stroke)-(white|black)($|\\s)/';
 
 const colorLiteralRules = [HEX_COLOR, FN_COLOR].flatMap((pattern) => [
   {
@@ -107,6 +113,19 @@ const colorLiteralRules = [HEX_COLOR, FN_COLOR].flatMap((pattern) => [
     message: 'No colour literals: add a token to src/theme/tokens.css and use it.',
   },
 ]);
+
+const defaultPaletteRules = [
+  {
+    selector: `Literal[value=${DEFAULT_PALETTE_CLASS}]`,
+    message:
+      'No Tailwind default colours (bg-red-500, text-white): use our tokens, e.g. bg-primary.',
+  },
+  {
+    selector: `TemplateElement[value.raw=${DEFAULT_PALETTE_CLASS}]`,
+    message:
+      'No Tailwind default colours (bg-red-500, text-white): use our tokens, e.g. bg-primary.',
+  },
+];
 
 const arbitraryClassRules = [
   {
@@ -123,7 +142,12 @@ const hardCodedValues = [
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-syntax': ['error', ...colorLiteralRules, ...arbitraryClassRules],
+      'no-restricted-syntax': [
+        'error',
+        ...colorLiteralRules,
+        ...arbitraryClassRules,
+        ...defaultPaletteRules,
+      ],
       'no-magic-numbers': 'off',
       '@typescript-eslint/no-magic-numbers': [
         'error',
@@ -143,7 +167,7 @@ const hardCodedValues = [
   {
     // The token files are the one place colours are written down.
     files: ['src/theme/**'],
-    rules: { 'no-restricted-syntax': ['error', ...arbitraryClassRules] },
+    rules: { 'no-restricted-syntax': ['error', ...arbitraryClassRules, ...defaultPaletteRules] },
   },
   {
     // Config, tokens, lesson data, tests, test fixtures and dev showcase sample data are where
@@ -155,6 +179,8 @@ const hardCodedValues = [
       'src/screens/dev/**',
       'src/**/*.test.{ts,tsx}',
       'src/**/*.fixture.ts',
+      // Line-drawing coordinates are drawing data, like glyph paths.
+      'src/components/topic-art/drawings.tsx',
     ],
     rules: { '@typescript-eslint/no-magic-numbers': 'off' },
   },

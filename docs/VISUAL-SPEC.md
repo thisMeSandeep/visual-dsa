@@ -149,6 +149,8 @@ Sizes and line heights are in points. These are the exact values in `src/theme/t
 | Minimum touch target | **44 × 44** |
 | Bottom padding above home indicator | 30–40 |
 
+**Safe area:** a full screen puts its top safe-area padding on the screen container (`pt-safe`), never inside the scrolling content, so nothing scrolls under the status bar. Form sheets start below it already.
+
 ### Corner radius
 
 | Token | Value | Use |
@@ -173,6 +175,7 @@ Sizes and line heights are in points. These are the exact values in `src/theme/t
 - **Colour:** `ink` by default. `muted` for inactive tabs. `primary` for the active tab and for icons on primary-tinted controls (e.g. the code toggle). Mode colour on Sandbox/Practice buttons.
 - **No background tiles.** Icons sit directly on the surface.
 - **Topic glyphs:** custom line drawings on a 24 grid with a 1.7 stroke, rounded joins, drawn at 30px in the category colour. They show the structure itself (boxes in a row, chained boxes, stacked bars, bucket column).
+- **Topic art:** larger line drawings on a 160 × 100 grid for Home's topic cards and the Continue card (`<TopicArt>`, `src/components/topic-art/`). Hairline strokes (`--art-stroke`, 1.1), rounded caps and joins, no fills except `surface-raised` inside cells. The structure is drawn in `ink-2`, labels in mono `--art-font` (9) `muted` (the system mono on Android, where react-native-svg misplaces the letters of runtime-loaded fonts; `SVG_MONO_FONT` in `src/theme/fonts.ts`), and **one accent** in the category colour for the part that tells the topic's story: the n² curve, the jump to `a[3]`, the head node, the item being pushed, the item leaving the queue, the colliding key. Each topic has its own drawing (keyed by topic id); a topic without one shows its glyph.
 
 Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
 
@@ -217,10 +220,13 @@ Press feedback: scale to 0.97 over 120ms with a strong ease-out, on press-in (`P
 | 1.5pt outline | `border-control` utility (defined in `tokens.css`) |
 
 ### Continue card
-`primary-soft` background, `radius-xl`, padding 24. Contents: overline "Continue" in `primary`, `headline` topic name, `label` position ("Collision · step 6 of 70"), then a 4px progress bar (`primary` on a `primary` 18% track) and a Resume pill.
+`primary-soft` background, `radius-xl`, padding 24. Contents: overline "Continue" in `primary`, `headline` topic name, `label` position ("Collision · step 6 of 70"), with the topic art (112 wide, 8:5) to the right of the text; then a 4px progress bar (`primary` on a `primary` 18% track) and a Resume pill.
+
+### Topic card
+Home's topic tile, two per row with a 12 gap. `surface-raised` with a **hairline** `line-strong` outline (`border-hairline`, one physical pixel) and `radius-xl`, no shadow. Top: an 8:5 `surface` panel holding the topic art with 12 padding. Bottom, under a hairline `line` divider: the title in `body` bold with two lines reserved (so cards in a row line up), then one status line: the `label` chapter count before starting, a `ProgressBar` with mono `2/6` once started, or a `success` check with "Completed". The whole card is one button with press scale.
 
 ### Topic row
-30px category glyph · title (`body` 500) over `label` ("5 chapters") · trailing status: success `Check` when done, mono `2/5` when in progress, a `primary` dot plus count for the current topic. There are no dividers between rows.
+*(Dev showcase only since the card grid; kept for compact lists.)* 30px category glyph · title (`body` 500) over `label` ("5 chapters") · trailing status: success `Check` when done, mono `2/5` when in progress, a `primary` dot plus count for the current topic. There are no dividers between rows.
 
 ### Chapter row
 Mono number · title · trailing status. The current chapter gets a `primary-soft` row background, a `primary` number and a "Step 6" label. Completed chapters show a success check.
@@ -367,7 +373,7 @@ These match the concept canvas.
 
 | Screen | Key layout |
 |---|---|
-| **Home** | `display` "Learn" (+ streak chip once streaks exist, P1) → Continue card ("Start here" before any progress) → categories with topic rows → tab bar |
+| **Home** | `display` "Learn" with a one-line `body-sm` subtitle (+ streak chip once streaks exist, P1) → each category: `overline` name with a `label` topic count on the right, then topic cards two per row → tab bar. No Continue card: each card shows its own progress, and the Topic screen's Continue button resumes |
 | **Topic** | Back / reference sheet (bookmark joins in P1) → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
 | **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption` → scrubber → speed · prev · **play** · next · code |
 | **Sandbox** | Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → live structure with pointers → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → stat strip → preset pills (current one solid `primary`, others tinted) → value field + round Random button → primary action → tinted secondary actions in one row |
