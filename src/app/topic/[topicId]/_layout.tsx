@@ -13,13 +13,23 @@ const SHEET_OPTIONS: NativeStackNavigationOptions = {
   sheetAllowedDetents: [...sheet.detents],
 };
 
+/**
+ * A topic's screens. The lesson is always landscape, so the canvas gets the width; the reference
+ * sheet opens over it in landscape too. Sandbox and practice stay portrait like the rest of the app.
+ */
 export default function TopicLayout() {
   const background = useColor('background');
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: background } }}>
-      <Stack.Screen name="chapters" options={SHEET_OPTIONS} />
-      <Stack.Screen name="reference" options={SHEET_OPTIONS} />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        orientation: 'portrait',
+        contentStyle: { backgroundColor: background },
+      }}
+    >
+      <Stack.Screen name="learn" options={{ orientation: 'landscape' }} />
+      <Stack.Screen name="reference" options={{ ...SHEET_OPTIONS, orientation: 'landscape' }} />
     </Stack>
   );
 }

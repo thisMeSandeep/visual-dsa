@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useCallback, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 
 import { AppText } from '@/components/app-text';
@@ -15,7 +16,6 @@ import { isChapterEnd, positionAt, startIndex as openingIndex } from '@/engine/l
 import { chapterAt, type CompiledLesson } from '@/engine/lesson/types';
 import { nextSpeed } from '@/engine/player/machine';
 import { getLesson } from '@/hooks/use-lesson';
-import { useLessonNavigation } from '@/stores/lesson-navigation';
 import { useProgress } from '@/stores/progress';
 import { useSettings } from '@/stores/settings';
 import {
@@ -34,10 +34,10 @@ import { CodePanel } from '@/viz/code-panel';
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
+import { ChapterPanel } from './chapter-panel';
 
 const { swipe } = config.player;
 
-/** Lesson player (F-201, F-202, F-203, F-205, F-401–F-403) with the code panel (F-501–F-506). */
 export type LessonProps = {
   topicId: string;
   /** Start at this chapter's first step. */
@@ -46,6 +46,12 @@ export type LessonProps = {
   step?: number;
 };
 
+/**
+ * Lesson player (F-201–F-205, F-401–F-403) with the code panel (F-501–F-506). Always landscape
+ * (the route locks it), so the canvas gets the width: a top bar with the topic's actions, the
+ * canvas, then the scrubber and a row of step controls around the caption. Tapping a topic on
+ * Learn opens this directly, resuming where the learner left off.
+ */
 export function Lesson({ topicId, chapter, step }: LessonProps) {
   const meta = getTopicMeta(topicId);
   const lesson = getLesson(topicId);
@@ -111,26 +117,22 @@ function LessonPlayer({
     if (isChapterEnd(lesson, index)) completeChapter(meta.id, position.chapterId);
   }, [index, lesson, meta.id]);
 
-  // A chapter picked in the chapter sheet.
-  const request = useLessonNavigation((state) => state.chapterRequest);
-  useEffect(() => {
-    if (!request || request.topicId !== meta.id) return;
-    const target = lesson.chapters.find((c) => c.id === request.chapterId);
-    if (target) playerActions(player).seek(target.firstStep);
-    useLessonNavigation.getState().clearChapterRequest();
-  }, [request, meta.id, lesson, player]);
+  // The chapter list slides in from the right; picking a chapter jumps to its first step.
+  const [chaptersOpen, setChaptersOpen] = useState(false);
+  const closeChapters = useCallback(() => setChaptersOpen(false), []);
 
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
 
-  // Code panel: docked under the canvas in portrait, beside it in landscape (F-506).
+  // Code panel: beside the canvas (F-506).
   const [codeOpen, setCodeOpen] = useState<boolean>(config.code.panelOpenByDefault);
   // The code language is remembered across lessons and app launches (F-1102).
   const language = useSettings((state) => state.codeLanguage);
   const setLanguage = useSettings((state) => state.setCodeLanguage);
   const sample = getCodeSample(meta.id, language);
-  const window = useWindowDimensions();
-  const landscape = window.width > window.height;
   const showCode = codeOpen && sample !== undefined;
+  const topicRoute = (
+    pathname: '/topic/[topicId]/reference' | '/topic/[topicId]/play' | '/topic/[topicId]/practice',
+  ) => router.push({ pathname, params: { topicId: meta.id } });
 
   // Swipe left for the next step, right for the previous one (a short flick is enough).
   const swipeGesture = usePanGesture({
@@ -150,10 +152,13 @@ function LessonPlayer({
   const ended = status === 'ended';
 
   return (
-    <View className="flex-1 bg-background pt-safe">
-      <View className="flex-row items-center px-3">
-        <IconButton icon="close" label="Close lesson" onPress={() => router.back()} />
-        <View className="flex-1 items-center">
+    <View className="flex-1 bg-background pt-safe pr-safe pb-safe pl-safe">
+      {/* The canvas needs every pixel in landscape. */}
+      <StatusBar hidden />
+
+      <View className="h-14 flex-row items-center gap-1 border-b-hairline border-line px-3">
+        <IconButton icon="back" label="Back" onPress={() => router.back()} />
+        <View className="flex-1 px-1">
           <AppText variant="body-sm" weight="bold" tone="ink" numberOfLines={1}>
             {meta.title}
           </AppText>
@@ -162,18 +167,45 @@ function LessonPlayer({
           </AppText>
         </View>
         <IconButton
+          label="Playback speed"
+          text={`${speed}×`}
+          onPress={() => {
+            const next = nextSpeed(speed);
+            actions.setSpeed(next);
+            setDefaultSpeed(next);
+          }}
+        />
+        <IconButton
+          label={showCode ? 'Hide code' : 'Show code'}
+          icon="code"
+          active={showCode}
+          disabled={!sample}
+          onPress={() => setCodeOpen((open) => !open)}
+        />
+        <IconButton
           icon="chapters"
           label="Chapters"
-          onPress={() =>
-            router.push({
-              pathname: '/topic/[topicId]/chapters',
-              params: { topicId: meta.id, current: chapter?.id ?? '' },
-            })
-          }
+          active={chaptersOpen}
+          onPress={() => setChaptersOpen(true)}
+        />
+        <IconButton
+          icon="reference"
+          label="Reference sheet"
+          onPress={() => topicRoute('/topic/[topicId]/reference')}
+        />
+        <IconButton
+          icon="random"
+          label="Sandbox"
+          onPress={() => topicRoute('/topic/[topicId]/play')}
+        />
+        <IconButton
+          icon="practice"
+          label="Practice"
+          onPress={() => topicRoute('/topic/[topicId]/practice')}
         />
       </View>
 
-      <View className={landscape ? 'flex-1 flex-row gap-4 px-6' : 'flex-1 gap-3 px-6 pb-3'}>
+      <View className="flex-1 flex-row gap-4 px-6 pt-3">
         <GestureDetector gesture={swipeGesture}>
           <View
             className="flex-1"
@@ -199,27 +231,14 @@ function LessonPlayer({
             language={language}
             onLanguageChange={setLanguage}
             lineId={step?.codeLine}
-            className={landscape ? 'w-1/2' : 'max-h-60'}
+            className="mb-3 w-2/5"
           />
         ) : null}
       </View>
 
-      {/* Fixed minimum height (three caption lines) so the controls don't jump between steps. */}
-      <View className="min-h-21 px-6">{step ? <CaptionText caption={step.caption} /> : null}</View>
+      <Scrubber current={number} total={total} onSeek={actions.seek} className="px-6" />
 
-      <Scrubber current={number} total={total} onSeek={actions.seek} className="px-6 pt-4" />
-
-      <View className="flex-row items-center justify-between px-6 pt-2 pb-safe-offset-6">
-        <IconButton
-          label="Playback speed"
-          text={`${speed}×`}
-          variant="round"
-          onPress={() => {
-            const next = nextSpeed(speed);
-            actions.setSpeed(next);
-            setDefaultSpeed(next);
-          }}
-        />
+      <View className="flex-row items-center gap-4 px-6 pt-1 pb-3">
         <IconButton
           label="Previous step"
           icon="step-back"
@@ -234,6 +253,10 @@ function LessonPlayer({
           disabled={status === 'awaiting-input'}
           onPress={playing ? actions.pause : actions.play}
         />
+        {/* Two caption lines reserved, so the controls don't jump between steps. */}
+        <View className="min-h-14 flex-1 justify-center">
+          {step ? <CaptionText caption={step.caption} className="text-center" /> : null}
+        </View>
         <IconButton
           label="Next step"
           icon="step-forward"
@@ -241,15 +264,20 @@ function LessonPlayer({
           disabled={!canForward}
           onPress={actions.next}
         />
-        <IconButton
-          label={showCode ? 'Hide code' : 'Show code'}
-          icon="code"
-          variant="round"
-          active={showCode}
-          disabled={!sample}
-          onPress={() => setCodeOpen((open) => !open)}
-        />
       </View>
+
+      {chaptersOpen ? (
+        <ChapterPanel
+          meta={meta}
+          chapters={lesson.chapters}
+          currentId={chapter?.id}
+          onClose={closeChapters}
+          onPick={(picked) => {
+            actions.seek(picked.firstStep);
+            setChaptersOpen(false);
+          }}
+        />
+      ) : null}
     </View>
   );
 }

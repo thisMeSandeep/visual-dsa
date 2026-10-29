@@ -163,7 +163,8 @@ Sizes and line heights are in points. These are the exact values in `src/theme/t
 
 ### Elevation
 - **No shadows.** Depth comes from tints (`surface`, `primary-soft`) and space.
-- Bottom sheets (chapter index, code, reference) use a `surface-raised` sheet with a 36×4 grabber and a 40% scrim.
+- Bottom sheets (reference) use a `surface-raised` sheet with a 36×4 grabber and a 40% scrim.
+- **Side panel** (the lesson's chapter list): slides in from the right edge (250ms strong ease-out in, 200ms out; reduced motion fades), 2/5 of the width, `surface-raised` with a hairline `line-strong` left edge, over a `scrim` (`--color-scrim`, charcoal at 40% light / 60% dark) that closes it on tap. Header: `overline` topic name over a `headline` "Chapters", close button on the right; then chapter rows.
 
 ---
 
@@ -375,11 +376,12 @@ These match the concept canvas.
 | Screen | Key layout |
 |---|---|
 | **Home** | `display` "Learn" with a one-line `body-sm` subtitle (+ streak chip once streaks exist, P1) → each category: `overline` name with a `label` topic count on the right, then topic cards two per row → tab bar. No Continue card: each card shows its own progress, and the Topic screen's Continue button resumes |
-| **Topic** | Back / reference sheet (bookmark joins in P1) → category overline with glyph → `display` title + summary → stat strip → primary "Continue lesson" + Sandbox / Practice mode buttons → chapter list |
-| **Lesson player** | Close · title/chapter · chapters button → canvas (callout + structure) → `caption` → scrubber → speed · prev · **play** · next · code |
+| **Topic** | *(Removed in the UI rework: a topic opens its lesson directly. Summary and stats live in the reference sheet; Sandbox and Practice in the lesson's top bar.)* |
+| **Lesson player** | **Always landscape**, status bar hidden. Top bar (56, hairline below): back · topic name (`body-sm` bold) over chapter title (`label`) · speed · code · chapters · reference · sandbox · practice (ghost icon buttons) → canvas, with the code panel beside it when open → scrubber → one row: prev (step) · **play** · centred `caption` (two lines reserved) · next (step). Chapters open in a side panel |
+| **Reference sheet** | Category glyph + topic name overline → `title` "Reference" → summary → "How it scales" stat strip (the cheat sheets come later) |
 | **Sandbox** | Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → live structure with pointers → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → stat strip → preset pills (current one solid `primary`, others tinted) → value field + round Random button → primary action → tinted secondary actions in one row |
 | **Practice** | Close · segmented progress → overline + `title` question → mono context block → 2×2 option tiles → feedback panel + Continue |
-| **Lesson (dark)** | Same as the lesson player, plus the docked code panel with the current line highlighted |
+| **Lesson (dark)** | Same as the lesson player, plus the code panel beside the canvas with the current line highlighted |
 | **Settings** | `display` "Settings" → sections (`overline` title, `surface` card with `radius-xl`, rows divided by `line` hairlines): Appearance (theme), Lessons (code language, playback speed), Motion and feel (reduce motion, haptics). Each row: `body` label + `label` detail on the left, a native `@expo/ui` picker or switch tinted `primary` on the right → `label` note that everything is saved on this device |
 
 ---

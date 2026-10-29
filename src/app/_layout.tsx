@@ -44,9 +44,14 @@ export default function RootLayout() {
         {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
         <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
           <StatusBar style="auto" />
-          {/* (tabs) is the home of the app; topic/[topicId] and dev/* push on top of it. */}
+          {/* (tabs) is the home of the app; topic/[topicId] and dev/* push on top of it. The
+              app is portrait; only the lesson locks itself to landscape (topic layout). */}
           <Stack
-            screenOptions={{ headerShown: false, contentStyle: { backgroundColor: background } }}
+            screenOptions={{
+              headerShown: false,
+              orientation: 'portrait',
+              contentStyle: { backgroundColor: background },
+            }}
           />
         </SafeAreaListener>
       </SafeAreaProvider>

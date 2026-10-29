@@ -56,6 +56,8 @@ export const COLOR_TOKENS = [
   'mode-practice',
   'mode-practice-ink',
   'mode-practice-soft',
+  // Overlays
+  'scrim',
   // Code syntax
   'code-keyword',
   'code-name',

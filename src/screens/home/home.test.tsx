@@ -32,11 +32,11 @@ describe('Home', () => {
     ).toBeOnTheScreen();
   });
 
-  it('opens a topic', async () => {
+  it('opens a topic straight into its lesson', async () => {
     await render(<Home />);
     await fireEvent.press(screen.getByRole('button', { name: /^Array, / }));
     expect(router.push).toHaveBeenCalledWith({
-      pathname: '/topic/[topicId]',
+      pathname: '/topic/[topicId]/learn',
       params: { topicId: 'array' },
     });
   });

@@ -33,7 +33,7 @@ jest.mock('react-native-reanimated', () => {
     Easing: { bezier: () => 'bezier' },
     // Layout animation builders: chainable, and inert in tests.
     ...Object.fromEntries(
-      ['LinearTransition', 'FadeIn', 'FadeOut'].map((name) => {
+      ['LinearTransition', 'FadeIn', 'FadeOut', 'SlideInRight', 'SlideOutRight'].map((name) => {
         const builder: Record<string, unknown> = {};
         for (const method of ['duration', 'easing', 'reduceMotion'])
           builder[method] = () => builder;

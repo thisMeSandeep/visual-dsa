@@ -67,6 +67,9 @@
       --color-mode-practice-ink: #5b3bb8;
       --color-mode-practice-soft: rgba(118, 80, 216, 0.1);
 
+      /* Scrim behind sheets and side panels (VISUAL-SPEC §6) */
+      --color-scrim: rgba(34, 32, 28, 0.4);
+
       /* Code syntax (code panel only). Plain code uses ink. */
       --color-code-keyword: #6a3fb0;
       --color-code-name: #1f5f9e;
@@ -129,6 +132,9 @@
       --color-mode-practice: #a48bff;
       --color-mode-practice-ink: #a48bff;
       --color-mode-practice-soft: rgba(164, 139, 255, 0.16);
+
+      /* Scrim */
+      --color-scrim: rgba(10, 9, 8, 0.6);
 
       /* Code syntax */
       --color-code-keyword: #c3a6ff;
@@ -298,6 +304,14 @@
   border-top-width: hairlineWidth();
 }
 
+@utility border-b-hairline {
+  border-bottom-width: hairlineWidth();
+}
+
+@utility border-l-hairline {
+  border-left-width: hairlineWidth();
+}
+
 /* -------------------------------------------------------------------------------------------------
  * Mark every colour token as used, so TypeScript can read it with useCSSVariable even when no
  * screen uses it as a class yet (the Skia canvas reads colours this way).
@@ -309,3 +323,4 @@
 @source inline("bg-cat-trees bg-cat-trees-ink bg-cat-graphs bg-cat-graphs-ink bg-cat-algorithms bg-cat-algorithms-ink");
 @source inline("bg-mode-sandbox bg-mode-sandbox-ink bg-mode-sandbox-soft bg-mode-practice bg-mode-practice-ink bg-mode-practice-soft");
 @source inline("bg-code-keyword bg-code-name bg-code-string bg-code-number bg-code-comment");
+@source inline("bg-scrim");

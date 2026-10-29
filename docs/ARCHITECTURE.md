@@ -67,12 +67,11 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   ├── progress.tsx
 │   │   │   └── settings.tsx
 │   │   └── topic/[topicId]/
-│   │       ├── _layout.tsx         #   stack for the topic
-│   │       ├── index.tsx           #   Topic detail
-│   │       ├── learn.tsx           #   Lesson player (?step=N)
+│   │       ├── _layout.tsx         #   stack for the topic (lesson locked to landscape)
+│   │       ├── index.tsx           #   redirects to learn (no separate topic page)
+│   │       ├── learn.tsx           #   Lesson player (?chapter=…, ?step=N)
 │   │       ├── play.tsx            #   Sandbox
 │   │       ├── practice.tsx        #   Topic quiz
-│   │       ├── chapters.tsx        #   form sheet
 │   │       └── reference.tsx       #   form sheet
 │   │
 │   ├── screens/                    # screen bodies rendered by routes
@@ -80,12 +79,10 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── practice-hub/           #   Practice tab (quizzes, revise list)
 │   │   ├── progress/
 │   │   ├── settings/
-│   │   ├── topic/
-│   │   ├── lesson/                 #   player layout, caption, controls
+│   │   ├── lesson/                 #   landscape player, chapter panel
 │   │   ├── sandbox/                #   Play mode screen, value-input.ts (Zod + engine limits)
 │   │   ├── practice/               #   one topic's quiz
-│   │   ├── chapters/               #   form sheet
-│   │   ├── reference/              #   form sheet
+│   │   ├── reference/              #   form sheet: summary + complexity
 │   │   └── dev/                    #   dev-only showcases (tokens, components)
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
@@ -467,10 +464,13 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 
 ### 6.2b Lesson screen (Step 4.4)
 
-- **Captions:** the engine emits caption keys with params. `content/captions.ts` holds the text for each key, with `{param}` placeholders and `**bold**` for key terms. `captionText` fills a template, and `CaptionText` (`screens/lesson`) draws the bold runs with `<Strong>`. Authored lesson text is used as it is. A test checks that every key a lesson uses has text, with no placeholder left unfilled.
+- **Captions:** the engine emits caption keys with params. `content/captions.ts` holds the text for each key, with `{param}` placeholders and `**bold**` for key terms. `captionText` fills a template, and `CaptionText` (`components/caption-text.tsx`) draws the bold runs with `<Strong>`. Authored lesson text is used as it is. A test checks that every key a lesson uses has text, with no placeholder left unfilled.
 - **Lessons:** `getLesson(topicId)` (`hooks/use-lesson.ts`) returns a `CompiledLesson` (`engine/lesson/types.ts`: steps plus chapters with their first step), compiled from the topic's recipe in `TOPIC_LESSONS` (§5.4) the first time it's asked for, then cached. Topics without a recipe return `undefined`, and the player says the lesson comes later.
 - **Gestures (Gesture Handler 3 hook API):** swipe the canvas left/right to step (`usePanGesture`, values in `config.player.swipe`: a 48pt swipe or a fast flick). Drag or tap the scrubber to seek. The scrubber is also an `adjustable` control for screen readers. The app root is wrapped in `GestureHandlerRootView`.
-- **Chapter sheet → lesson:** the sheet is its own route. A chapter pick goes through a small shared store (`stores/lesson-navigation.ts`): the sheet records `{ topicId, chapterId }` and closes, and the open lesson seeks to that chapter's first step and clears the request. This doesn't rely on how route params merge when a sheet is dismissed. The lesson opens the sheet with `current=<chapterId>` so the current chapter is highlighted.
+- **Landscape:** the lesson route is locked to landscape with the native stack's `orientation` option (`topic/[topicId]/_layout.tsx`); the root stack and every other screen are `portrait`. The lesson hides the status bar so the canvas gets the full height, and pads every side by the safe area.
+- **Layout (UI rework):** a top bar (back, topic and chapter title, then speed, code, chapters, reference, sandbox and practice), the canvas with the code panel beside it (2/5 width) when open, the scrubber, and one row of controls: previous, play, the centred caption, next.
+- **Chapters:** an in-screen panel (`screens/lesson/chapter-panel.tsx`) that slides in from the right over a `scrim`, listing chapters as done, current (the one on screen) or upcoming; a pick seeks to the chapter's first step. Android's back button closes it first. It replaced the chapter form sheet route and its shared store, which a landscape screen made awkward.
+- **No topic page:** tapping a topic on Learn opens this screen directly and resumes; `/topic/[id]` redirects here. The topic summary and complexity stats moved to the reference sheet; Sandbox and Practice are in the top bar.
 
 ### 6.3 Code panel
 
@@ -537,12 +537,11 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 |---|---|---|
 | `/` | Home (`screens/home`) | Tab "Learn" |
 | `/practice`, `/progress`, `/settings` | `screens/practice-hub`, `progress`, `settings` | Tabs |
-| `/topic/[topicId]` | Topic detail | Stack push |
-| `/topic/[topicId]/learn` (`?chapter=<id>`, `?step=N`) | Lesson player: resumes by default; `chapter` opens a chapter, `step` (1-based) opens a step and wins over both | Stack push (full screen) |
+| `/topic/[topicId]` | Redirects to `learn` (there's no separate topic page) | — |
+| `/topic/[topicId]/learn` (`?chapter=<id>`, `?step=N`) | Lesson player: resumes by default; `chapter` opens a chapter, `step` (1-based) opens a step and wins over both | Stack push, full screen, **landscape** |
 | `/topic/[topicId]/play` | Sandbox | Stack push |
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
-| `/topic/[topicId]/chapters` | Chapter index | Form sheet |
-| `/topic/[topicId]/reference` | Reference sheet | Form sheet |
+| `/topic/[topicId]/reference` | Reference sheet (summary, complexity) | Form sheet, landscape (it opens over the lesson) |
 | `/dev/tokens`, `/dev/components` | Dev-only showcases | Stack push; production redirects to `/` |
 
 Deep links come for free from Expo Router, e.g. `visualdsa://topic/hash-table/learn?step=6`. These are needed later for shared scenarios (F-607).

@@ -48,4 +48,13 @@ export const motion = {
     slideMs: 250,
     slideEasing: [0.77, 0, 0.175, 1],
   },
+  /**
+   * Side panels (the lesson's chapter list): slide in from the edge with a strong ease-out, leave
+   * a little faster; the scrim fades. Reduced motion: fades only.
+   */
+  panel: {
+    enterMs: 250,
+    exitMs: 200,
+    easing: [0.23, 1, 0.32, 1],
+  },
 } as const;

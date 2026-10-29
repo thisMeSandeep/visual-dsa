@@ -1,8 +1,7 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { useLessonNavigation } from '@/stores/lesson-navigation';
 import { useProgress } from '@/stores/progress';
 import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
 
@@ -72,25 +71,46 @@ describe('Lesson player', () => {
     expect(screen.getByLabelText(/^Step 2 of \d+$/)).toBeOnTheScreen();
   });
 
-  it('opens the chapter sheet with the current chapter', async () => {
-    await renderLesson(<Lesson topicId="stack" />);
+  it('opens the chapter panel with the current chapter, and jumps to a picked one', async () => {
+    useProgress.setState({ topics: { stack: { completedChapters: ['lifo'] } } });
+    await renderLesson(<Lesson topicId="stack" chapter="push-pop-peek" />);
     await fireEvent.press(screen.getByRole('button', { name: 'Chapters' }));
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/topic/[topicId]/chapters',
-      params: { topicId: 'stack', current: 'lifo' },
-    });
-  });
 
-  it('jumps to a chapter picked in the sheet', async () => {
-    await renderLesson(<Lesson topicId="stack" />);
-    await act(async () => {
-      useLessonNavigation.getState().requestChapter('stack', 'overflow-underflow');
-    });
+    expect(screen.getByRole('header', { name: 'Chapters' })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Chapter 1, Last in, first out, completed' }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Chapter 2, Push, pop and peek, in progress' }),
+    ).toBeSelected();
+
+    await fireEvent.press(
+      screen.getByRole('button', { name: /^Chapter 6, Overflow and underflow/ }),
+    );
     expect(
       caption('A fixed-size stack can run out of room, and any stack can run out of items.'),
     ).toBeOnTheScreen();
-    expect(screen.getByText('Overflow and underflow')).toBeOnTheScreen();
-    expect(useLessonNavigation.getState().chapterRequest).toBeNull();
+    expect(screen.queryByRole('header', { name: 'Chapters' })).toBeNull();
+  });
+
+  it('closes the chapter panel without moving', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    await fireEvent.press(screen.getByRole('button', { name: 'Chapters' }));
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Close chapters' })[0]!);
+    expect(screen.queryByRole('header', { name: 'Chapters' })).toBeNull();
+    expect(caption(INTRO)).toBeOnTheScreen();
+  });
+
+  it('opens the topic’s reference, sandbox and practice from the top bar', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    for (const [name, pathname] of [
+      ['Reference sheet', '/topic/[topicId]/reference'],
+      ['Sandbox', '/topic/[topicId]/play'],
+      ['Practice', '/topic/[topicId]/practice'],
+    ] as const) {
+      await fireEvent.press(screen.getByRole('button', { name }));
+      expect(router.push).toHaveBeenLastCalledWith({ pathname, params: { topicId: 'stack' } });
+    }
   });
 
   it('can start at a chapter', async () => {

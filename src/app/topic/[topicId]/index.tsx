@@ -1,8 +1,7 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 
-import { Topic } from '@/screens/topic';
-
+/** There's no separate topic page: a topic opens its lesson, which resumes where it left off. */
 export default function TopicRoute() {
   const { topicId } = useLocalSearchParams<{ topicId: string }>();
-  return <Topic topicId={topicId} />;
+  return <Redirect href={{ pathname: '/topic/[topicId]/learn', params: { topicId } }} />;
 }

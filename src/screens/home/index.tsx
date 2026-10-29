@@ -43,7 +43,8 @@ const HOME_ITEMS = buildItems();
  */
 export function Home() {
   const openTopic = useCallback((topicId: string) => {
-    router.push({ pathname: '/topic/[topicId]', params: { topicId } });
+    // A topic opens straight into its (landscape) lesson, resuming where the learner left off.
+    router.push({ pathname: '/topic/[topicId]/learn', params: { topicId } });
   }, []);
 
   return (
