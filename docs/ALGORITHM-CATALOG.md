@@ -230,7 +230,7 @@ Glyph: row of boxes with an arrow · Renderer: `queue`
 5. Circular buffer (head/tail wrap-around)
 6. Preview: queues in BFS
 
-**Sandbox:** `enqueue(x)`, `dequeue()`, `front()`, `clear()`. Parameter: capacity, plus a toggle for the circular-buffer view (shows the head and tail indices wrapping).
+**Sandbox:** `enqueue(x)`, `dequeue()`, `front()`, `clear()`. Two tools act as the circular-buffer toggle: **Circular** (head and tail indices wrap) and **Plain array** (freed slots are wasted). Capacity comes from the presets.
 
 | Operation | Time |
 |---|---|
@@ -238,7 +238,7 @@ Glyph: row of boxes with an arrow · Renderer: `queue`
 | Space | O(n) |
 
 **States:** active (front and rear pointers), new, dimmed (dequeued slot), error (empty / full)
-**Presets:** empty, full, wrap-around (tail index past the end)
+**Presets:** circular: a few items, empty, full, wrap-around (tail index past the end); plain array: a few items, wasted slots
 **Practice ideas:** "head = 4, tail = 1, capacity = 6. How many items are in the queue?"
 
 ---

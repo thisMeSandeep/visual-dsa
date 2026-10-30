@@ -16,6 +16,14 @@ import {
   type BracketsModel,
   type StackModel,
 } from '../structures/stack';
+import {
+  createQueue,
+  describeQueue,
+  queueToScene,
+  traceQueue,
+  type QueueMode,
+  type QueueModel,
+} from '../structures/queue';
 
 export class CompileError extends Error {
   constructor(
@@ -149,8 +157,40 @@ const brackets: StructureDefinition<BracketsModel> = {
   },
 };
 
+/** The queue: a row of slots, circular (the default) or a plain array (`mode: 'naive'`). */
+const QUEUE_MODES: readonly QueueMode[] = ['circular', 'naive'];
+const queue: StructureDefinition<QueueModel> = {
+  /** { values?: string[] (front first), capacity?: number, head?: number, mode?: 'circular' | 'naive' } */
+  create: (input, at) => {
+    const fields = record(input, at);
+    const values = optionalTextList(fields, 'values', at);
+    const capacity = optionalWholeNumber(fields, 'capacity', at);
+    const head = optionalWholeNumber(fields, 'head', at);
+    const mode = fields.mode;
+    if (mode !== undefined && !QUEUE_MODES.includes(mode as QueueMode)) {
+      throw new CompileError(`"mode" must be one of ${QUEUE_MODES.join(', ')}`, at);
+    }
+    return atSegment(at, () =>
+      createQueue(values, capacity, {
+        ...(head === undefined ? {} : { head }),
+        ...(mode === undefined ? {} : { mode: mode as QueueMode }),
+      }),
+    );
+  },
+  toScene: (model) => queueToScene(model),
+  describe: describeQueue,
+  operations: {
+    enqueue: (model, input, at) =>
+      traceQueue(model, { type: 'enqueue', value: text(record(input, at), 'value', at) }),
+    dequeue: (model) => traceQueue(model, { type: 'dequeue' }),
+    front: (model) => traceQueue(model, { type: 'front' }),
+    clear: (model) => traceQueue(model, { type: 'clear' }),
+  },
+};
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
   brackets: brackets as StructureDefinition<unknown>,
+  queue: queue as StructureDefinition<unknown>,
 };

@@ -403,7 +403,7 @@ feat(sandbox): add bracket checker mini-tool to the stack sandbox
 feat(practice): add topic quizzes with explanations and revise list
 ```
 
-### Step 8.2: Predict the next step *(P1, can move to after the MVP)*
+### Step 8.2: Predict the next step *(P1, deferred: skipped for now, done after Phase 9 or after the MVP)*
 **Goal:** pause the animation and ask what happens next (F-702).
 - The player enters `awaiting-input` at `predict` steps. The learner taps an element or option, and the answer is checked against the next step's scene.
 - Add predict questions inline in the Stack lesson and in its quiz.
@@ -423,6 +423,7 @@ Each topic step includes: the engine structure with tests → renderer (if new) 
 
 ### Step 9.1: Queue
 - Engine: enqueue, dequeue, front and circular buffer. Renderer: `queue` with front/rear pointers and a wrap-around view. Lesson L6, including the printer queue example.
+- Sandbox: two tools, **Circular** and **Plain array** (the catalog's circular-buffer toggle), with capacity set by the presets.
 
 **Commit:**
 ```

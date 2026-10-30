@@ -258,6 +258,9 @@
   --viz-stack-padding: 10px; /* inside the U-shaped container */
   --viz-stack-radius: 18px; /* container's bottom corners */
 
+  /* Queue renderer: slots are --viz-cell-width × --viz-cell-height */
+  --viz-queue-arc: 18px; /* how far the circular buffer's wrap-around arc dips below the row */
+
   /* Input row: an expression read left to right above a structure (bracket checker) */
   --viz-char-width: 28px;
   --viz-char-height: 40px;

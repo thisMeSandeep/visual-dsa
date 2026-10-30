@@ -110,7 +110,7 @@ describe('Sandbox', () => {
   });
 
   it('says when a topic has no sandbox yet', async () => {
-    await renderSandbox('queue');
+    await renderSandbox('array');
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
 

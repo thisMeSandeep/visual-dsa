@@ -21,6 +21,25 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'stack.cleared': 'The stack is empty again.',
   'stack.already-empty': 'The stack is already empty.',
 
+  // Queue (engine/structures/queue/operations.ts)
+  'queue.enqueue.check': 'Enqueue **{value}**. First, check there’s a free slot.',
+  'queue.enqueued': '**{value}** joins at the **rear**.',
+  'queue.enqueued.wrap':
+    '**{value}** goes in slot {slot}: the **rear** wrapped round to the start.',
+  'queue.full':
+    'All {capacity} slots are taken, so **{value}** can’t join. That’s an **overflow**.',
+  'queue.full.wasted':
+    'The rear has hit the last slot, so **{value}** can’t join, though {free} slots at the start are free.',
+  'queue.dequeue.check': 'Dequeue. First, check the queue isn’t empty.',
+  'queue.dequeue.read': 'The **front** item is **{value}**.',
+  'queue.dequeued': '**{value}** leaves from the front. The next item is the new **front**.',
+  'queue.underflow': 'The queue is empty, so there’s nothing to dequeue. That’s an **underflow**.',
+  'queue.front': 'Front shows **{value}**, the next to leave, without removing it.',
+  'queue.empty': 'The queue is empty, so there’s no front to show.',
+  'queue.clear.start': 'Clear removes all {count} items at once.',
+  'queue.cleared': 'The queue is empty again.',
+  'queue.already-empty': 'The queue is already empty.',
+
   // Bracket checker (engine/structures/stack/brackets.ts)
   'brackets.start': 'Read **{expression}** left to right. Opening brackets wait on the stack.',
   'brackets.open': '**{bracket}** opens a group, so push it.',

@@ -26,6 +26,7 @@ export const SIZES: VizSizes = {
   stackItemWidth: 132,
   stackPadding: 10,
   stackRadius: 18,
+  queueArc: 18,
   charWidth: 28,
   charHeight: 40,
   charGap: 4,

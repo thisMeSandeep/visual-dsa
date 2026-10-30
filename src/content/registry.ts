@@ -9,7 +9,10 @@ import { meta as array } from './topics/array/meta';
 import { meta as bigO } from './topics/big-o/meta';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { meta as hashTable } from './topics/hash-table/meta';
+import { lesson as queueLesson } from './topics/queue/lesson';
 import { meta as queue } from './topics/queue/meta';
+import { quiz as queueQuiz } from './topics/queue/quiz';
+import { sandbox as queueSandbox } from './topics/queue/sandbox';
 import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
 import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
@@ -46,16 +49,19 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
  */
 export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeInput>> = {
   stack: stackLesson,
+  queue: queueLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
 export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>> = {
   stack: stackSandbox,
+  queue: queueSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
 export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   stack: stackQuiz,
+  queue: queueQuiz,
 };
 
 /** All topics in Home order. */

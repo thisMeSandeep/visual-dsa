@@ -1,0 +1,34 @@
+// slots is a fixed array of capacity slots.
+// head is the slot of the front item; size counts items.
+// The rear wraps round: (head + size) mod capacity.
+
+function enqueue(value)
+  if size is capacity then // @line check-full
+    error "Queue is full" // @line overflow
+  end if
+  tail = (head + size) mod capacity
+  slots[tail] = value // @line enqueue
+  size = size + 1 // @line enqueue
+end function
+
+function dequeue()
+  if size is 0 then // @line check-empty
+    error "Queue is empty" // @line underflow
+  end if
+  value = slots[head] // @line read-front
+  head = (head + 1) mod capacity // @line dequeue
+  size = size - 1 // @line dequeue
+  return value
+end function
+
+function front()
+  if size is 0 then
+    error "Queue is empty" // @line front-empty
+  end if
+  return slots[head] // @line front
+end function
+
+function clear()
+  head = 0 // @line clear
+  size = 0 // @line clear
+end function

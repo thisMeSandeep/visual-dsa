@@ -77,7 +77,7 @@ describe('Topic quiz', () => {
   });
 
   it('explains a topic without a quiz yet', async () => {
-    await render(<TopicPractice topicId="queue" />);
+    await render(<TopicPractice topicId="array" />);
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
 });

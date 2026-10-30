@@ -94,7 +94,7 @@ export const PSEUDOCODE_GRAMMAR = {
     {
       name: 'keyword.control.pseudocode',
       match:
-        '\\b(?:function|end|if|then|else|while|for|each|in|do|repeat|until|return|error|is|not|and|or|to|break|continue)\\b',
+        '\\b(?:function|end|if|then|else|while|for|each|in|do|repeat|until|return|error|is|not|and|or|mod|to|break|continue)\\b',
     },
     { name: 'entity.name.function.pseudocode', match: '\\b[A-Za-z_]\\w*(?=\\()' },
   ],
