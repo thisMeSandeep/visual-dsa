@@ -563,6 +563,8 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 
 **Step 11.6, as built:** the Recursion topic (Foundations), on a new `call-stack` renderer (`viz/renderers/call-stack/`): frames stack upwards on the left (running `active`, returning `found` with its result, waiting plain), and for Fibonacci the call tree sits to the right (done calls `visited`, memo hits `found`). The engine (`engine/foundations/recursion/`) dry-runs each function first, so every call's column in the tree and the stack's tallest point are known from the start and nothing moves as calls appear. Functions: factorial, Fibonacci, Fibonacci with a memo, and a factorial with no base case that overflows; sandbox presets pick n. The catalog's `sum(array)` is left out (it teaches what factorial does). The general `tree` renderer, with pan and zoom, is still Step 12.1.
 
+**Step 11.7, as built:** every topic's code in Python (`.py`, `# @line`), Java (`.java`) and C++ (`.cpp`) as well, marking exactly the JavaScript's line ids; `config.app.codeLanguages` lists all five and the highlight script tokenises them with Shiki's grammars. The code panel's tabs and the Settings switch use short names (Pseudo, JS, Python, Java, C++). Live variables: a watch row in the code panel shows each step's `vars`, the changed ones in the signal colour. Haptics: `config.features.haptics` is on, so presses give a light tap, and `useStepHaptics` (lesson and sandbox) reads canvas events from each step as it plays forward (error, found, collision, swap; `config.haptics`).
+
 ### v1.2: Trees
 | Step | Work | Commit |
 |---|---|---|

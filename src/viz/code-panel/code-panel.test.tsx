@@ -57,6 +57,20 @@ describe('CodePanel', () => {
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Pseudocode' }));
     expect(onLanguageChange).toHaveBeenCalledWith('pseudocode');
+    expect(screen.getAllByRole('tab')).toHaveLength(config.app.codeLanguages.length);
+    // Short names on the tabs, full names for screen readers.
+    expect(screen.getByRole('tab', { name: 'C++' })).toBeOnTheScreen();
+    expect(screen.getByText('JS')).toBeOnTheScreen();
+  });
+
+  it('shows the step’s variables, marking the ones that changed', async () => {
+    await renderPanel({ vars: { i: '3', top: '42' }, previousVars: { i: '2', top: '42' } });
+    expect(screen.getByLabelText('Variables: i is 3, top is 42')).toBeOnTheScreen();
+  });
+
+  it('keeps the watch row when a step has no variables', async () => {
+    await renderPanel();
+    expect(screen.getByLabelText('No variables at this step')).toBeOnTheScreen();
   });
 
   it('copies the code and confirms it for a moment', async () => {

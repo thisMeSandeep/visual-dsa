@@ -15,6 +15,7 @@ import { isChapterEnd, positionAt, startIndex as openingIndex } from '@/engine/l
 import { chapterAt, type CompiledLesson } from '@/engine/lesson/types';
 import { nextSpeed } from '@/engine/player/machine';
 import { getLesson } from '@/hooks/use-lesson';
+import { useStepHaptics } from '@/hooks/use-step-haptics';
 import { useProgress } from '@/stores/progress';
 import { useSettings } from '@/stores/settings';
 import {
@@ -102,6 +103,7 @@ function LessonPlayer({
   const status = usePlayerStatus(player);
   const speed = usePlayerSpeed(player);
   const index = useStepIndex(player);
+  useStepHaptics(lesson.steps, index);
   const number = useStepNumber(player);
   const total = useTotalSteps(player);
   const canBack = useCanGoBack(player);
@@ -261,6 +263,8 @@ function LessonPlayer({
             language={language}
             onLanguageChange={setLanguage}
             lineId={step?.codeLine}
+            vars={step?.vars}
+            previousVars={lesson.steps[index - 1]?.vars}
             className="mb-3 w-2/5"
           />
         ) : null}

@@ -27,6 +27,9 @@ const OUTPUT = join(ROOT, 'src', 'content', 'generated', 'code-tokens.json');
 const LANGUAGES: Record<CodeLanguage, { extension: string; grammar: string }> = {
   pseudocode: { extension: '.pseudo', grammar: PSEUDOCODE_GRAMMAR.name },
   javascript: { extension: '.js', grammar: 'javascript' },
+  python: { extension: '.py', grammar: 'python' },
+  java: { extension: '.java', grammar: 'java' },
+  cpp: { extension: '.cpp', grammar: 'cpp' },
 };
 
 /** Shiki needs a theme to tokenise. Its colours are never used, so any theme will do. */
@@ -34,7 +37,7 @@ const THEME = 'min-light';
 
 const highlighter = await createHighlighter({
   themes: [THEME],
-  langs: [PSEUDOCODE_GRAMMAR, 'javascript'],
+  langs: [PSEUDOCODE_GRAMMAR, 'javascript', 'python', 'java', 'cpp'],
 });
 
 function tokenise(code: string, grammar: string): CodeToken[][] {

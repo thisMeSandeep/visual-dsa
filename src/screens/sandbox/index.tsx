@@ -25,6 +25,7 @@ import {
   type RestStep,
   type SandboxSession,
 } from '@/engine/sandbox/session';
+import { useStepHaptics } from '@/hooks/use-step-haptics';
 import { useSettings } from '@/stores/settings';
 import {
   playerActions,
@@ -195,6 +196,7 @@ function Playground({
   const actions = playerActions(player);
   const step = useCurrentStep(player);
   const stepIndex = useStepIndex(player);
+  useStepHaptics(session.steps, stepIndex);
   const number = useStepNumber(player);
   const total = useTotalSteps(player);
   useEffect(() => {

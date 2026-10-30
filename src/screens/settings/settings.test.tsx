@@ -60,8 +60,8 @@ describe('Settings', () => {
 
   it('shows the haptics switch only when the haptics feature is on', async () => {
     await render(<Settings />);
-    expect(screen.queryByTestId('setting-haptics')).toBe(
-      config.features.haptics ? expect.anything() : null,
-    );
+    const toggle = screen.queryByTestId('setting-haptics');
+    if (config.features.haptics) expect(toggle).toBeOnTheScreen();
+    else expect(toggle).toBeNull();
   });
 });

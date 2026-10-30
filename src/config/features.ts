@@ -4,8 +4,8 @@ export const features = {
   predictTheNextStep: false,
   /** Side-by-side compare and race modes (F-901, F-904, P1). */
   compareMode: false,
-  /** Haptic feedback on key events (F-307, P1). */
-  haptics: false,
+  /** Haptic feedback on key events (F-307, P1): presses, and canvas events (config/haptics.ts). */
+  haptics: true,
   /** Caption narration with text-to-speech (F-210, P2). */
   narration: false,
 } as const;

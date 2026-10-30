@@ -1,3 +1,4 @@
+import { config } from '@/config';
 import { compileLesson } from '@/engine/lesson/compile';
 import type { CompiledLesson } from '@/engine/lesson/types';
 
@@ -125,27 +126,30 @@ describe('code line validation', () => {
     lines: [],
     lineIds: Object.fromEntries(ids.map((id, line) => [id, [line]])),
   });
+  /** The same sample in every language the app offers. */
+  const everyLanguage = (one: CodeSample) =>
+    Object.fromEntries(config.app.codeLanguages.map((language) => [language, one]));
   const issues = (samples: Parameters<typeof validateCodeLines>[2]) =>
     validateCodeLines('stack', lesson, samples).map((issue) => `${issue.path}: ${issue.message}`);
 
   it('accepts samples that mark every line the lesson highlights', () => {
-    const both = sample('check-full', 'push');
-    expect(issues({ stack: { pseudocode: both, javascript: both } })).toEqual([]);
+    expect(issues({ stack: everyLanguage(sample('check-full', 'push')) })).toEqual([]);
   });
 
   it('reports a line id missing from one language', () => {
     expect(
       issues({
-        stack: { pseudocode: sample('check-full', 'push'), javascript: sample('check-full') },
+        stack: { ...everyLanguage(sample('check-full', 'push')), javascript: sample('check-full') },
       }),
     ).toEqual(['code/javascript: No line is marked "@line push", which the lesson highlights']);
   });
 
   it('reports a missing sample', () => {
-    expect(issues({})).toEqual([
-      'code/pseudocode: The lesson highlights code, but there is no sample',
-      'code/javascript: The lesson highlights code, but there is no sample',
-    ]);
+    expect(issues({})).toEqual(
+      config.app.codeLanguages.map(
+        (language) => `code/${language}: The lesson highlights code, but there is no sample`,
+      ),
+    );
   });
 
   it('needs no code for a lesson that never highlights any', () => {

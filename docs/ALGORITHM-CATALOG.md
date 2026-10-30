@@ -72,7 +72,7 @@ Each topic follows the same arc so that learners know what to expect:
 - **Captions** are at most about 120 characters (two lines at 19px on a phone). Bold only the key terms.
 - **Example data fits a phone in portrait:** arrays of 6–8 cells, values 0–99, at most 6–10 hash buckets, trees at most 4 levels deep, graphs of 5–8 nodes.
 - **Names** come from a short, friendly, international set for keys (Sam, Jim, Ben, Sid, Kat, Ana, Leo, Mia).
-- **Code** is shown as pseudocode plus JavaScript in the MVP. Python, Java and C++ come in P1. Every step references the code line it executes.
+- **Code** is shown as pseudocode, JavaScript, Python, Java and C++ (the last three since Step 11.7). Every step references the code line it executes, and every language marks the same line ids.
 - **Each topic** has a sandbox with edge-case presets and at least 8 practice questions, of which at least 3 are "predict the next step".
 
 ### 2.3 Fields used below

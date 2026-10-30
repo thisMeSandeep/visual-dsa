@@ -10,6 +10,8 @@ import { PressableScale } from './pressable-scale';
 export type SegmentOption<T extends string | number> = {
   value: T;
   label: string;
+  /** What screen readers say, when the label is short: "JS" is read as "JavaScript". */
+  accessibilityLabel?: string;
   icon?: IconName;
 };
 
@@ -47,7 +49,7 @@ export function SegmentedControl<T extends string | number>({
           <PressableScale
             key={String(option.value)}
             accessibilityRole="radio"
-            accessibilityLabel={option.label}
+            accessibilityLabel={option.accessibilityLabel ?? option.label}
             accessibilityState={{ checked: selected }}
             onPress={() => onChange(option.value)}
             className="flex-1"

@@ -287,7 +287,7 @@ Bottom panel inset 16, `radius-xl`, `success-soft` (or `danger-soft`) fill. Head
 ### Code panel
 `surface` block, `radius-lg`, mono 13/1.9, syntax colours from §2.5. Line numbers in `muted`. **Current line:** `signal-soft` row with `radius-sm`, and the line number in `signal-ink`. The panel scrolls to keep the current line in the middle (no animation with reduced motion). Long lines scroll sideways instead of wrapping.
 
-The header holds the language pills on the left (selected: `primary-soft` fill, `primary` label in medium; others: `muted` label) and a ghost **Copy** button on the right, which shows a `Check` for 1.5 s after copying. The round code button in the player controls opens and closes it (active state when open). Docked under the canvas in portrait (at most 240pt tall, the canvas shrinks to fit) and beside it in landscape (half the width).
+The header holds the language pills on the left (selected: `primary-soft` fill, `primary` label in medium; others: `muted` label) and a ghost **Copy** button on the right, which shows a `Check` for 1.5 s after copying. Five languages: the pills use short names (Pseudo, JS, Python, Java, C++; screen readers hear the full name) and scroll sideways if the panel is narrow. **Watch row** (F-503) under the header, above a hairline: the step's variables in mono `index`, `i = 3   top = 42`, `ink-2`, with any that changed on this step in `signal-ink` (like the counters); one line that scrolls sideways, kept (showing `–`) when a step has none so the code doesn't jump. The round code button in the player controls opens and closes it (active state when open). Docked under the canvas in portrait (at most 240pt tall, the canvas shrinks to fit) and beside it in landscape (half the width).
 
 ### Segmented control
 One choice from a few, all visible at once: equal segments on a fully rounded `surface` track (4 padding), each 36 tall; the chosen one is a `primary-soft` pill with a bold `primary` label and, if it has one, a filled `primary` icon; the others have a medium `ink-2` label and a `muted` regular icon. A radio group for screen readers. In code: `<SegmentedControl label options value onChange>` (`src/components/segmented-control.tsx`). Used for settings and the sandbox presets.
@@ -367,7 +367,7 @@ Built with Reanimated (see TECH-STACK.md).
 
 All canvas values live in `config.motion.canvas`.
 
-**Haptics (P1):** light on step change via swipe, medium on collision / swap / found, success notification on a correct answer.
+**Haptics (P1, F-307):** a light tap on every press, and on canvas events while the player moves forward one step (playing or Next; never when scrubbing or stepping back): an **error** notification when something fails (overflow, out of bounds, a stack overflow), a **success** notification when a match appears, a **medium** impact on a collision, and a **light** impact when items swap. Which feedback each event gives is in `config.haptics`. A success notification on a correct quiz answer is still to come.
 
 ---
 

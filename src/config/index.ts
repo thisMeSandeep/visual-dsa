@@ -3,6 +3,7 @@ import { bigO } from './big-o';
 import { code } from './code';
 import { engine } from './engine';
 import { features } from './features';
+import { haptics } from './haptics';
 import { motion } from './motion';
 import { navigation } from './navigation';
 import { patterns } from './patterns';
@@ -23,6 +24,7 @@ export const config = Object.freeze({
   code,
   engine,
   features,
+  haptics,
   motion,
   navigation,
   patterns,
@@ -36,3 +38,4 @@ export const config = Object.freeze({
 
 export type Config = typeof config;
 export type { CodeLanguage } from './app';
+export type { HapticEvent, HapticFeedback } from './haptics';

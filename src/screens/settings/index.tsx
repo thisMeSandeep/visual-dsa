@@ -8,7 +8,7 @@ import { SegmentedControl, type SegmentOption } from '@/components/segmented-con
 import { config, type CodeLanguage } from '@/config';
 import { useSettings, type ReducedMotionChoice, type ThemeChoice } from '@/stores/settings';
 import { useActiveTheme, useColor } from '@/theme';
-import { CODE_LANGUAGE_LABELS } from '@/viz/code-panel';
+import { CODE_LANGUAGE_LABELS, CODE_LANGUAGE_SHORT_LABELS } from '@/viz/code-panel';
 
 const THEME_OPTIONS: readonly SegmentOption<ThemeChoice>[] = [
   { value: 'system', label: 'Device', icon: 'theme-system' },
@@ -17,7 +17,11 @@ const THEME_OPTIONS: readonly SegmentOption<ThemeChoice>[] = [
 ];
 
 const LANGUAGE_OPTIONS: readonly SegmentOption<CodeLanguage>[] = config.app.codeLanguages.map(
-  (language) => ({ value: language, label: CODE_LANGUAGE_LABELS[language] }),
+  (language) => ({
+    value: language,
+    label: CODE_LANGUAGE_SHORT_LABELS[language],
+    accessibilityLabel: CODE_LANGUAGE_LABELS[language],
+  }),
 );
 
 const SPEED_OPTIONS: readonly SegmentOption<number>[] = config.player.speeds.map((speed) => ({

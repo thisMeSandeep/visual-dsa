@@ -10,6 +10,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 import { centredOffset } from './scroll';
 import type { CodePanelSample, CodeRole } from './types';
+import { WatchRow, type Variables } from './watch-row';
 
 /** Plain code uses the line's own colour (ink). */
 const ROLE_TONE: Record<CodeRole, TextTone | undefined> = {
@@ -21,9 +22,22 @@ const ROLE_TONE: Record<CodeRole, TextTone | undefined> = {
   comment: 'code-comment',
 };
 
+/** Each language's name, for screen readers and anywhere there's room. */
 export const CODE_LANGUAGE_LABELS: Record<CodeLanguage, string> = {
   pseudocode: 'Pseudocode',
   javascript: 'JavaScript',
+  python: 'Python',
+  java: 'Java',
+  cpp: 'C++',
+};
+
+/** Short names for the code panel's tabs and the settings switch, where five must fit. */
+export const CODE_LANGUAGE_SHORT_LABELS: Record<CodeLanguage, string> = {
+  pseudocode: 'Pseudo',
+  javascript: 'JS',
+  python: 'Python',
+  java: 'Java',
+  cpp: 'C++',
 };
 
 export type CodePanelProps = {
@@ -32,13 +46,17 @@ export type CodePanelProps = {
   onLanguageChange: (language: CodeLanguage) => void;
   /** The current step's line id. Its lines are highlighted and scrolled into view. */
   lineId?: string;
+  /** The current step's variables, shown in the watch row (F-503). */
+  vars?: Variables | undefined;
+  /** The step before's, so the watch row can mark what changed. */
+  previousVars?: Variables | undefined;
   /** Size and position within the parent only. */
   className?: string;
 };
 
 /**
- * The code being run, with the current line highlighted (F-501), a language switch (F-502) and
- * copy (F-505). VISUAL-SPEC §6 "Code panel". Long lines scroll sideways instead of wrapping, so
+ * The code being run, with the current line highlighted (F-501), a language switch (F-502), the
+ * step's live variables (F-503) and copy (F-505). VISUAL-SPEC §6 "Code panel". Long lines scroll sideways instead of wrapping, so
  * every line stays one row tall and line numbers stay aligned.
  */
 export function CodePanel({
@@ -46,6 +64,8 @@ export function CodePanel({
   language,
   onLanguageChange,
   lineId,
+  vars,
+  previousVars,
   className,
 }: CodePanelProps) {
   const highlighted = new Set(lineId ? (sample.lineIds[lineId] ?? []) : []);
@@ -81,13 +101,21 @@ export function CodePanel({
   return (
     <View className={`overflow-hidden rounded-lg bg-surface ${className ?? ''}`}>
       <View className="flex-row items-center justify-between pt-1 pr-1 pl-2">
-        <View accessibilityRole="tablist" className="flex-row gap-1">
+        {/* Five tabs can outgrow a narrow panel, so they scroll sideways. */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          accessibilityRole="tablist"
+          className="shrink"
+          contentContainerClassName="flex-row gap-1"
+        >
           {config.app.codeLanguages.map((option) => {
             const selected = option === language;
             return (
               <PressableScale
                 key={option}
                 accessibilityRole="tab"
+                accessibilityLabel={CODE_LANGUAGE_LABELS[option]}
                 accessibilityState={{ selected }}
                 onPress={() => onLanguageChange(option)}
                 contentClassName={`h-9 justify-center rounded-full px-3 ${selected ? 'bg-primary-soft' : ''}`}
@@ -97,12 +125,12 @@ export function CodePanel({
                   weight={selected ? 'medium' : 'regular'}
                   tone={selected ? 'primary' : 'muted'}
                 >
-                  {CODE_LANGUAGE_LABELS[option]}
+                  {CODE_LANGUAGE_SHORT_LABELS[option]}
                 </AppText>
               </PressableScale>
             );
           })}
-        </View>
+        </ScrollView>
         <IconButton
           icon={copied ? 'done' : 'copy'}
           label={copied ? 'Copied' : 'Copy code'}
@@ -110,6 +138,11 @@ export function CodePanel({
           onPress={copy}
         />
       </View>
+
+      <WatchRow
+        {...(vars === undefined ? {} : { vars })}
+        {...(previousVars === undefined ? {} : { previous: previousVars })}
+      />
 
       <ScrollView
         ref={scrollRef}
