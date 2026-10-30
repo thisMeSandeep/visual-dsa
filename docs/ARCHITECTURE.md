@@ -95,7 +95,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── icons.ts                #   icon registry by meaning
 │   │   ├── chip.tsx · progress-bar.tsx · scrubber.tsx · stat-strip.tsx
 │   │   ├── text-field.tsx · caption-text.tsx
-│   │   ├── topic-card.tsx · topic-row.tsx · chapter-row.tsx · continue-card.tsx
+│   │   ├── art-card.tsx · topic-card.tsx · quiz-card.tsx · topic-row.tsx · chapter-row.tsx · continue-card.tsx
 │   │   ├── floating-tab-bar.tsx    #   the app's tab bar (custom tabBar for JS tabs)
 │   │   ├── feedback-panel.tsx
 │   │   ├── topic-art/              #   per-topic line drawings for Home's cards

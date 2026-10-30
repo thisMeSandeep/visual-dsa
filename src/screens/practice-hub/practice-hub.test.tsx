@@ -13,20 +13,26 @@ describe('Practice tab', () => {
     useProgress.setState({ topics: {}, lastTopicId: undefined, revise: [] });
   });
 
-  it('shows an empty revise list and the Stack quiz, not tried yet', async () => {
+  it('suggests the first quiz and lists every quiz as a card', async () => {
     await render(<PracticeHub />);
-    expect(screen.getByText('Nothing to revise')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: 'Revise now' })).toBeNull();
+    expect(screen.getByText('Try the Big O Notation quiz')).toBeOnTheScreen();
+    expect(screen.getByText('0 of 7 tried')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Start' }));
+    expect(router.push).toHaveBeenLastCalledWith({
+      pathname: '/topic/[topicId]/practice',
+      params: { topicId: 'big-o' },
+    });
+
     await fireEvent.press(
       screen.getByRole('button', { name: 'Stack quiz, 10 questions, not tried yet' }),
     );
-    expect(router.push).toHaveBeenCalledWith({
+    expect(router.push).toHaveBeenLastCalledWith({
       pathname: '/topic/[topicId]/practice',
       params: { topicId: 'stack' },
     });
   });
 
-  it('shows the revise list and the best score', async () => {
+  it('puts missed questions first, and shows best scores on the cards', async () => {
     useProgress.setState({
       topics: { stack: { completedChapters: [], quiz: { last: 6, best: 8, total: 10 } } },
       revise: [
@@ -35,16 +41,13 @@ describe('Practice tab', () => {
       ],
     });
     await render(<PracticeHub />);
-    expect(screen.getByText('2 questions to revise')).toBeOnTheScreen();
-    expect(screen.getByText('peek() removes the top item from the stack.')).toBeOnTheScreen();
+    expect(screen.getByText('Revise 2 missed questions')).toBeOnTheScreen();
+    expect(screen.getByText('1 of 7 tried')).toBeOnTheScreen();
     expect(
       screen.getByRole('button', { name: 'Stack quiz, 10 questions, best score 8 of 10' }),
     ).toBeOnTheScreen();
-    expect(screen.getByText('8/10')).toBeOnTheScreen();
-    // Every MVP topic has a quiz, each with its own row.
-    expect(screen.getByRole('button', { name: /^Big O Notation quiz/ })).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Revise now' }));
-    expect(router.push).toHaveBeenCalledWith('/revise');
+    await fireEvent.press(screen.getByRole('button', { name: 'Start' }));
+    expect(router.push).toHaveBeenLastCalledWith('/revise');
   });
 });
