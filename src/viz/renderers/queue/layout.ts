@@ -18,6 +18,7 @@ import type { ElementState, Scene, SceneElement } from '@/engine/core/types';
 import type { VizSizes } from '@/theme';
 
 import type { Drawable } from '../../canvas/types';
+import { roundedRect } from '../paths';
 
 export type QueueLayout = { drawables: Drawable[]; width: number; height: number };
 
@@ -161,14 +162,6 @@ export function layoutQueue(scene: Scene, sizes: VizSizes): QueueLayout {
     width,
     height: arcTop + sizes.queueArc,
   };
-}
-
-function roundedRect(left: number, top: number, right: number, bottom: number, r: number): string {
-  return (
-    `M ${left + r} ${top} H ${right - r} A ${r} ${r} 0 0 1 ${right} ${top + r} ` +
-    `V ${bottom - r} A ${r} ${r} 0 0 1 ${right - r} ${bottom} H ${left + r} ` +
-    `A ${r} ${r} 0 0 1 ${left} ${bottom - r} V ${top + r} A ${r} ${r} 0 0 1 ${left + r} ${top} Z`
-  );
 }
 
 /** A curve from the last slot, dipping below, back up to slot 0, with an arrowhead there. */

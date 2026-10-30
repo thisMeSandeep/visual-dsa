@@ -432,6 +432,7 @@ feat(queue): add queue engine, renderer, lesson, sandbox and quiz
 
 ### Step 9.2: Array
 - Engine: get, set, push, insert, removeAt, search, dynamic resize. Renderer: `array` with indices, shifting and pointer labels. Lesson L1.
+- Also: the sandbox gains `index` and `index-value` inputs (an Index field and a button grid), scenes gain a `source` slot for the old array while one grows, and the canvas fit animates so a growing drawing zooms out smoothly.
 
 **Commit:**
 ```

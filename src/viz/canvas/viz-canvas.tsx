@@ -1,9 +1,11 @@
 import { Canvas, Group } from '@shopify/react-native-skia';
 import { View } from 'react-native';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { COLOR_TOKENS, useColors, useVizSizes } from '@/theme';
 
+import { MOVE_EASING, useAnimatedNumber } from './animated-values';
 import {
   AnimatedBox,
   AnimatedLine,
@@ -55,6 +57,16 @@ export function VizCanvas({
   const timings = canvasTimings(speed, reducedMotion);
   const present = usePresence(drawables, timings.exit);
   const fit = fitContent({ width, height }, { width: contentWidth, height: contentHeight });
+  // The fit animates like the elements do, so a drawing that grows (an array doubling) zooms
+  // out smoothly instead of jumping.
+  const scale = useAnimatedNumber(fit.scale, timings.move, MOVE_EASING);
+  const offsetX = useAnimatedNumber(fit.offsetX, timings.move, MOVE_EASING);
+  const offsetY = useAnimatedNumber(fit.offsetY, timings.move, MOVE_EASING);
+  const transform = useDerivedValue(() => [
+    { translateX: offsetX.get() },
+    { translateY: offsetY.get() },
+    { scale: scale.get() },
+  ]);
 
   return (
     <View
@@ -65,13 +77,7 @@ export function VizCanvas({
     >
       {fonts ? (
         <Canvas style={{ width, height }}>
-          <Group
-            transform={[
-              { translateX: fit.offsetX },
-              { translateY: fit.offsetY },
-              { scale: fit.scale },
-            ]}
-          >
+          <Group transform={transform}>
             {present.map(({ item, exiting }) => (
               <DrawableView
                 key={item.id}

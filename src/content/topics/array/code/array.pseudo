@@ -1,0 +1,69 @@
+// slots is a block of capacity slots.
+// size counts the items, in slots 0 to size - 1.
+
+function get(index)
+  if index < 0 or index >= size then // @line get-check
+    error "Index out of bounds" // @line get-out-of-bounds
+  end if
+  return slots[index] // @line get
+end function
+
+function set(index, value)
+  if index < 0 or index >= size then // @line set-check
+    error "Index out of bounds" // @line set-out-of-bounds
+  end if
+  slots[index] = value // @line set
+end function
+
+function push(value)
+  if size is capacity then grow() // @line push-check
+  slots[size] = value // @line push
+  size = size + 1 // @line push
+end function
+
+function insert(index, value)
+  if index < 0 or index > size then // @line insert-check
+    error "Index out of bounds" // @line insert-out-of-bounds
+  end if
+  if size is capacity then grow()
+  for j from size - 1 down to index
+    slots[j + 1] = slots[j] // @line shift-right
+  end for
+  slots[index] = value // @line insert
+  size = size + 1 // @line insert
+end function
+
+function removeAt(index)
+  if index < 0 or index >= size then // @line remove-check
+    error "Index out of bounds" // @line remove-out-of-bounds
+  end if
+  value = slots[index] // @line remove-read
+  for j from index + 1 to size - 1
+    slots[j - 1] = slots[j] // @line shift-left
+  end for
+  size = size - 1 // @line remove-done
+  return value
+end function
+
+function search(value)
+  for i from 0 to size - 1
+    if slots[i] is value then // @line search-compare
+      return i // @line search-found
+    end if
+  end for
+  return -1 // @line search-not-found
+end function
+
+function traverse(visit)
+  for i from 0 to size - 1
+    visit(slots[i]) // @line traverse-visit
+  end for
+end function
+
+function grow()
+  bigger = new block of capacity × 2 slots // @line grow
+  for i from 0 to size - 1
+    bigger[i] = slots[i] // @line copy
+  end for
+  slots = bigger // @line grow-done
+end function

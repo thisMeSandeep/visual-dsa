@@ -26,6 +26,8 @@ export type ElementState =
 export type Slot =
   /** array, stack and queue cells */
   | { type: 'index'; index: number }
+  /** the old, smaller array a dynamic array copies from while it grows */
+  | { type: 'source'; index: number }
   /** hash-table chain nodes */
   | { type: 'bucket'; bucket: number; chainIndex: number }
   /** lists, trees and graphs: laid out by the renderer */

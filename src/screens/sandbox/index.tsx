@@ -37,6 +37,7 @@ import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
 import { parseExpression } from './expression-input';
+import { parseIndex } from './index-input';
 import { parseValue } from './value-input';
 
 /**
@@ -72,6 +73,17 @@ type Operation = SandboxConfig['operations'][number];
 type Preset = SandboxConfig['presets'][number];
 
 const UNDONE = 'Undone: back to before the last change.';
+
+const takesIndex = (operation: Operation) =>
+  operation.input === 'index' || operation.input === 'index-value';
+const takesValue = (operation: Operation) =>
+  operation.input === 'value' || operation.input === 'index-value';
+
+/** Splits `items` into rows of `size`, for a grid of buttons. */
+const rows = <T,>(items: readonly T[], size: number): T[][] =>
+  Array.from({ length: Math.ceil(items.length / size) }, (_, row) =>
+    items.slice(row * size, (row + 1) * size),
+  );
 
 /** The expression a bracket-checker preset starts with, to show in the field. */
 const presetExpression = (preset: Preset): string => {
@@ -109,6 +121,10 @@ function Playground({
     primary?.input === 'expression' ? presetExpression(firstPreset) : '',
   );
   const [problem, setProblem] = useState<string>();
+  // Tools with index operations (the array) get a second field for the index.
+  const indexed = sandbox.operations.some(takesIndex);
+  const [indexText, setIndexText] = useState('');
+  const [indexProblem, setIndexProblem] = useState<string>();
   const [rng] = useState(() => createRng(Date.now()));
 
   // Each operation's trace plays from its first step at the learner's speed.
@@ -125,25 +141,40 @@ function Playground({
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
 
   const run = (operation: Operation) => {
-    let input: unknown;
-    if (operation.input === 'value') {
-      const parsed = parseValue(text);
-      if (!parsed.ok) {
-        setProblem(parsed.problem);
-        return;
+    const fields: Record<string, unknown> = {};
+    // Check every field the operation needs, so both problems show at once.
+    let ok = true;
+    if (takesIndex(operation)) {
+      const parsed = parseIndex(indexText);
+      if (parsed.ok) fields.index = parsed.index;
+      else {
+        setIndexProblem(parsed.problem);
+        ok = false;
       }
-      input = { value: parsed.value };
-      setText('');
+    }
+    if (takesValue(operation)) {
+      const parsed = parseValue(text);
+      if (parsed.ok) fields.value = parsed.value;
+      else {
+        setProblem(parsed.problem);
+        ok = false;
+      }
     } else if (operation.input === 'expression') {
       const parsed = parseExpression(text);
-      if (!parsed.ok) {
+      if (parsed.ok) fields.expression = parsed.expression;
+      else {
         setProblem(parsed.problem);
-        return;
+        ok = false;
       }
-      input = { expression: parsed.expression };
-      setText(parsed.expression);
     }
+    if (!ok) return;
+
+    // A value is used up; an index and an expression stay, ready to run again.
+    if (takesValue(operation)) setText('');
+    if (typeof fields.expression === 'string') setText(fields.expression);
     setProblem(undefined);
+    setIndexProblem(undefined);
+    const input = operation.input ? fields : undefined;
     const result = definition.operations[operation.id]!(session.model, input, 'sandbox');
     setSession(applyOperation(session, result));
   };
@@ -256,7 +287,64 @@ function Playground({
           }}
         />
 
-        {primary?.input === 'value' ? (
+        {indexed ? (
+          <>
+            <View className="flex-row items-start gap-2">
+              <TextField
+                label="Index"
+                labelHidden
+                value={indexText}
+                onChangeText={(next) => {
+                  setIndexText(next);
+                  setIndexProblem(undefined);
+                }}
+                error={indexProblem}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                placeholder="Index"
+                className="w-24"
+              />
+              <TextField
+                label={`Value (${valueRange.min}–${valueRange.max})`}
+                labelHidden
+                value={text}
+                onChangeText={(next) => {
+                  setText(next);
+                  setProblem(undefined);
+                }}
+                error={problem}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                placeholder={`Value ${valueRange.min}–${valueRange.max}`}
+                accessory={
+                  <IconButton
+                    icon="random"
+                    label="Random value"
+                    onPress={() => {
+                      setText(String(rng.int(valueRange.min, valueRange.max)));
+                      setProblem(undefined);
+                    }}
+                  />
+                }
+                className="flex-1"
+              />
+            </View>
+            {rows(sandbox.operations, config.sandbox.buttonsPerRow).map((row) => (
+              <View key={row[0]!.id} className="flex-row gap-2">
+                {row.map((operation) => (
+                  <Button
+                    key={operation.id}
+                    label={operation.label}
+                    variant={operation === primary ? 'primary' : 'tinted'}
+                    size="compact"
+                    className="flex-1"
+                    onPress={() => run(operation)}
+                  />
+                ))}
+              </View>
+            ))}
+          </>
+        ) : primary?.input === 'value' ? (
           <View className="flex-row items-start gap-2">
             <TextField
               label={`Value (${valueRange.min}–${valueRange.max})`}
@@ -309,7 +397,7 @@ function Playground({
           <Button label={primary.label} size="compact" onPress={() => run(primary)} />
         ) : null}
 
-        {secondary.length > 0 ? (
+        {!indexed && secondary.length > 0 ? (
           <View className="flex-row gap-2">
             {secondary.map((operation) => (
               <Button

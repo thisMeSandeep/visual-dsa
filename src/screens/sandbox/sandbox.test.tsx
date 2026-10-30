@@ -109,8 +109,34 @@ describe('Sandbox', () => {
     expect(stat('Size', '5')).toBeOnTheScreen();
   });
 
-  it('says when a topic has no sandbox yet', async () => {
+  it('runs array operations from an index field and a value field', async () => {
     await renderSandbox('array');
+    const indexField = () => screen.getByLabelText('Index');
+    await fireEvent.changeText(indexField(), '1');
+    await fireEvent.changeText(valueField(), '99');
+    await press('Insert');
+    await playToEnd();
+    expect(stat('Size', '5')).toBeOnTheScreen();
+    expect(stat('Capacity', '8')).toBeOnTheScreen();
+    // The value is used up; the index stays for the next operation.
+    expect(valueField().props.value).toBe('');
+    expect(indexField().props.value).toBe('1');
+
+    await press('Get');
+    await playToEnd();
+    expect(screen.getByText(/^Index 1 holds 99\./)).toBeOnTheScreen();
+  });
+
+  it('explains a missing index and a missing value together', async () => {
+    await renderSandbox('array');
+    await press('Set');
+    expect(screen.getByText('Type an index first, like 2.')).toBeOnTheScreen();
+    expect(screen.getByText('Type a number first, or tap Random.')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled();
+  });
+
+  it('says when a topic has no sandbox yet', async () => {
+    await renderSandbox('hash-table');
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
 

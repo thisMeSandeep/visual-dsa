@@ -4,6 +4,12 @@ export const structures = {
     /** How many items fit before push overflows. At most config.engine.maxItems. */
     defaultCapacity: 8,
   },
+  array: {
+    /** Slots in a new array when content gives no capacity. At most config.engine.maxItems. */
+    defaultCapacity: 4,
+    /** A full dynamic array grows to this many times its capacity (capped at maxItems). */
+    growthFactor: 2,
+  },
   queue: {
     /** Slots in a new queue. At most config.engine.maxItems. */
     defaultCapacity: 6,

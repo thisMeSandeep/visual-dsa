@@ -17,6 +17,14 @@ import {
   type StackModel,
 } from '../structures/stack';
 import {
+  arrayToScene,
+  createArray,
+  describeArray,
+  traceArray,
+  type ArrayAddresses,
+  type ArrayModel,
+} from '../structures/array';
+import {
   createQueue,
   describeQueue,
   queueToScene,
@@ -100,6 +108,12 @@ function optionalWholeNumber(
   if (typeof value !== 'number' || !Number.isInteger(value)) {
     throw new CompileError(`"${key}" must be a whole number`, at);
   }
+  return value;
+}
+
+function wholeNumber(input: Record<string, unknown>, key: string, at: string): number {
+  const value = optionalWholeNumber(input, key, at);
+  if (value === undefined) throw new CompileError(`"${key}" is required`, at);
   return value;
 }
 
@@ -188,9 +202,62 @@ const queue: StructureDefinition<QueueModel> = {
   },
 };
 
+/** The array: a dynamic array that grows when it's full. */
+const array: StructureDefinition<ArrayModel> = {
+  /** { values?: string[], capacity?: number, addresses?: { base: number, stride: number } } */
+  create: (input, at) => {
+    const fields = record(input, at);
+    const values = optionalTextList(fields, 'values', at);
+    const capacity = optionalWholeNumber(fields, 'capacity', at);
+    const addresses =
+      fields.addresses === undefined ? undefined : addressesFrom(fields.addresses, at);
+    return atSegment(at, () =>
+      createArray(values, capacity, addresses === undefined ? {} : { addresses }),
+    );
+  },
+  toScene: (model) => arrayToScene(model),
+  describe: describeArray,
+  operations: {
+    get: (model, input, at) =>
+      traceArray(model, { type: 'get', index: wholeNumber(record(input, at), 'index', at) }),
+    set: (model, input, at) => {
+      const fields = record(input, at);
+      return traceArray(model, {
+        type: 'set',
+        index: wholeNumber(fields, 'index', at),
+        value: text(fields, 'value', at),
+      });
+    },
+    push: (model, input, at) =>
+      traceArray(model, { type: 'push', value: text(record(input, at), 'value', at) }),
+    insert: (model, input, at) => {
+      const fields = record(input, at);
+      return traceArray(model, {
+        type: 'insert',
+        index: wholeNumber(fields, 'index', at),
+        value: text(fields, 'value', at),
+      });
+    },
+    removeAt: (model, input, at) =>
+      traceArray(model, { type: 'removeAt', index: wholeNumber(record(input, at), 'index', at) }),
+    search: (model, input, at) =>
+      traceArray(model, { type: 'search', value: text(record(input, at), 'value', at) }),
+    traverse: (model) => traceArray(model, { type: 'traverse' }),
+  },
+};
+
+function addressesFrom(input: unknown, at: string): ArrayAddresses {
+  const fields = record(input, `${at}.addresses`);
+  return {
+    base: wholeNumber(fields, 'base', `${at}.addresses`),
+    stride: wholeNumber(fields, 'stride', `${at}.addresses`),
+  };
+}
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
   brackets: brackets as StructureDefinition<unknown>,
   queue: queue as StructureDefinition<unknown>,
+  array: array as StructureDefinition<unknown>,
 };

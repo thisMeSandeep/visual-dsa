@@ -5,7 +5,10 @@
 import type { LessonRecipeInput } from '@/engine/lesson/recipe';
 
 import type { LessonRecipe, Quiz, SandboxConfig, TopicCategory, TopicMeta } from './schema';
+import { lesson as arrayLesson } from './topics/array/lesson';
 import { meta as array } from './topics/array/meta';
+import { quiz as arrayQuiz } from './topics/array/quiz';
+import { sandbox as arraySandbox } from './topics/array/sandbox';
 import { meta as bigO } from './topics/big-o/meta';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { meta as hashTable } from './topics/hash-table/meta';
@@ -50,18 +53,21 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
 export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeInput>> = {
   stack: stackLesson,
   queue: queueLesson,
+  array: arrayLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
 export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>> = {
   stack: stackSandbox,
   queue: queueSandbox,
+  array: arraySandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
 export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   stack: stackQuiz,
   queue: queueQuiz,
+  array: arrayQuiz,
 };
 
 /** All topics in Home order. */

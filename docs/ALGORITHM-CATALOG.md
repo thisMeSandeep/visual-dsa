@@ -131,7 +131,7 @@ Glyph: four boxes in a row · Renderer: `array`
 7. Dynamic arrays: capacity, doubling, amortised O(1) push
 8. 2D arrays *(P1 chapter)*
 
-**Sandbox:** `get(i)`, `set(i, x)`, `push(x)`, `insert(i, x)`, `removeAt(i)`, `search(x)`. Parameter: capacity, for the dynamic-array view.
+**Sandbox:** `get(i)`, `set(i, x)`, `push(x)`, `insert(i, x)`, `removeAt(i)`, `search(x)`, with an index field beside the value field. It's always a dynamic array: capacity comes from the presets, and a push or insert into a full array doubles it (up to the 12-item limit).
 
 | Operation | Time |
 |---|---|

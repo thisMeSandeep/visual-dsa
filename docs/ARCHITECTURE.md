@@ -214,6 +214,7 @@ type SceneElement =
 
 type Slot =
   | { type: 'index'; index: number }                       // array, stack, queue
+  | { type: 'source'; index: number }                      // the old array a dynamic array copies from as it grows
   | { type: 'bucket'; bucket: number; chainIndex: number } // hash table
   | { type: 'node' }                                       // list, tree, graph (laid out by renderer)
   | { type: 'input'; index: number };                      // a character of an input read left to right

@@ -275,13 +275,15 @@ The canvas follows the same tokens, which Skia reads from the theme (see section
 |---|---|
 | Cell / bucket / node | `surface-raised` fill, 1.5px `line-strong` border, `radius-sm`, mono value centred |
 | Array cell | 46 × 52, value `value-lg` 20 |
+| Array row | Every slot of the capacity drawn (empty ones as plain cells) in a 2px `line-strong` frame with 10 padding, `danger` when an index is out of bounds. Indices under the row; memory addresses under those when a lesson shows them. Pointers (`i`) point down from above. While a dynamic array grows, the old array (1.5px `line` frame, labelled "old array") sits 32 above the new one; each item moves down as it's copied, leaving a `dimmed` copy behind |
+| Queue row | Like the array row, for the full capacity: `front` points down from above, `rear` up from below the indices. A circular buffer adds a wrap-around arc (`edge`) from the last slot back to slot 0; a plain array dims the slots before the front. A value that didn't fit shows just past the frame |
 | Bucket | 44 × 40, a small `ink` dot when occupied |
 | Linked node | Auto width, height 44, name 15/700 over mono 12 detail |
 | Stack container | U-shape, 2px `line-strong` (`danger` on overflow / underflow), open top, 18px bottom radius. Drawn for the full capacity so the canvas never changes height; one slot above it shows a value that didn't fit. Items are 132 × 44, 8 apart, with 10 padding. The `top →` pointer sits to the left |
 | Input row | An expression read left to right (bracket checker), above the structure: one 28 × 40 cell per character, 4 apart, mono value. Read characters are `dimmed`, the current one `active` (`found` when it matches, `error` when it fails), unread ones default. The structure is centred under the row |
 | Analogy scene | Hand-built picture from the same parts. **Browser back button:** a window frame (1.5px `line-strong`, toolbar with a `‹ Back` label in `muted`, `signal-ink` when pressed) showing the current page as a stack-sized item, and a "Back stack" U-container to its right, 32 apart. Column labels in `label` style, `muted` |
 | Edge / arrow | 1.5px `edge`, rounded caps, small open arrowhead |
-| Index label | `index` style, `muted`, above cells or left of buckets |
+| Index label | `index` style, `muted`, under array and queue cells, left of buckets |
 | Pointer label | Mono 13, `signal-ink`, with a `signal` arrow (`top →`, `j`, `j+1`) |
 | Callout | Mono 15, `signal-soft` fill, `radius-sm`, padding 8 × 12 (`h("Sid") = 2`) |
 | Counters | Mono 13, `ink-2` (`comparisons 7   swaps 3`) |
