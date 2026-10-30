@@ -72,7 +72,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │       ├── learn.tsx           #   Lesson player (?chapter=…, ?step=N)
 │   │       ├── play.tsx            #   Sandbox
 │   │       ├── practice.tsx        #   Topic quiz
-│   │       └── reference.tsx       #   form sheet
+│   │       ├── reference.tsx       #   form sheet
+│   │       └── legend.tsx          #   form sheet: what each canvas state means
 │   │
 │   ├── screens/                    # screen bodies rendered by routes
 │   │   ├── home/                   #   Learn tab
@@ -83,6 +84,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── sandbox/                #   Play mode screen, value-input.ts (Zod + engine limits)
 │   │   ├── practice/               #   topic quiz, revise session, quiz runner + session
 │   │   ├── reference/              #   form sheet: summary, how it scales, tabbed cheat sheet
+│   │   ├── legend/                 #   form sheet: the state legend (F-306)
 │   │   └── dev/                    #   dev-only showcases (tokens, components)
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
@@ -553,6 +555,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
 | `/revise` | Revise session: the missed questions, across topics | Stack push |
 | `/topic/[topicId]/reference` | Reference sheet (summary, how it scales, tabbed cheat sheet) | Form sheet, landscape (it opens over the lesson) |
+| `/topic/[topicId]/legend` | State legend (F-306), opened from the lesson's inline legend | Form sheet, landscape (it opens over the lesson) |
 | `/dev/tokens`, `/dev/components` | Dev-only showcases | Stack push; production redirects to `/` |
 
 Deep links come for free from Expo Router, e.g. `visualdsa://topic/hash-table/learn?step=6`. These are needed later for shared scenarios (F-607).
@@ -560,7 +563,7 @@ Deep links come for free from Expo Router, e.g. `visualdsa://topic/hash-table/le
 **Implementation notes (Step 2.1):**
 - **Entry points:** `Stack` from `expo-router/stack`, and `Tabs` from `expo-router/js-tabs`. The root `Tabs` export is deprecated in SDK 58.
 - **The tab bar is JS `Tabs`, not `NativeTabs`.** NativeTabs only accepts SF Symbols, Material symbols, images or font icons. Our tab bar uses Phosphor icons (filled when active) on both platforms, rendered with `<Icon>` and `<AppText variant="tab">`. Tab switches don't animate.
-- **Sheets:** chapters and reference use `presentation: 'formSheet'` with a grabber and detents from `config.navigation.sheet`.
+- **Sheets:** the reference and legend sheets use `presentation: 'formSheet'` with a grabber and detents from `config.navigation.sheet`.
 - **Typed routes:** `bun run start` generates `.expo/types/router.d.ts`, so typecheck then rejects unknown paths. Use the object form `{ pathname: '/topic/[topicId]/learn', params: { topicId } }`. `expo-env.d.ts` is committed (not ignored) so Expo's global types load on every machine.
 
 ---

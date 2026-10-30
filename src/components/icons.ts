@@ -27,6 +27,7 @@ import { PlayIcon } from 'phosphor-react-native/src/icons/Play';
 import { ShuffleIcon } from 'phosphor-react-native/src/icons/Shuffle';
 import { SlidersHorizontalIcon } from 'phosphor-react-native/src/icons/SlidersHorizontal';
 import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
+import { SwatchesIcon } from 'phosphor-react-native/src/icons/Swatches';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 
 /* VISUAL-SPEC §5 */
@@ -45,6 +46,7 @@ export const ICONS = {
   timeline: SlidersHorizontalIcon,
   copy: CopyIcon,
   reference: BookOpenIcon,
+  legend: SwatchesIcon,
   // Sandbox
   reset: ArrowCounterClockwiseIcon,
   undo: ArrowUUpLeftIcon,

@@ -481,6 +481,7 @@ feat(reference): add reference sheets for MVP topics
 
 ### Step 10.1: Counters and legend
 - Live operation counters on the canvas (F-902), the state legend sheet, and the inline legend for states in the current step (F-306).
+- Built as: a row above the lesson canvas (counters left, inline legend right) so neither covers the drawing; counters under the sandbox's stat chips; swatches painted from `STATE_PAINT`; the legend sheet at `/topic/[topicId]/legend`. Memory used (F-902) waits for a memory counter in the engine.
 
 **Commit:**
 ```

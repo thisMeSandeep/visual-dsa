@@ -16,7 +16,7 @@ const SHEET_OPTIONS: NativeStackNavigationOptions = {
 /**
  * A topic's screens. The lesson is always landscape and full screen (status bar and Android's
  * navigation bar hidden, like the reference), so the canvas gets every pixel; the reference
- * sheet opens over it in landscape too. Sandbox and practice stay portrait, with the bars shown,
+ * and legend sheets open over it in landscape too. Sandbox and practice stay portrait, with the bars shown,
  * like the rest of the app. The native stack applies and restores these per screen.
  */
 const LESSON_OPTIONS: NativeStackNavigationOptions = {
@@ -39,6 +39,7 @@ export default function TopicLayout() {
     >
       <Stack.Screen name="learn" options={LESSON_OPTIONS} />
       <Stack.Screen name="reference" options={{ ...SHEET_OPTIONS, ...LESSON_OPTIONS }} />
+      <Stack.Screen name="legend" options={{ ...SHEET_OPTIONS, ...LESSON_OPTIONS }} />
     </Stack>
   );
 }

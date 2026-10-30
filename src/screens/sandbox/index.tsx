@@ -30,9 +30,11 @@ import {
   playerActions,
   useCurrentStep,
   usePlayer,
+  useStepIndex,
   useStepNumber,
   useTotalSteps,
 } from '@/stores/use-player';
+import { OperationCounters } from '@/viz/operation-counters';
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
@@ -188,6 +190,7 @@ function Playground({
   const player = usePlayer(session.steps, 0, defaultSpeed);
   const actions = playerActions(player);
   const step = useCurrentStep(player);
+  const stepIndex = useStepIndex(player);
   const number = useStepNumber(player);
   const total = useTotalSteps(player);
   useEffect(() => {
@@ -295,6 +298,16 @@ function Playground({
                 </AppText>
               </View>
             ))}
+          </View>
+          {/* What the operation has cost so far (F-902). Its line is kept even when there's
+              nothing to count, so the canvas doesn't jump. */}
+          <View className="min-h-6 px-4 pt-2">
+            {step ? (
+              <OperationCounters
+                counters={step.counters}
+                previous={session.steps[stepIndex - 1]?.counters}
+              />
+            ) : null}
           </View>
           <View
             className="flex-1 p-3"

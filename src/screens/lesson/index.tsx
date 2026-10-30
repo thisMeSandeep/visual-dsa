@@ -30,6 +30,8 @@ import {
   useTotalSteps,
 } from '@/stores/use-player';
 import { CodePanel } from '@/viz/code-panel';
+import { InlineLegend } from '@/viz/inline-legend';
+import { OperationCounters } from '@/viz/operation-counters';
 import { SceneView } from '@/viz/scene-view';
 
 import { ScreenPlaceholder } from '../placeholder';
@@ -133,7 +135,11 @@ function LessonPlayer({
   const showScrubber = useSettings((state) => state.showScrubber);
   const setShowScrubber = useSettings((state) => state.setShowScrubber);
   const topicRoute = (
-    pathname: '/topic/[topicId]/reference' | '/topic/[topicId]/play' | '/topic/[topicId]/practice',
+    pathname:
+      | '/topic/[topicId]/reference'
+      | '/topic/[topicId]/legend'
+      | '/topic/[topicId]/play'
+      | '/topic/[topicId]/practice',
   ) => router.push({ pathname, params: { topicId: meta.id } });
 
   // Swipe left for the next step, right for the previous one (a short flick is enough).
@@ -212,22 +218,41 @@ function LessonPlayer({
 
       <View className="flex-1 flex-row gap-4 px-6 pt-3">
         <GestureDetector gesture={swipeGesture}>
-          <View
-            className="flex-1"
-            onLayout={(event) => {
-              const { width, height } = event.nativeEvent.layout;
-              setCanvas({ width, height });
-            }}
-          >
-            {step && canvas.width > 0 && canvas.height > 0 ? (
-              <SceneView
-                scene={step.scene}
-                width={canvas.width}
-                height={canvas.height}
-                speed={speed}
-                accessibilityLabel={step.a11y}
-              />
-            ) : null}
+          <View className="flex-1 gap-2">
+            {/* Above the canvas, never over it: this operation's counters (F-902), and the
+                states on screen, which open the full legend (F-306). */}
+            <View className="h-8 flex-row items-center justify-between gap-4">
+              {step ? (
+                <>
+                  <OperationCounters
+                    counters={step.counters}
+                    previous={lesson.steps[index - 1]?.counters}
+                    className="flex-1"
+                  />
+                  <InlineLegend
+                    scene={step.scene}
+                    onPress={() => topicRoute('/topic/[topicId]/legend')}
+                  />
+                </>
+              ) : null}
+            </View>
+            <View
+              className="flex-1"
+              onLayout={(event) => {
+                const { width, height } = event.nativeEvent.layout;
+                setCanvas({ width, height });
+              }}
+            >
+              {step && canvas.width > 0 && canvas.height > 0 ? (
+                <SceneView
+                  scene={step.scene}
+                  width={canvas.width}
+                  height={canvas.height}
+                  speed={speed}
+                  accessibilityLabel={step.a11y}
+                />
+              ) : null}
+            </View>
           </View>
         </GestureDetector>
         {showCode ? (

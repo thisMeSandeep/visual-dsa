@@ -201,6 +201,7 @@ Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
 | Code panel / copy | `code`, `copy` | `Code`, `Copy` |
 | Show / hide the lesson's progress bar | `timeline` | `SlidersHorizontal` |
 | Reference sheet | `reference` | `BookOpen` |
+| State legend | `legend` | `Swatches` |
 | Reset / undo / random | `reset`, `undo`, `random` | `ArrowCounterClockwise`, `ArrowUUpLeft`, `Shuffle` |
 | Bookmark | `bookmark` | `BookmarkSimple` |
 | Tabs | `learn`, `practice`, `progress`, `settings` | `BookOpen`, `GraduationCap`, `ChartLineUp`, `Gear` |
@@ -302,7 +303,7 @@ The canvas follows the same tokens, which Skia reads from the theme (see section
 | Index label | `index` style, `muted`, under array and queue cells, left of buckets |
 | Pointer label | Mono 13, `signal-ink`, with a `signal` arrow (`top →`, `j`, `j+1`) |
 | Callout | Mono 15, `signal-soft` fill, `radius-sm`, padding 8 × 12 (`h("Sid") = 2`) |
-| Counters | Mono 13, `ink-2` (`comparisons 7   swaps 3`) |
+| Counters | Mono `index`, `ink-2` (`comparisons 7   reads 3`): only counters above 0, in the order comparisons, reads, writes, swaps; the one that changed on this step in `signal-ink`. In the lesson they sit at the left of a row above the canvas (never over it); in the sandbox, under the stat chips, on a line kept even when empty |
 
 ### State palette
 
@@ -320,7 +321,7 @@ Each state is shown by more than colour alone (border weight, fill, icon or labe
 | **Error** (overflow, not found) | 2px dashed `danger` border, `danger-soft` fill, message in the caption |
 | **Dimmed** (out of focus) | 40% opacity |
 
-A legend sheet listing these states is always one tap away. The lesson screen shows an inline legend only for the states visible in the current step.
+A legend sheet listing these states is always one tap away. The lesson screen shows an inline legend only for the states visible in the current step: a `surface` capsule at the right of the row above the canvas, with the `Swatches` icon and, per state, a 14px swatch painted exactly as the canvas paints it plus its name (Current, New, Collision, Visited, Found, Error, Faded…). Tapping it opens the legend sheet: one row per group of look-alike states (swatches, bold name, what it means), then "Also on the canvas" (pointers, arrows, callouts, counters).
 
 ### Composition
 - The canvas is centred in the free space between the header and the caption, with the 24 gutter.
@@ -400,6 +401,7 @@ These match the concept canvas.
 | **Home** | `display` "Learn" with a one-line `body-sm` subtitle (+ streak chip once streaks exist, P1) → each category: `overline` name with a `label` topic count on the right, then topic cards two per row → tab bar. No Continue card: each card shows its own progress, and the Topic screen's Continue button resumes |
 | **Topic** | *(Removed in the UI rework: a topic opens its lesson directly. Summary and stats live in the reference sheet; Sandbox and Practice in the lesson's top bar.)* |
 | **Lesson player** | **Always landscape and full screen**: the status bar and Android's navigation bar are hidden while it's open (immersive, like the reference), so the screen reaches every edge. Top bar (56, hairline below): back · topic name (`body-sm` bold) over chapter title (`label`) · speed · code · progress-bar toggle · chapters · reference · sandbox · practice (ghost icon buttons; code and progress bar show their active state) → canvas, with the code panel beside it when open → scrubber (can be hidden for a taller canvas; the choice is remembered) → one row: prev (step) · **play** · centred `caption` (two lines reserved) · a mono `index` "34 / 54" counter when the scrubber is hidden · next (step). Chapters open in a side panel |
+| **Legend sheet** | Form sheet over the lesson, landscape: `title` "Legend" → the state groups (swatches · name · meaning) → "Also on the canvas" |
 | **Reference sheet** | Category glyph + topic name overline → `title` "Reference" → summary → "How it scales" stat strip → the cheat sheet: a segmented control of its tabs (Overview, Complexity, Pitfalls, plus topic tabs such as Hashing) → the tab's blocks: `overline` headings, `body` text and bulleted lists (6px `muted` dots) in `ink-2` with key terms bold, and tables (hairline `line` border and row dividers, a `surface` header row in bold `label`, the first column taking the spare width, complexities and numbers in mono `code`) |
 | **Sandbox** | Portrait. Back · `Sandbox` overline in `mode-sandbox-ink` over the topic title · undo · reset → the canvas in a `surface` panel (`radius-xl`) taking most of the screen, with the stats as small pills in its top corner (`label` name + mono `index` value on `surface-raised`, hairline `line` outline) → `caption` (two lines reserved) → scrubber (only when a trace has more than one step) → **the dock**: one `surface-raised` card (`radius-xl`, hairline `line-strong` outline, 12 padding, 12 from the screen edges) holding the tool switch when the topic has more than one tool (Stack: "Stack" / "Bracket checker"), the presets as a segmented control (on a `surface` track; the current one `primary-soft` with a bold `primary` label), the input next to the primary action (the value field with Random inside it, or the bracket checker's expression field, filled by its presets), and the other actions as tinted buttons in one row. The dock rises with the keyboard |
 | **Practice (quiz)** | Close · segmented progress · mono "3/10" → `overline` (topic · question kind) + `title` question → mono context block on `surface` (when the question has one) → option tiles → after answering, the feedback panel pinned to the bottom with "See in lesson" and Continue / See results → results: `display` "Quiz done" (or "All correct"), mono score, the questions now on the revise list, Try again and Done |

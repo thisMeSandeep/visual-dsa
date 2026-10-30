@@ -114,6 +114,15 @@ describe('Lesson player', () => {
     }
   });
 
+  it('opens the state legend from the canvas', async () => {
+    await renderLesson(<Lesson topicId="stack" />);
+    await fireEvent.press(screen.getByRole('button', { name: /^State legend/ }));
+    expect(router.push).toHaveBeenLastCalledWith({
+      pathname: '/topic/[topicId]/legend',
+      params: { topicId: 'stack' },
+    });
+  });
+
   it('hides the progress bar for more canvas, keeping a step counter, and remembers it', async () => {
     await renderLesson(<Lesson topicId="stack" />);
     expect(screen.getByRole('adjustable')).toBeOnTheScreen();
