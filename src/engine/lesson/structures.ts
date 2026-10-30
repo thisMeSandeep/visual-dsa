@@ -25,6 +25,17 @@ import {
   type ArrayModel,
 } from '../structures/array';
 import {
+  CURVE_IDS,
+  createGrowth,
+  describeGrowth,
+  growthToScene,
+  SAMPLES,
+  traceGrowth,
+  type CurveId,
+  type GrowthModel,
+  type SampleId,
+} from '../foundations/big-o';
+import {
   createTable,
   describeHashTable,
   hashToScene,
@@ -405,6 +416,41 @@ function textRecord(
   return value as Record<string, string>;
 }
 
+/** The Big O growth chart: curves, the n marker, and sample functions to run. */
+const growth: StructureDefinition<GrowthModel> = {
+  /** { n?: number, curves?: CurveId[] } */
+  create: (input, at) => {
+    const fields = record(input, at);
+    const n = optionalWholeNumber(fields, 'n', at);
+    const curves = optionalTextList(fields, 'curves', at);
+    const unknown = curves.find((curve) => !CURVE_IDS.includes(curve as CurveId));
+    if (unknown) throw new CompileError(`Unknown curve "${unknown}"`, at);
+    return atSegment(at, () =>
+      createGrowth({ curves: curves as CurveId[], ...(n === undefined ? {} : { n }) }),
+    );
+  },
+  toScene: (model) => growthToScene(model),
+  describe: describeGrowth,
+  operations: {
+    setN: (model, input, at) =>
+      traceGrowth(model, { type: 'setN', n: wholeNumber(record(input, at), 'n', at) }),
+    show: (model, input, at) => {
+      const curve = text(record(input, at), 'curve', at);
+      if (!CURVE_IDS.includes(curve as CurveId)) {
+        throw new CompileError(`Unknown curve "${curve}"`, at);
+      }
+      return traceGrowth(model, { type: 'show', curve: curve as CurveId });
+    },
+    // One operation per sample, so the sandbox can give each its own button.
+    ...Object.fromEntries(
+      (Object.keys(SAMPLES) as SampleId[]).map((sample) => [
+        sample,
+        (model: GrowthModel) => traceGrowth(model, { type: 'run', sample }),
+      ]),
+    ),
+  },
+};
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
@@ -413,4 +459,5 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   array: array as StructureDefinition<unknown>,
   'linked-list': linkedList as StructureDefinition<unknown>,
   'hash-table': hashTable as StructureDefinition<unknown>,
+  'big-o': growth as StructureDefinition<unknown>,
 };

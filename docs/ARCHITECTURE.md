@@ -117,6 +117,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   ├── engine/                     # PURE TypeScript: no React / RN imports
 │   │   ├── core/                   #   types, tracer, scene builders, rng, limits,
 │   │   │                           #   renderer.ts (RENDERER_IDS)
+│   │   ├── foundations/            #   big-o/: growth curves, n, sample functions to count
 │   │   ├── structures/             #   array/, linked-list/, stack/, queue/, hash-table/
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts

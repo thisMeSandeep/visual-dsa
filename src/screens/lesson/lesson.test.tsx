@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { TOPIC_LESSONS } from '@/content/registry';
 import { useProgress } from '@/stores/progress';
 import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
 
@@ -197,7 +198,13 @@ describe('Lesson player', () => {
   });
 
   it('explains when a topic has no lesson yet', async () => {
-    await renderLesson(<Lesson topicId="big-o" />);
-    expect(screen.getByText(/written in a later step/)).toBeOnTheScreen();
+    // Every MVP topic has a lesson; take one away to see what a later topic shows.
+    const missing = jest.replaceProperty(TOPIC_LESSONS, 'big-o', undefined);
+    try {
+      await renderLesson(<Lesson topicId="big-o" />);
+      expect(screen.getByText(/written in a later step/)).toBeOnTheScreen();
+    } finally {
+      missing.restore();
+    }
   });
 });

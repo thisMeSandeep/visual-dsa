@@ -1,0 +1,62 @@
+// Each function counts its steps, so you can
+// see how the count grows with n.
+
+function lookup(items, i) // @line lookup-start
+  steps = 0
+  item = items[i] // @line lookup-step
+  steps = steps + 1 // @line lookup-step
+  return steps // @line lookup-done
+end function
+
+function loop(items) // @line loop-start
+  steps = 0
+  for each item in items
+    steps = steps + 1 // @line loop-step
+  end for
+  return steps // @line loop-done
+end function
+
+function nested(items) // @line nested-start
+  steps = 0
+  for each a in items
+    for each b in items
+      steps = steps + 1 // @line nested-step
+    end for
+  end for
+  return steps // @line nested-done
+end function
+
+function halving(n) // @line halving-start
+  steps = 0
+  while n > 1
+    n = floor(n / 2) // @line halving-step
+    steps = steps + 1 // @line halving-step
+  end while
+  return steps // @line halving-done
+end function
+
+// Best and worst case: stop as soon as it's found.
+function search(items, value)
+  for i from 0 to size - 1
+    if items[i] is value then // @line search-compare
+      return i // @line search-found
+    end if
+  end for
+  return -1 // @line search-not-found
+end function
+
+// Amortised cost: push is quick, except when a full
+// array doubles.
+function push(value)
+  if size is capacity then grow() // @line push-check
+  slots[size] = value // @line push
+  size = size + 1 // @line push
+end function
+
+function grow()
+  bigger = new block of capacity × 2 slots // @line grow
+  for i from 0 to size - 1
+    bigger[i] = slots[i] // @line copy
+  end for
+  slots = bigger // @line grow-done
+end function

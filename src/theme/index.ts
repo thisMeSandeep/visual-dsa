@@ -64,6 +64,13 @@ export const COLOR_TOKENS = [
   'code-string',
   'code-number',
   'code-comment',
+  // Growth curves (Big O chart), fastest class first
+  'curve-1',
+  'curve-2',
+  'curve-3',
+  'curve-4',
+  'curve-5',
+  'curve-6',
 ] as const;
 
 export type ColorToken = (typeof COLOR_TOKENS)[number];
@@ -124,6 +131,9 @@ const VIZ_SIZE_VARS = {
   linkGap: '--viz-link-gap',
   linkOffset: '--viz-link-offset',
   entryWidth: '--viz-entry-width',
+  chartWidth: '--viz-chart-width',
+  chartHeight: '--viz-chart-height',
+  chartDot: '--viz-chart-dot',
   calloutPadX: '--viz-callout-pad-x',
   calloutPadY: '--viz-callout-pad-y',
   charWidth: '--viz-char-width',

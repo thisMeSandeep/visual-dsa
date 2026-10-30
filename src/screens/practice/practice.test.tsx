@@ -77,8 +77,14 @@ describe('Topic quiz', () => {
   });
 
   it('explains a topic without a quiz yet', async () => {
-    await render(<TopicPractice topicId="big-o" />);
-    expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
+    // Every MVP topic has a quiz; take one away to see what a later topic shows.
+    const missing = jest.replaceProperty(TOPIC_QUIZZES, 'big-o', undefined);
+    try {
+      await render(<TopicPractice topicId="big-o" />);
+      expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
+    } finally {
+      missing.restore();
+    }
   });
 });
 

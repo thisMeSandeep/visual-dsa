@@ -88,7 +88,7 @@ Each topic follows the same arc so that learners know what to expect:
 ## 3. Foundations
 
 ### F1 · Big O Notation (P0)
-Category glyph: rising curves · Renderer: `growth-chart` (Victory Native) + live step counter
+Category glyph: rising curves · Renderer: `growth-chart` (our own canvas) + live step counter
 
 **Chapters**
 1. Why we measure growth, not seconds
@@ -99,7 +99,7 @@ Category glyph: rising curves · Renderer: `growth-chart` (Victory Native) + liv
 6. Space complexity
 7. Amortised cost (dynamic array push) *(preview, full detail in L1)*
 
-**Sandbox:** an `n` slider (1–1,000). Toggle each class on the chart. Run small sample functions (constant lookup, single loop, nested loop, halving loop) and watch the step counter next to the curve.
+**Sandbox:** an `n` slider (1–1,000, on a log scale so small n is easy to reach). Presets choose which classes are on the chart (all six, fast, slow, n vs n²). Run small sample functions (constant lookup, single loop, nested loop, halving loop) and watch the step counter climb the `n` marker to their curve.
 
 **Practice ideas:** "This loop halves `n` each time. Which class is it?" · "Which curve is lowest at n = 1,000?"
 

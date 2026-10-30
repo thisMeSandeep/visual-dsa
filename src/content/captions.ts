@@ -184,6 +184,39 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'hash.tombstone':
     '**{key}** is replaced by a **tombstone**, not emptied, so searches for keys further on keep going.',
 
+  // Big O (engine/foundations/big-o/operations.ts)
+  'bigo.n-range': 'n must be a whole number from 1 to {max}.',
+  'bigo.n': 'n = {n}. The dots show how many steps each curve takes at this size.',
+  'bigo.n.zoom': 'n = {n}. The chart zooms out to show n up to {xMax}.',
+  'bigo.show.constant':
+    '**{label}**, constant: the same work whatever n is, like reading an array item by its index.',
+  'bigo.show.logarithmic':
+    '**{label}**: halve the problem every step, like binary search. At n = {n}, about {steps} steps.',
+  'bigo.show.linear':
+    '**{label}**, linear: one step per item, like a single loop. {steps} steps at n = {n}.',
+  'bigo.show.linearithmic':
+    '**{label}**: a little more than linear. The best general sorting algorithms land here.',
+  'bigo.show.quadratic':
+    '**{label}**, quadratic: a loop inside a loop. Already {steps} steps at n = {n}.',
+  'bigo.show.exponential':
+    '**{label}**, exponential: each extra item doubles the work. Only tiny inputs are practical.',
+  'bigo.show.scaled-linear':
+    '**{label}**: a few steps per item, plus a few more. Still a straight line.',
+  'bigo.show.scaled-quadratic': '**{label}**: half of n², so it starts out small…',
+  'bigo.run.lookup': 'Run a **constant lookup**: read one item by its index, with n = {n}.',
+  'bigo.run.loop': 'Run a **single loop** over n = {n} items, counting each step.',
+  'bigo.run.nested': 'Run a **nested loop**: for each of the {n} items, loop over all {n} again.',
+  'bigo.run.halving': 'Run a **halving loop**: start at n = {n} and halve it until it reaches 1.',
+  'bigo.count': 'Steps so far: **{count}**.',
+  'bigo.count.skip': 'Steps so far: **{count}** (skipping ahead).',
+  'bigo.done.lookup':
+    'Done in **{count}** step, whatever n is: the dot sits on the **{label}** line.',
+  'bigo.done.loop': 'Done: **{count}** steps for n = {n}. The dot lands on the **{label}** curve.',
+  'bigo.done.nested':
+    'Done: **{count}** steps for n = {n}, that’s n × n. The dot lands on the **{label}** curve.',
+  'bigo.done.halving':
+    'Done: **{count}** halvings for n = {n}: log₂ n, rounded down. The dot sits on the **{label}** curve.',
+
   // Queue (engine/structures/queue/operations.ts)
   'queue.enqueue.check': 'Enqueue **{value}**. First, check there’s a free slot.',
   'queue.enqueued': '**{value}** joins at the **rear**.',

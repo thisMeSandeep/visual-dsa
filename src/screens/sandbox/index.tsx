@@ -39,6 +39,7 @@ import { ScreenPlaceholder } from '../placeholder';
 import { parseExpression } from './expression-input';
 import { parseIndex } from './index-input';
 import { parseKey } from './key-input';
+import { SliderRow } from './slider-row';
 import { parseTarget, parseValue } from './value-input';
 
 /**
@@ -127,11 +128,12 @@ const keyKind = (operations: readonly Operation[]): keyof typeof KEY_FIELDS => {
   return 'index';
 };
 
-/** Splits `items` into rows of `size`, for a grid of buttons. */
-const rows = <T,>(items: readonly T[], size: number): T[][] =>
-  Array.from({ length: Math.ceil(items.length / size) }, (_, row) =>
-    items.slice(row * size, (row + 1) * size),
-  );
+/** Splits `items` into even rows of at most `max`, for a grid of buttons: 4 → 2 + 2, 8 → 3 + 3 + 2. */
+const rows = <T,>(items: readonly T[], max: number): T[][] => {
+  const count = Math.ceil(items.length / max);
+  const size = Math.ceil(items.length / count);
+  return Array.from({ length: count }, (_, row) => items.slice(row * size, (row + 1) * size));
+};
 
 /** The expression a bracket-checker preset starts with, to show in the field. */
 const presetExpression = (preset: Preset): string => {
@@ -163,7 +165,10 @@ function Playground({
   const [session, setSession] = useState<SandboxSession<unknown>>(() =>
     startSession(build(firstPreset), restWith(firstPreset.hint)),
   );
-  const [primary, ...secondary] = sandbox.operations;
+  // A slider operation (Big O's n) gets its own row; the rest are buttons.
+  const slider = sandbox.operations.find((operation) => operation.input === 'slider');
+  const buttons = sandbox.operations.filter((operation) => operation !== slider);
+  const [primary, ...secondary] = buttons;
   // The expression field starts filled with the preset's expression, ready to check.
   const [text, setText] = useState(() =>
     primary?.input === 'expression' ? presetExpression(firstPreset) : '',
@@ -172,6 +177,8 @@ function Playground({
   // Tools whose operations take a key (an index, a list node, a hash key) get a second field.
   const keyed = sandbox.operations.some(takesKey);
   const keyField = KEY_FIELDS[keyKind(sandbox.operations)];
+  // Keyed tools, and tools of plain buttons, lay their operations out as a grid.
+  const grid = keyed || (buttons.length > 1 && buttons.every((operation) => !operation.input));
   const [keyText, setKeyText] = useState('');
   const [keyProblem, setKeyProblem] = useState<string>();
   const [rng] = useState(() => createRng(Date.now()));
@@ -189,8 +196,9 @@ function Playground({
 
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
 
-  const run = (operation: Operation) => {
-    const fields: Record<string, unknown> = {};
+  /** Runs an operation with what the dock's fields hold, or with `given` input (a slider's). */
+  const run = (operation: Operation, given?: Record<string, unknown>) => {
+    const fields: Record<string, unknown> = { ...given };
     // Check every field the operation needs, so both problems show at once.
     let ok = true;
     if (takesKey(operation)) {
@@ -336,51 +344,62 @@ function Playground({
           }}
         />
 
-        {keyed ? (
+        {slider?.range ? (
+          <SliderRow
+            label={slider.label}
+            value={Number(step?.scene.meta?.[slider.range.param] ?? slider.range.min)}
+            range={slider.range}
+            onSettle={(value) => run(slider, { [slider.range!.param]: value })}
+          />
+        ) : null}
+
+        {grid ? (
           <>
-            <View className="flex-row items-start gap-2">
-              <TextField
-                label={keyField.label}
-                labelHidden
-                value={keyText}
-                onChangeText={(next) => {
-                  setKeyText(next);
-                  setKeyProblem(undefined);
-                }}
-                error={keyProblem}
-                keyboardType={keyField.numeric ? 'number-pad' : 'default'}
-                autoCapitalize={keyField.numeric ? 'none' : 'words'}
-                autoCorrect={false}
-                returnKeyType="done"
-                placeholder={keyField.label}
-                className={keyField.numeric ? 'w-24' : 'w-32'}
-              />
-              <TextField
-                label={`Value (${valueRange.min}–${valueRange.max})`}
-                labelHidden
-                value={text}
-                onChangeText={(next) => {
-                  setText(next);
-                  setProblem(undefined);
-                }}
-                error={problem}
-                keyboardType="number-pad"
-                returnKeyType="done"
-                placeholder={`Value ${valueRange.min}–${valueRange.max}`}
-                accessory={
-                  <IconButton
-                    icon="random"
-                    label="Random value"
-                    onPress={() => {
-                      setText(String(rng.int(valueRange.min, valueRange.max)));
-                      setProblem(undefined);
-                    }}
-                  />
-                }
-                className="flex-1"
-              />
-            </View>
-            {rows(sandbox.operations, config.sandbox.buttonsPerRow).map((row) => (
+            {keyed ? (
+              <View className="flex-row items-start gap-2">
+                <TextField
+                  label={keyField.label}
+                  labelHidden
+                  value={keyText}
+                  onChangeText={(next) => {
+                    setKeyText(next);
+                    setKeyProblem(undefined);
+                  }}
+                  error={keyProblem}
+                  keyboardType={keyField.numeric ? 'number-pad' : 'default'}
+                  autoCapitalize={keyField.numeric ? 'none' : 'words'}
+                  autoCorrect={false}
+                  returnKeyType="done"
+                  placeholder={keyField.label}
+                  className={keyField.numeric ? 'w-24' : 'w-32'}
+                />
+                <TextField
+                  label={`Value (${valueRange.min}–${valueRange.max})`}
+                  labelHidden
+                  value={text}
+                  onChangeText={(next) => {
+                    setText(next);
+                    setProblem(undefined);
+                  }}
+                  error={problem}
+                  keyboardType="number-pad"
+                  returnKeyType="done"
+                  placeholder={`Value ${valueRange.min}–${valueRange.max}`}
+                  accessory={
+                    <IconButton
+                      icon="random"
+                      label="Random value"
+                      onPress={() => {
+                        setText(String(rng.int(valueRange.min, valueRange.max)));
+                        setProblem(undefined);
+                      }}
+                    />
+                  }
+                  className="flex-1"
+                />
+              </View>
+            ) : null}
+            {rows(buttons, config.sandbox.buttonsPerRow).map((row) => (
               <View key={row[0]!.id} className="flex-row gap-2">
                 {row.map((operation) => (
                   <Button
@@ -448,7 +467,7 @@ function Playground({
           <Button label={primary.label} size="compact" onPress={() => run(primary)} />
         ) : null}
 
-        {!keyed && secondary.length > 0 ? (
+        {!grid && secondary.length > 0 ? (
           <View className="flex-row gap-2">
             {secondary.map((operation) => (
               <Button

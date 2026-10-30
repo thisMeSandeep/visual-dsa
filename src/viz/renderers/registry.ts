@@ -8,6 +8,7 @@ import type { RendererId } from '@/engine/core/renderer';
 
 import { AnalogyRenderer } from './analogy/renderer';
 import { ArrayRenderer } from './array/renderer';
+import { GrowthChartRenderer } from './growth-chart/renderer';
 import { HashTableRenderer } from './hash-table/renderer';
 import { LinkedListRenderer } from './linked-list/renderer';
 import { QueueRenderer } from './queue/renderer';
@@ -21,4 +22,5 @@ export const RENDERERS: Partial<Record<RendererId, ComponentType<RendererProps>>
   array: ArrayRenderer,
   'linked-list': LinkedListRenderer,
   'hash-table': HashTableRenderer,
+  'growth-chart': GrowthChartRenderer,
 };

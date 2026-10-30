@@ -9,7 +9,10 @@ import { lesson as arrayLesson } from './topics/array/lesson';
 import { meta as array } from './topics/array/meta';
 import { quiz as arrayQuiz } from './topics/array/quiz';
 import { sandbox as arraySandbox } from './topics/array/sandbox';
+import { lesson as bigOLesson } from './topics/big-o/lesson';
 import { meta as bigO } from './topics/big-o/meta';
+import { quiz as bigOQuiz } from './topics/big-o/quiz';
+import { sandbox as bigOSandbox } from './topics/big-o/sandbox';
 import { lesson as doublyLinkedListLesson } from './topics/doubly-linked-list/lesson';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { quiz as doublyLinkedListQuiz } from './topics/doubly-linked-list/quiz';
@@ -66,6 +69,7 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'singly-linked-list': singlyLinkedListLesson,
   'doubly-linked-list': doublyLinkedListLesson,
   'hash-table': hashTableLesson,
+  'big-o': bigOLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -76,6 +80,7 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'singly-linked-list': singlyLinkedListSandbox,
   'doubly-linked-list': doublyLinkedListSandbox,
   'hash-table': hashTableSandbox,
+  'big-o': bigOSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -86,6 +91,7 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'singly-linked-list': singlyLinkedListQuiz,
   'doubly-linked-list': doublyLinkedListQuiz,
   'hash-table': hashTableQuiz,
+  'big-o': bigOQuiz,
 };
 
 /** All topics in Home order. */

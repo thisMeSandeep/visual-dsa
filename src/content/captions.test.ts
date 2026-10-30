@@ -1,6 +1,12 @@
 import { compileLesson } from '@/engine/lesson/compile';
 import type { Trace } from '@/engine/core/types';
 import {
+  CURVE_IDS,
+  createGrowth,
+  traceGrowth,
+  type GrowthOperation,
+} from '@/engine/foundations/big-o';
+import {
   createArray,
   traceArray,
   type ArrayModel,
@@ -194,6 +200,27 @@ describe('hash-table captions', () => {
     ];
     for (const [model, operation] of cases) {
       for (const step of traceHashTable(model, operation).trace.steps) {
+        if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+        expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
+      }
+    }
+  });
+});
+
+describe('Big O captions', () => {
+  it('has a caption for every key the operations use, with every placeholder filled', () => {
+    const operations: GrowthOperation[] = [
+      { type: 'setN', n: 9 },
+      { type: 'setN', n: 300 },
+      { type: 'setN', n: 0 },
+      ...CURVE_IDS.map((curve): GrowthOperation => ({ type: 'show', curve })),
+      ...(['lookup', 'loop', 'nested', 'halving'] as const).map((sample): GrowthOperation => ({
+        type: 'run',
+        sample,
+      })),
+    ];
+    for (const operation of operations) {
+      for (const step of traceGrowth(createGrowth({ n: 30 }), operation).trace.steps) {
         if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
         expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
       }

@@ -150,7 +150,8 @@ export type LessonRecipe = z.infer<typeof LessonRecipeSchema>;
  * 'target-value' is the node to insert next to and a value (list insertAfter and insertBefore);
  * 'key' is a hash-table key such as Sid (get, remove) and 'key-value' a key and a value (put);
  * 'expression' is a short line of text such as `((5+3)+1)` (the bracket checker), which presets
- * can fill in. A tool's operations use one kind of key: index, target or key.
+ * can fill in; 'slider' is one number set with a slider (Big O's n), described by `range`.
+ * A tool's operations use one kind of key: index, target or key.
  */
 export const SANDBOX_INPUTS = [
   'value',
@@ -160,6 +161,7 @@ export const SANDBOX_INPUTS = [
   'key',
   'key-value',
   'expression',
+  'slider',
 ] as const;
 
 /** One sandbox tool: a structure to play with, e.g. the stack, or the bracket checker. */
@@ -173,12 +175,31 @@ export const SandboxSchema = z.strictObject({
   /** In button order; the first is the primary action. */
   operations: z
     .array(
-      z.strictObject({
-        /** The structure's operation, e.g. "push". */
-        id: z.string().regex(/^[a-zA-Z]+$/, 'Use the operation name, e.g. "push"'),
-        label: TextSchema,
-        input: z.enum(SANDBOX_INPUTS).optional(),
-      }),
+      z
+        .strictObject({
+          /** The structure's operation, e.g. "push". */
+          id: z.string().regex(/^[a-zA-Z]+$/, 'Use the operation name, e.g. "push"'),
+          label: TextSchema,
+          input: z.enum(SANDBOX_INPUTS).optional(),
+          /** A slider's input field, its ends, and whether it moves linearly or on a log scale. */
+          range: z
+            .strictObject({
+              param: IdSchema,
+              min: z.number().int(),
+              max: z.number().int(),
+              scale: z.enum(['linear', 'log']),
+            })
+            .refine((range) => range.min < range.max, 'min must be below max')
+            .refine(
+              (range) => range.scale === 'linear' || range.min > 0,
+              'A log scale must start above 0',
+            )
+            .optional(),
+        })
+        .refine(
+          (operation) => (operation.input === 'slider') === (operation.range !== undefined),
+          'A slider needs a range, and only a slider has one',
+        ),
     )
     .min(1)
     .refine(hasUniqueIds, 'Operation ids must be unique'),

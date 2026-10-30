@@ -76,6 +76,15 @@
       --color-code-string: #256b41;
       --color-code-number: #9a5800;
       --color-code-comment: #6e685f;
+
+      /* Growth curves (Big O chart): a sequential ramp, fastest class first. One hue (OKLCH 262),
+         light to dark: slower classes are darker. Checked with the dataviz skill's validator (--ordinal). */
+      --color-curve-1: #799ee3;
+      --color-curve-2: #6185c8;
+      --color-curve-3: #4a6dae;
+      --color-curve-4: #355695;
+      --color-curve-5: #203f7c;
+      --color-curve-6: #0b2964;
     }
 
     @variant dark {
@@ -142,6 +151,15 @@
       --color-code-string: #93d6a8;
       --color-code-number: #f0b866;
       --color-code-comment: #a29c92;
+
+      /* Growth curves (Big O chart): a sequential ramp, fastest class first. One hue (OKLCH 262),
+         dark to light on the dark surface: slower classes are brighter. Checked with the dataviz skill's validator (--ordinal). */
+      --color-curve-1: #43629c;
+      --color-curve-2: #597ab6;
+      --color-curve-3: #7092d0;
+      --color-curve-4: #88abea;
+      --color-curve-5: #a1c5ff;
+      --color-curve-6: #badfff;
     }
   }
 }
@@ -269,6 +287,11 @@
 
   /* Hash-table renderer: buckets are --viz-bucket-width × --viz-bucket-height, rows --viz-node-height */
   --viz-entry-width: 84px; /* a key over its value, in a chain or an open-addressing slot */
+
+  /* Growth chart (Big O): the plot area, and the dots where n meets each curve */
+  --viz-chart-width: 260px;
+  --viz-chart-height: 170px;
+  --viz-chart-dot: 8px;
 
   /* Callouts (VISUAL-SPEC §7): mono text on a signal-soft chip */
   --viz-callout-pad-x: 12px;

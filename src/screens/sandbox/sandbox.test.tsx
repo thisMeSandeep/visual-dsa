@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { config } from '@/config';
+import { TOPIC_SANDBOXES } from '@/content/registry';
 import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
 
 import { Sandbox } from '.';
@@ -170,9 +171,32 @@ describe('Sandbox', () => {
     expect(stat('Load', '0.57')).toBeOnTheScreen();
   });
 
-  it('says when a topic has no sandbox yet', async () => {
+  it('runs a Big O sample, and moves n with the slider once it settles', async () => {
     await renderSandbox('big-o');
-    expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
+    expect(stat('n', '8')).toBeOnTheScreen();
+    await press('Loop');
+    await playToEnd();
+    expect(stat('Steps', '8')).toBeOnTheScreen();
+
+    const slider = screen.getByTestId('slider-n');
+    await fireEvent(slider, 'valueChange', config.sandbox.sliderPositions);
+    expect(screen.getByText('n = 1000')).toBeOnTheScreen();
+    await act(async () => {
+      jest.advanceTimersByTime(config.sandbox.sliderSettleMs);
+    });
+    expect(stat('n', '1000')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeEnabled();
+  });
+
+  it('says when a topic has no sandbox yet', async () => {
+    // Every MVP topic has a sandbox; take one away to see what a later topic shows.
+    const missing = jest.replaceProperty(TOPIC_SANDBOXES, 'big-o', undefined);
+    try {
+      await renderSandbox('big-o');
+      expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
+    } finally {
+      missing.restore();
+    }
   });
 
   it('switches to the bracket checker, with the preset expression ready to check', async () => {

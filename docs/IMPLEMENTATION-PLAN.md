@@ -458,7 +458,8 @@ feat(hash-table): add hash table with chaining, probing, lesson and quiz
 ```
 
 ### Step 9.5: Big O
-- Install Victory Native. Renderer: `growth-chart` with the user's `n` marker. Sandbox: the `n` slider and sample functions with live step counts. Lesson F1.
+- Renderer: `growth-chart` with the user's `n` marker, drawn on our own canvas (no Victory Native: see TECH-STACK §9). Sandbox: the `n` slider and sample functions with live step counts. Lesson F1.
+- Also: a validated sequential `curve-1…6` colour ramp, the engine's `foundations/` folder, an `@expo/ui` slider in the sandbox dock (`slider` input, log scale), and even button rows.
 
 **Commit:**
 ```

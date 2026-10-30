@@ -93,7 +93,20 @@ Used **only** for code in the code panel, on the `surface` fill. Plain code (ope
 | `code-number` | `#9A5800` | `#F0B866` | Numbers |
 | `code-comment` | `#6E685F` | `#A29C92` | Comments |
 
-### 2.6 Colour budget
+### 2.6 Growth curve colours
+
+Used **only** for the curves on the Big O growth chart. The classes are ordered (O(1) fastest … O(2ⁿ) slowest), so they form a **sequential** ramp in one hue (OKLCH 262), not a set of unrelated colours: slower classes are darker in light mode and brighter in dark mode. Every curve also carries a direct label, so colour is never the only way to tell them apart, and the curve in focus switches to `signal`. Both ramps pass the dataviz skill's validator (`--ordinal`: monotone lightness, steps ≥ 0.06 apart, the lightest step ≥ 2:1 on `surface`).
+
+| Token | Class | Light | Dark |
+|---|---|---|---|
+| `curve-1` | O(1) | `#799EE3` | `#43629C` |
+| `curve-2` | O(log n) | `#6185C8` | `#597AB6` |
+| `curve-3` | O(n) | `#4A6DAE` | `#7092D0` |
+| `curve-4` | O(n log n) | `#355695` | `#88ABEA` |
+| `curve-5` | O(n²) | `#203F7C` | `#A1C5FF` |
+| `curve-6` | O(2ⁿ) | `#0B2964` | `#BADFFF` |
+
+### 2.7 Colour budget
 
 - Each screen has **at most one** solid `primary` button.
 - `signal` appears only inside the visualisation canvas and the code panel, plus the streak flame. It is never used for buttons.
@@ -278,6 +291,7 @@ The canvas follows the same tokens, which Skia reads from the theme (see section
 | Array row | Every slot of the capacity drawn (empty ones as plain cells) in a 2px `line-strong` frame with 10 padding, `danger` when an index is out of bounds. Indices under the row; memory addresses under those when a lesson shows them. Pointers (`i`) point down from above. While a dynamic array grows, the old array (1.5px `line` frame, labelled "old array") sits 32 above the new one; each item moves down as it's copied, leaving a `dimmed` copy behind |
 | Linked-list row | Nodes 46 × 44 (value only), 36 apart, joined by `edge` arrows clipped to the boxes; the arrow just re-aimed is `signal`. A doubly linked list draws `next` 6 above the centre line and `prev` 6 below. `null` (`muted`, `danger` on an error) follows the last node. A node being linked in or out is raised one row above (32 gap), dimmed when it's leaving. `head`, `tail`, `prev`, `cur`, `next` labels stack under their node in that order, each with an up arrow |
 | Hash table | A vertical bucket column, indices to the left. **Chaining:** 44 × 40 buckets (a `•` when occupied) with chains running right: entries 84 × 44, key over its value in mono 12 `muted`, joined by `edge` arrows 36 apart. **Linear probing:** one 84 × 44 slot per bucket holding its entry; a tombstone is a `dimmed` `×` over "deleted"; a `signal` probe arrow runs down beside the slots from the bucket just tried to the next. The bucket in focus takes the step's state (active, collision, error). A callout row above the table is always reserved. While resizing, the old table stands left of the new one, labelled "old table" and "new table" underneath |
+| Growth chart | A 260 × 170 plot with recessive `edge` axes marked only at 0 and their ends (and "steps" above the y-axis). The x-axis runs to the first of 10, 20, 50 … 1,000 that holds `n`, and the y-axis to 4 × that, so the curves keep their shapes as it zooms (old curves cross-fade into new ones). Curves are 2px `curve-*` lines, clipped where they leave the top; each has a direct label in `ink-2` (`signal-ink` in focus) where it ends, nudged apart when crowded. The `n` marker is a `signal` line with `n = 8` below it, and an 8px dot where it meets each curve. A sample run adds an `active` dot that climbs the marker, with a `steps = 37` callout above the chart, and turns `found` when it lands |
 | Queue row | Like the array row, for the full capacity: `front` points down from above, `rear` up from below the indices. A circular buffer adds a wrap-around arc (`edge`) from the last slot back to slot 0; a plain array dims the slots before the front. A value that didn't fit shows just past the frame |
 | Bucket | 44 × 40, a small `ink` dot when occupied |
 | Linked node | Auto width, height 44, name 15/700 over mono 12 detail |

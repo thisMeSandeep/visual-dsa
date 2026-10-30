@@ -29,7 +29,7 @@ This is the stack for Visual-DSA, chosen to deliver the features in [FEATURE.md]
 | App config | **`src/config/`**, the only place tunable constants are defined | Whole app |
 | Content schema | **Zod v4** | Validating lesson / quiz content |
 | Code highlighting | **Shiki** at build time, rendered as native `<Text>` spans | F-501–F-506 |
-| Charts | **Victory Native** (Skia-based) | F-903 |
+| Charts | **Our own Skia canvas** (the `growth-chart` renderer); no chart library | F-903 |
 | Styling | **Uniwind** (Tailwind CSS v4), with theme tokens as CSS variables | F-1101, F-1104, F-1106 |
 | Icons | **Phosphor** (`phosphor-react-native`) | Whole app |
 | Fonts | **Manrope** (UI) + **JetBrains Mono** (code & values), via `@expo-google-fonts` | Whole app |
@@ -181,7 +181,7 @@ Apart from the canvas, most screens are ordinary UI: the topic grid, topic detai
 **How we use it**
 - **One source of truth:** every design token (colours in light and dark, including the **state palette** for comparing/swapping/visited/found/collision/sorted, plus fonts, type sizes, spacing, radius and canvas sizes) is defined once in `src/theme/tokens.css`. `global.css` only imports Tailwind, Uniwind and that file. To change a colour, edit `tokens.css` and nothing else (ARCHITECTURE.md §9).
 - **Screens and components** use `className`.
-- **Skia canvas and Victory charts** read the same variables with `useCSSVariable`, so the canvas and the UI always match, including after a theme switch.
+- **The Skia canvas** (charts included) reads the same variables with `useCSSVariable`, so the canvas and the UI always match, including after a theme switch.
 - **`@expo/ui` components** are real SwiftUI/Compose. They're styled through their own props, not `className`.
 - **Escape hatch:** `StyleSheet` still works alongside Uniwind for any component that needs it.
 - We use the free open-source core. The paid Pro tier isn't needed.
@@ -253,7 +253,7 @@ Phosphor is clean and minimal, but much less common than Lucide, which has becom
 
 ## 9. Charts
 
-- **Victory Native** for the Big O growth chart (F-903). It's built on Skia, so it matches the canvas and the theme.
+- The Big O growth chart (F-903) is drawn by our own `growth-chart` renderer, with the same drawables and step animation as every other renderer, so curves fade in as the lesson introduces them and the `n` marker moves with the same timing. Its layout is unit-tested and its colours are tokens. (Victory Native was the first plan; it would have animated and themed itself separately, so it was dropped in Step 9.5.)
 - Operation counters (F-902) are plain animated text, so no chart library is needed.
 
 ## 10. Testing
