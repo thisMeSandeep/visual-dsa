@@ -13,7 +13,7 @@ import { Uniwind } from 'uniwind';
 
 import { useStoresHydrated } from '@/hooks/use-stores-hydrated';
 import { useSettings } from '@/stores/settings';
-import { setThemePreference, useColor } from '@/theme';
+import { applyAccent, setThemePreference, useColor } from '@/theme';
 import { FONT_FILES } from '@/theme/fonts';
 
 // Keep the splash screen up until the fonts and saved settings are ready, so text never renders
@@ -29,6 +29,9 @@ export default function RootLayout() {
   // The theme chosen in Settings (F-1101).
   const theme = useSettings((state) => state.theme);
   useEffect(() => setThemePreference(theme), [theme]);
+  // The accent colour chosen in Settings, applied before the splash screen hides.
+  const accent = useSettings((state) => state.accent);
+  useEffect(() => applyAccent(accent), [accent]);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();

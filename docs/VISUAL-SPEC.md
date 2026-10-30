@@ -12,7 +12,7 @@ A calm, legible, uncluttered interface. Warm neutrals replace pure white and bla
 
 ### Principles
 
-1. **Every colour means one thing.** Cobalt means "you can act". Orange means "look here now". Green means "correct / done". Category colours mean "what kind of topic". Colour is never decoration.
+1. **Every colour means one thing.** Cobalt (or the accent the learner picks, §2.8) means "you can act". Orange means "look here now". Green means "correct / done". Category colours mean "what kind of topic". Colour is never decoration.
 2. **Space instead of lines.** Separate content with whitespace. Hairlines are used only where structure needs them (tab bar, stat strips). No card borders, no drop shadows.
 3. **Soft contrast, never weak contrast.** No `#FFFFFF` on `#000000`. Every text pair still meets WCAG AA (section 9).
 4. **The visualisation is the hero.** Chrome around the canvas stays quiet so the data and the highlighted step stand out.
@@ -111,6 +111,22 @@ Used **only** for the curves on the Big O growth chart. The classes are ordered 
 - Each screen has **at most one** solid `primary` button.
 - `signal` appears only inside the visualisation canvas and the code panel, plus the streak flame. It is never used for buttons.
 - Category colours appear only on glyphs and overlines, never as large fills.
+
+### 2.8 Accent colours
+
+The learner can change the colour of acting (Settings → Appearance → **Accent**). It replaces the four `primary` tokens (`primary`, `on-primary`, `primary-soft`, `primary-track`) in both themes, so buttons, selected tabs and segments, the tab-bar pill, links, switches, the Learn mode and quick sort's pivot all follow. Nothing else changes: `signal`, `success`, `danger` and the category colours keep their meaning.
+
+| Accent | Light | Dark | Note |
+|---|---|---|---|
+| **Cobalt** | `#3554D9` | `#8199FF` | The default |
+| Violet | `#6C47D4` | `#A991FF` | |
+| Plum | `#A6346F` | `#F07FB6` | Deep magenta-rose |
+| Ocean | `#11708C` | `#5EC4DF` | Deep blue-teal, kept well away from success green |
+| Graphite | `#3A3732` | `#E6E0D4` | Charcoal: the quietest; on-primary is cream (light) or charcoal (dark) |
+
+- **Green, orange and red are never accents.** Green means correct, orange "look here now", red error; an accent in one of them would make every button look like an answer or a highlight.
+- Every accent's `primary` reaches 4.5:1 as text on `background` and `surface`, and its `on-primary` 4.5:1 on it, in both themes (checked by `src/theme/accents.test.ts`). The soft and track tints are the primary at 9% / 18% (16% / 24% in dark).
+- The palettes live in `tokens.css` (§1b); `src/theme`'s `applyAccent` copies the chosen one in at launch, before the splash screen hides. The picker is a row of 36pt round swatches in each accent's own primary; the chosen one has an `on-primary` check and a 2px `ink` ring, and its name shows in the row's hint.
 
 ---
 

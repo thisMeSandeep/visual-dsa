@@ -10,6 +10,8 @@ import { useSettings, type ReducedMotionChoice, type ThemeChoice } from '@/store
 import { useActiveTheme, useColor } from '@/theme';
 import { CODE_LANGUAGE_LABELS, CODE_LANGUAGE_SHORT_LABELS } from '@/viz/code-panel';
 
+import { ACCENT_LABELS, AccentPicker } from './accent-picker';
+
 const THEME_OPTIONS: readonly SegmentOption<ThemeChoice>[] = [
   { value: 'system', label: 'Device', icon: 'theme-system' },
   { value: 'light', label: 'Light', icon: 'theme-light' },
@@ -37,8 +39,8 @@ const REDUCED_MOTION_OPTIONS: readonly SegmentOption<ReducedMotionChoice>[] = [
 
 /**
  * Settings tab (F-1101–F-1104, F-1107). Grouped cards in the app's own style: choices are
- * segmented controls, so every option is visible at once; on/off settings are native @expo/ui
- * switches, tinted cobalt and following the app's theme. Every change is saved on the device at
+ * segmented controls (and swatches for the accent), so every option is visible at once; on/off
+ * settings are native @expo/ui switches, tinted with the accent and following the app's theme. Every change is saved on the device at
  * once (stores/settings.ts).
  */
 export function Settings() {
@@ -60,13 +62,20 @@ export function Settings() {
         </View>
 
         <Section title="Appearance">
-          <ChoiceRow label="Theme" detail="Device follows your phone’s light or dark mode" last>
+          <ChoiceRow label="Theme" detail="Device follows your phone’s light or dark mode">
             <SegmentedControl
               label="Theme"
               options={THEME_OPTIONS}
               value={settings.theme}
               onChange={settings.setTheme}
             />
+          </ChoiceRow>
+          <ChoiceRow
+            label="Accent"
+            detail={`${ACCENT_LABELS[settings.accent]}: buttons, tabs and links`}
+            last
+          >
+            <AccentPicker value={settings.accent} onChange={settings.setAccent} />
           </ChoiceRow>
         </Section>
 
@@ -113,7 +122,7 @@ export function Settings() {
           {config.features.haptics ? (
             <SwitchRow
               label="Haptics"
-              detail="A light tap when you press a button"
+              detail="Taps for presses, swaps, matches and errors"
               value={settings.haptics}
               onChange={settings.setHaptics}
               testID="setting-haptics"

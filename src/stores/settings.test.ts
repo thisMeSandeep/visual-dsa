@@ -36,6 +36,7 @@ describe('settings store', () => {
   it('saves every change, with the schema version', async () => {
     const {
       setTheme,
+      setAccent,
       setCodeLanguage,
       setDefaultSpeed,
       setHaptics,
@@ -43,6 +44,7 @@ describe('settings store', () => {
       setReducedMotion,
     } = useSettings.getState();
     setTheme('dark');
+    setAccent('plum');
     setCodeLanguage('javascript');
     setDefaultSpeed(2);
     setHaptics(false);
@@ -53,6 +55,7 @@ describe('settings store', () => {
     expect(saved()).toEqual({
       state: {
         theme: 'dark',
+        accent: 'plum',
         codeLanguage: 'javascript',
         defaultSpeed: 2,
         haptics: false,
@@ -73,11 +76,18 @@ describe('settings store', () => {
 
   it('falls back to the default for anything invalid, keeping the rest', () => {
     const state = launchWith({
-      state: { theme: 'sepia', codeLanguage: 'javascript', defaultSpeed: 3, haptics: 'yes' },
+      state: {
+        theme: 'sepia',
+        accent: 'lime',
+        codeLanguage: 'javascript',
+        defaultSpeed: 3,
+        haptics: 'yes',
+      },
       version: config.storage.versions.settings,
     });
     expect(state).toMatchObject({
       theme: 'system',
+      accent: 'cobalt',
       codeLanguage: 'javascript',
       defaultSpeed: config.player.defaultSpeed,
       haptics: true,

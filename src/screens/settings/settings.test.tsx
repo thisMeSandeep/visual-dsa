@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { config } from '@/config';
-import { DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
+import { ACCENT_CHOICES, DEFAULT_SETTINGS, useSettings } from '@/stores/settings';
+import { ACCENTS } from '@/theme';
 
 import { Settings } from '.';
 
@@ -63,5 +64,16 @@ describe('Settings', () => {
     const toggle = screen.queryByTestId('setting-haptics');
     if (config.features.haptics) expect(toggle).toBeOnTheScreen();
     else expect(toggle).toBeNull();
+  });
+
+  it('offers every accent as a swatch, and saves the one tapped', async () => {
+    expect(ACCENT_CHOICES).toEqual(ACCENTS);
+    await render(<Settings />);
+    expect(screen.getByLabelText('Accent').props.accessibilityRole).toBe('radiogroup');
+    expect(screen.getByRole('radio', { name: 'Cobalt', checked: true })).toBeOnTheScreen();
+    await choose('Ocean');
+    expect(useSettings.getState().accent).toBe('ocean');
+    expect(screen.getByRole('radio', { name: 'Ocean', checked: true })).toBeOnTheScreen();
+    expect(screen.getByText('Ocean: buttons, tabs and links')).toBeOnTheScreen();
   });
 });

@@ -234,6 +234,46 @@ export function setThemePreference(preference: ThemePreference): void {
   Uniwind.setTheme(preference);
 }
 
+/* Accent colours ------------------------------------------------------------------------------ */
+
+/** The accents a learner can pick in Settings (tokens.css §1b). Cobalt is the default. */
+export const ACCENTS = ['cobalt', 'violet', 'plum', 'ocean', 'graphite'] as const;
+export type Accent = (typeof ACCENTS)[number];
+
+const ACCENT_ROLES = ['primary', 'on-primary', 'primary-soft', 'primary-track'] as const;
+const ACCENT_MODES = ['light', 'dark'] as const;
+const accentVar = (accent: Accent, mode: 'light' | 'dark', role: (typeof ACCENT_ROLES)[number]) =>
+  `--accent-${accent}-${mode}-${role}`;
+
+/**
+ * Gives the four primary tokens the chosen accent's colours, in the light and dark themes at
+ * once, so switching theme keeps the accent. Class names and canvas colours follow straight
+ * away. The choice is saved in the settings store; the root layout applies it.
+ */
+export function applyAccent(accent: Accent): void {
+  for (const mode of ACCENT_MODES) {
+    const values: Record<string, string> = {};
+    for (const role of ACCENT_ROLES) {
+      const value = Uniwind.getCSSVariable(accentVar(accent, mode, role));
+      if (value !== undefined) values[`--color-${role}`] = String(value);
+    }
+    if (Object.keys(values).length === ACCENT_ROLES.length) {
+      Uniwind.updateCSSVariables(mode, values);
+    }
+  }
+}
+
+/** Each accent's primary colour in the theme on screen, for the swatches in Settings. */
+export function useAccentSwatches(): Record<Accent, string> {
+  const mode = useActiveTheme();
+  const values = useCSSVariable(ACCENTS.map((accent) => accentVar(accent, mode, 'primary'))) as (
+    string | number | undefined
+  )[];
+  return Object.fromEntries(
+    ACCENTS.map((accent, index) => [accent, String(values[index] ?? '')]),
+  ) as Record<Accent, string>;
+}
+
 /** The theme on screen right now, after following the device. Native controls (@expo/ui) use it. */
 export function useActiveTheme(): 'light' | 'dark' {
   const { theme } = useUniwind();

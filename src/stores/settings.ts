@@ -15,12 +15,17 @@ import { kvStorage } from './storage';
 export const THEME_CHOICES = ['system', 'light', 'dark'] as const;
 export type ThemeChoice = (typeof THEME_CHOICES)[number];
 
+/** Accent colour for actions (buttons, tabs, links). Matches src/theme's ACCENTS. */
+export const ACCENT_CHOICES = ['cobalt', 'violet', 'plum', 'ocean', 'graphite'] as const;
+export type AccentChoice = (typeof ACCENT_CHOICES)[number];
+
 /** Reduced motion: follow the device setting, or force it on or off. */
 export const REDUCED_MOTION_CHOICES = ['system', 'on', 'off'] as const;
 export type ReducedMotionChoice = (typeof REDUCED_MOTION_CHOICES)[number];
 
 export type SettingsValues = {
   theme: ThemeChoice;
+  accent: AccentChoice;
   /** The language the code panel opens in. Switching language in the panel changes it too. */
   codeLanguage: CodeLanguage;
   /** The speed lessons start at. Changing speed in a lesson changes it too. */
@@ -34,6 +39,7 @@ export type SettingsValues = {
 
 export const DEFAULT_SETTINGS: SettingsValues = {
   theme: 'system',
+  accent: 'cobalt',
   codeLanguage: config.app.defaultCodeLanguage,
   defaultSpeed: config.player.defaultSpeed,
   haptics: true,
@@ -47,6 +53,7 @@ const isOfferedSpeed = (speed: number) =>
 const SettingsSchema = z
   .object({
     theme: z.enum(THEME_CHOICES).catch(DEFAULT_SETTINGS.theme),
+    accent: z.enum(ACCENT_CHOICES).catch(DEFAULT_SETTINGS.accent),
     codeLanguage: z.enum(config.app.codeLanguages).catch(DEFAULT_SETTINGS.codeLanguage),
     defaultSpeed: z.number().refine(isOfferedSpeed).catch(DEFAULT_SETTINGS.defaultSpeed),
     haptics: z.boolean().catch(DEFAULT_SETTINGS.haptics),
@@ -62,6 +69,7 @@ export function parseSettings(saved: unknown): SettingsValues {
 
 export type SettingsState = SettingsValues & {
   setTheme: (theme: ThemeChoice) => void;
+  setAccent: (accent: AccentChoice) => void;
   setCodeLanguage: (language: CodeLanguage) => void;
   setDefaultSpeed: (speed: number) => void;
   setHaptics: (on: boolean) => void;
@@ -74,6 +82,7 @@ export const useSettings = create<SettingsState>()(
     (set) => ({
       ...DEFAULT_SETTINGS,
       setTheme: (theme) => set({ theme }),
+      setAccent: (accent) => set({ accent }),
       setCodeLanguage: (codeLanguage) => set({ codeLanguage }),
       setDefaultSpeed: (defaultSpeed) => set({ defaultSpeed }),
       setHaptics: (haptics) => set({ haptics }),
@@ -86,6 +95,7 @@ export const useSettings = create<SettingsState>()(
       storage: kvStorage,
       partialize: ({
         theme,
+        accent,
         codeLanguage,
         defaultSpeed,
         haptics,
@@ -93,6 +103,7 @@ export const useSettings = create<SettingsState>()(
         reducedMotion,
       }) => ({
         theme,
+        accent,
         codeLanguage,
         defaultSpeed,
         haptics,

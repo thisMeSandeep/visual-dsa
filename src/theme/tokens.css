@@ -165,6 +165,66 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * 1b. Accent colours (VISUAL-SPEC §2.8): the palettes the Settings "Accent" choice can give the
+ *     four primary tokens above. src/theme copies the chosen one over --color-primary,
+ *     --color-on-primary, --color-primary-soft and --color-primary-track in both themes.
+ *     Cobalt must match the primary values above. Green, orange and red are never accents:
+ *     they mean correct, "look here now" and error. Each primary reaches 4.5:1 as text on
+ *     background and surface, and on-primary 4.5:1 on it.
+ * ---------------------------------------------------------------------------------------------- */
+@theme static {
+  /* Cobalt: the default */
+  --accent-cobalt-light-primary: #3554d9;
+  --accent-cobalt-light-on-primary: #ffffff;
+  --accent-cobalt-light-primary-soft: rgba(53, 84, 217, 0.09);
+  --accent-cobalt-light-primary-track: rgba(53, 84, 217, 0.18);
+  --accent-cobalt-dark-primary: #8199ff;
+  --accent-cobalt-dark-on-primary: #14161f;
+  --accent-cobalt-dark-primary-soft: rgba(129, 153, 255, 0.16);
+  --accent-cobalt-dark-primary-track: rgba(129, 153, 255, 0.24);
+
+  /* Violet */
+  --accent-violet-light-primary: #6c47d4;
+  --accent-violet-light-on-primary: #ffffff;
+  --accent-violet-light-primary-soft: rgba(108, 71, 212, 0.09);
+  --accent-violet-light-primary-track: rgba(108, 71, 212, 0.18);
+  --accent-violet-dark-primary: #a991ff;
+  --accent-violet-dark-on-primary: #17141f;
+  --accent-violet-dark-primary-soft: rgba(169, 145, 255, 0.16);
+  --accent-violet-dark-primary-track: rgba(169, 145, 255, 0.24);
+
+  /* Plum: deep magenta-rose */
+  --accent-plum-light-primary: #a6346f;
+  --accent-plum-light-on-primary: #ffffff;
+  --accent-plum-light-primary-soft: rgba(166, 52, 111, 0.09);
+  --accent-plum-light-primary-track: rgba(166, 52, 111, 0.18);
+  --accent-plum-dark-primary: #f07fb6;
+  --accent-plum-dark-on-primary: #1f1419;
+  --accent-plum-dark-primary-soft: rgba(240, 127, 182, 0.16);
+  --accent-plum-dark-primary-track: rgba(240, 127, 182, 0.24);
+
+  /* Ocean: deep blue-teal, kept well away from success green */
+  --accent-ocean-light-primary: #11708c;
+  --accent-ocean-light-on-primary: #ffffff;
+  --accent-ocean-light-primary-soft: rgba(17, 112, 140, 0.09);
+  --accent-ocean-light-primary-track: rgba(17, 112, 140, 0.18);
+  --accent-ocean-dark-primary: #5ec4df;
+  --accent-ocean-dark-on-primary: #10191c;
+  --accent-ocean-dark-primary-soft: rgba(94, 196, 223, 0.16);
+  --accent-ocean-dark-primary-track: rgba(94, 196, 223, 0.24);
+
+  /* Graphite: charcoal: the quietest */
+  --accent-graphite-light-primary: #3a3732;
+  --accent-graphite-light-on-primary: #fbf8f2;
+  --accent-graphite-light-primary-soft: rgba(58, 55, 50, 0.08);
+  --accent-graphite-light-primary-track: rgba(58, 55, 50, 0.16);
+  --accent-graphite-dark-primary: #e6e0d4;
+  --accent-graphite-dark-on-primary: #1a1917;
+  --accent-graphite-dark-primary-soft: rgba(230, 224, 212, 0.12);
+  --accent-graphite-dark-primary-track: rgba(230, 224, 212, 0.2);
+}
+
+/* -------------------------------------------------------------------------------------------------
  * 2. Scales used through class names (VISUAL-SPEC §4).
  *    Tailwind's default radii are removed so only our tokens exist.
  *
