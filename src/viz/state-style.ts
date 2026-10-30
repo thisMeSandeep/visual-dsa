@@ -48,6 +48,7 @@ export const STATE_PAINT: Record<ElementState, StatePaint> = {
   new: SIGNAL,
   collision: SIGNAL,
   swapping: SIGNAL,
+  pivot: { ...DEFAULT, fill: 'primary-soft', stroke: 'primary', strokeWidth: 'active' },
   visited: { ...DEFAULT, fill: 'primary-soft' },
   found: SUCCESS,
   sorted: SUCCESS,

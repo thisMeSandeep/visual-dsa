@@ -403,6 +403,7 @@ All sorting and searching topics use the `array` renderer with comparison/swap c
 
 **Sandbox (all sorts):** custom or random arrays (5–12 values). Presets: sorted, reverse-sorted, all equal, few unique values, nearly sorted.
 *As built (A2–A4):* each sort is its own topic. The sandbox takes 2–12 typed numbers or 8 random ones; presets are Mixed, Reversed, Sorted, Nearly and Repeats (few unique). "All equal" is left to typing, since the preset switch holds five. Bubble sort's `j`, selection sort's `min` and `j` (with `i` below) are pointers; insertion sort lifts its key above the row while bigger items shift right under it.
+*As built (A5, A6):* merge sort is drawn as split levels (one faint row per recursion level under the array). Quick sort uses Lomuto with a `pivot` state, `j` above and `i` below; its sandbox adds a **Random pivot** button. Hoare's partition is explained, not animated.
 **States:** active/comparing, swapping, sorted, dimmed (inactive range), plus a pivot marker for quick sort
 **Practice ideas:** "After pass 1 on [5,3,8,1,9,2], what's the last element?" · "Which element does Lomuto pick as the pivot?" · "Which sort is fastest on this nearly sorted input?"
 

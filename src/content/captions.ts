@@ -133,6 +133,35 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'insertion.done.rest':
     'Sorted! These last rounds took comparisons: {comparisons}, shifts: {shifts}.',
 
+  'quick.start':
+    'Quick sort {size} items: pick a **pivot**, put smaller items left of it and bigger ones right, then repeat.',
+  'quick.start.random':
+    'Quick sort {size} items, with a **random pivot** each time instead of the last item.',
+  'quick.partition':
+    'Partition index {lo} to {hi} around the **pivot**, **{pivot}**. **i** marks where the next small item goes.',
+  'quick.small': '**{value}** ≤ **{pivot}**: it belongs on the left, so swap it to index {i}.',
+  'quick.small.stay':
+    '**{value}** ≤ **{pivot}**: it belongs on the left, and it’s already there. **i** moves on.',
+  'quick.big': '**{value}** > **{pivot}**: it stays on the right side for now.',
+  'quick.swapped': '**{value}** swaps with **{other}**, into index {i}. **i** moves on.',
+  'quick.place':
+    'Swap the pivot **{pivot}** into index {index}: smaller or equal on its left, bigger on its right. It’s in place.',
+  'quick.place.end':
+    '**{pivot}** is the biggest here, so it stays at index {index}, with everything left of it smaller. In place.',
+  'quick.single': 'Only **{value}** is left between placed items, so it’s in place too.',
+  'quick.random':
+    'Pick a **random pivot**: **{pivot}**. Swap it to the end, then partition as usual.',
+  'quick.random.last': 'Pick a **random pivot**: **{pivot}**, which is already at the end.',
+  'merge.start':
+    'Merge sort {size} items: split in half until each piece is one item, then merge the pieces back in order.',
+  'merge.split': 'Split into two halves: **{left}** and **{right}**.',
+  'merge.take': '**{value}** is smaller than **{other}**, so it goes up next.',
+  'merge.take.equal':
+    '**{value}** and **{other}** are equal: take the left one first, so equal values keep their order.',
+  'merge.rest': 'One half is used up, so the rest of the other, **{items}**, goes up in order.',
+  'merge.merged': 'Merged: **{items}** is one sorted run.',
+  'merge.done': 'Sorted! Comparisons: {comparisons}.',
+
   // Linked lists (engine/structures/linked-list/operations.ts)
   'list.create': 'Make a new node for **{value}**. Nothing points to it yet.',
   'list.search.compare':

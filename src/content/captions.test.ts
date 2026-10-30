@@ -5,7 +5,13 @@ import {
   traceSearch,
   type SearchOperation,
 } from '@/engine/algorithms/searching';
-import { createSortArray, SORT_ALGORITHMS, traceSort } from '@/engine/algorithms/sorting';
+import {
+  createMergeArray,
+  createSortArray,
+  SORT_ALGORITHMS,
+  traceMergeSort,
+  traceSort,
+} from '@/engine/algorithms/sorting';
 import {
   CURVE_IDS,
   createGrowth,
@@ -158,14 +164,36 @@ describe('sorting captions', () => {
     ];
     for (const algorithm of SORT_ALGORITHMS) {
       for (const values of arrays) {
-        for (const rounds of [{}, { rounds: 1 }, { from: 1 }]) {
-          const { trace } = traceSort(createSortArray(values), algorithm, rounds);
+        for (const options of [{}, { rounds: 1 }, { from: 1 }, { pivot: 'random' as const }]) {
+          const { trace } = traceSort(createSortArray(values), algorithm, options);
           for (const step of trace.steps) {
             if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
             const text = captionText(step.caption);
             expect(text).not.toMatch(/\{\w+\}/);
             expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
           }
+        }
+      }
+    }
+  });
+});
+
+describe('merge sort captions', () => {
+  it('has a caption for every key merge sort uses, with every placeholder filled', () => {
+    const arrays = [
+      [],
+      ['4'],
+      ['3', '1', '2'],
+      ['5a', '3', '5b', '1'],
+      ['9', '8', '7', '6', '5', '4'],
+    ];
+    for (const values of arrays) {
+      for (const options of [{}, { depth: 1 }]) {
+        for (const step of traceMergeSort(createMergeArray(values), options).trace.steps) {
+          if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+          const text = captionText(step.caption);
+          expect(text).not.toMatch(/\{\w+\}/);
+          expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
         }
       }
     }

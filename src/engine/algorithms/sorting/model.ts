@@ -11,11 +11,13 @@ import {
   type ArrayModel,
 } from '../../structures/array';
 
-export type SortAlgorithm = 'bubble-sort' | 'selection-sort' | 'insertion-sort';
+/** The sorts that work on the array in place (merge sort has its own model: merge.ts). */
+export type SortAlgorithm = 'bubble-sort' | 'selection-sort' | 'insertion-sort' | 'quick-sort';
 export const SORT_ALGORITHMS: readonly SortAlgorithm[] = [
   'bubble-sort',
   'selection-sort',
   'insertion-sort',
+  'quick-sort',
 ];
 
 const TAGGED = /^(\d+)([a-z])?$/;

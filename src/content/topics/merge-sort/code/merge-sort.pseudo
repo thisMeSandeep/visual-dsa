@@ -1,0 +1,25 @@
+// Sorts a[lo..hi - 1], smallest first.
+// Start with mergeSort(a, 0, length(a)).
+
+function mergeSort(a, lo, hi)
+  if hi - lo < 2 then return
+  mid = floor((lo + hi) / 2) // @line split
+  mergeSort(a, lo, mid)
+  mergeSort(a, mid, hi)
+  merge(a, lo, mid, hi)
+end function
+
+function merge(a, lo, mid, hi)
+  left = copy of a[lo..mid - 1]
+  right = copy of a[mid..hi - 1]
+  i = 0, j = 0, k = lo
+  while i < length(left) and j < length(right)
+    if left[i] <= right[j] then
+      a[k] = left[i], i = i + 1 // @line take-left
+    else
+      a[k] = right[j], j = j + 1 // @line take-right
+    end if
+    k = k + 1
+  end while
+  copy the rest of left, then right, to a[k..] // @line rest
+end function

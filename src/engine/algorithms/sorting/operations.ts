@@ -6,11 +6,15 @@
  * - bubble-sort: compare, swap, pass-done, early-exit
  * - selection-sort: scan, compare, new-min, swap, place
  * - insertion-sort: take, shift, insert
+ * - quick-sort: random-pivot, pivot, compare, swap, place
  *
  * Caption keys: the `bubble.*`, `selection.*`, `insertion.*` and `sort.*` keys in
  * content/captions.ts. Items in their final (or, for insertion sort, sorted-so-far) place are
  * `sorted`; the items being compared are `active`; two items trading places are `swapping`.
  */
+import { config } from '@/config';
+
+import { createRng } from '../../core/rng';
 import { runTrace, type Tracer } from '../../core/tracer';
 import type { ElementState, Trace } from '../../core/types';
 import {
@@ -53,6 +57,10 @@ function highlight(
  * Lessons use this to show one round per chapter on the same array; the default is all.
  */
 export type SortRounds = { from?: number; rounds?: number };
+
+/** Quick sort's pivot: always the last item of the range (Lomuto), or a random one. */
+export type PivotChoice = 'last' | 'random';
+export type SortOptions = SortRounds & { pivot?: PivotChoice };
 
 const ALL = () => true;
 
@@ -331,10 +339,190 @@ export function insertionSort(
   });
 }
 
-const SORTS: Record<SortAlgorithm, (t: SortTracer, rounds?: SortRounds) => void> = {
+/**
+ * Quick sort with Lomuto partitioning: the pivot is the range's last item (or a random one,
+ * swapped to the end first). Scanning with j, every item no bigger than the pivot is swapped to
+ * i, which then moves on; finally the pivot swaps into index i, its final place, with smaller
+ * items left of it and bigger ones right. Then the same for each side, left first.
+ *
+ * A round is one partition. Unlike the simple sorts, `from` partitions are replayed out of sight
+ * on the array given, so a lesson sets up the original array again to show the rest after an
+ * earlier `pass`.
+ */
+export function quickSort(
+  t: SortTracer,
+  { from = 0, rounds = Infinity, pivot: choice = 'last' }: SortOptions = {},
+): void {
+  if (trivial(t)) return;
+  const n = t.model.size;
+  // Seeded, so a "random" pivot run replays the same way every time.
+  const rng = createRng(config.engine.defaultSeed);
+  const placed = new Set<number>();
+  let partitions = 0;
+  let comparisons = 0;
+  let swaps = 0;
+
+  // Partitions before `from` happen, but out of sight.
+  const shown = () => partitions >= from;
+  const step = (input: Parameters<SortTracer['step']>[0]) => {
+    if (shown()) t.step(input);
+  };
+  const count = (counter: 'comparisons' | 'swaps' | 'reads' | 'writes', by = 1) => {
+    if (shown()) t.count(counter, by);
+  };
+  /** Placed items are sorted; outside lo…hi is out of focus; `states` picks out single items. */
+  const focus = (lo: number, hi: number, states: Readonly<Record<number, ElementState>> = {}) => {
+    const result: Record<string, ElementState> = {};
+    t.model.slots.forEach((item, index) => {
+      if (!item) return;
+      const state =
+        states[index] ??
+        (placed.has(index) ? 'sorted' : index < lo || index > hi ? 'dimmed' : undefined);
+      if (state) result[item.id] = state;
+    });
+    return result;
+  };
+  const swap = (a: number, b: number) => {
+    t.update((array) => withSwapped(array, a, b));
+    swaps += shown() ? 1 : 0;
+    count('swaps');
+    count('writes', 2);
+  };
+
+  function partition(lo: number, hi: number): number {
+    if (choice === 'random') {
+      const r = rng.int(lo, hi);
+      const picked = itemLabel(itemAt(t, r));
+      if (r !== hi) swap(r, hi);
+      step({
+        line: 'random-pivot',
+        caption: {
+          key: r === hi ? 'quick.random.last' : 'quick.random',
+          params: { pivot: picked },
+        },
+        annotations: {
+          highlight: focus(
+            lo,
+            hi,
+            r === hi ? { [hi]: 'pivot' } : { [r]: 'swapping', [hi]: 'swapping' },
+          ),
+        },
+      });
+    }
+    const pivot = itemAt(t, hi);
+    const label = itemLabel(pivot);
+    let i = lo;
+    const at = (j?: number): ArrayPointer[] => [
+      ...(j === undefined ? [] : [{ label: 'j', index: j }]),
+      { label: 'i', index: i, side: 'below' },
+    ];
+    step({
+      line: 'pivot',
+      caption: { key: 'quick.partition', params: { pivot: label, lo, hi } },
+      vars: { lo, hi, pivot: label, i },
+      annotations: { highlight: focus(lo, hi, { [hi]: 'pivot' }), pointers: at() },
+    });
+
+    for (let j = lo; j < hi; j++) {
+      const item = itemAt(t, j);
+      const small = compareItems(item, pivot) <= 0;
+      comparisons += shown() ? 1 : 0;
+      count('comparisons');
+      count('reads');
+      step({
+        line: 'compare',
+        caption: {
+          key: !small ? 'quick.big' : i === j ? 'quick.small.stay' : 'quick.small',
+          params: { value: itemLabel(item), pivot: label, i },
+        },
+        vars: { lo, hi, pivot: label, i, j },
+        annotations: {
+          highlight: focus(lo, hi, { [hi]: 'pivot', [j]: 'active' }),
+          pointers: at(j),
+        },
+      });
+      if (!small) continue;
+      if (i !== j) {
+        const other = itemAt(t, i);
+        swap(i, j);
+        step({
+          line: 'swap',
+          caption: {
+            key: 'quick.swapped',
+            params: { value: itemLabel(item), other: itemLabel(other), i },
+          },
+          vars: { lo, hi, pivot: label, i, j },
+          annotations: {
+            highlight: focus(lo, hi, { [hi]: 'pivot', [i]: 'swapping', [j]: 'swapping' }),
+            pointers: at(j),
+          },
+        });
+      }
+      i++;
+    }
+
+    const moved = i !== hi;
+    if (moved) swap(i, hi);
+    placed.add(i);
+    step({
+      line: 'place',
+      caption: {
+        key: moved ? 'quick.place' : 'quick.place.end',
+        params: { pivot: label, index: i, left: i - lo, right: hi - i },
+      },
+      vars: { lo, hi, pivot: label, i },
+      annotations: {
+        highlight: focus(lo, hi, moved ? { [i]: 'swapping', [hi]: 'swapping' } : {}),
+        pointers: at(),
+      },
+    });
+    return i;
+  }
+
+  if (from === 0) {
+    t.step({
+      caption: {
+        key: choice === 'random' ? 'quick.start.random' : 'quick.start',
+        params: { size: n },
+      },
+      vars: { n },
+    });
+  }
+  // Ranges still to sort, lo…hi inclusive; the left side is popped first.
+  const ranges: [number, number][] = [[0, n - 1]];
+  while (ranges.length > 0) {
+    const [lo, hi] = ranges.at(-1)!;
+    if (lo === hi) {
+      ranges.pop();
+      placed.add(lo);
+      step({
+        caption: { key: 'quick.single', params: { value: itemLabel(itemAt(t, lo)), index: lo } },
+        annotations: { highlight: focus(lo, hi) },
+      });
+      continue;
+    }
+    if (lo > hi) {
+      ranges.pop();
+      continue;
+    }
+    if (partitions >= from + rounds) return;
+    ranges.pop();
+    const p = partition(lo, hi);
+    partitions++;
+    ranges.push([p + 1, hi], [lo, p - 1]);
+  }
+
+  t.step({
+    caption: { key: from === 0 ? 'sort.done' : 'sort.done.rest', params: { comparisons, swaps } },
+    annotations: { allItems: 'sorted' },
+  });
+}
+
+const SORTS: Record<SortAlgorithm, (t: SortTracer, options?: SortOptions) => void> = {
   'bubble-sort': bubbleSort,
   'selection-sort': selectionSort,
   'insertion-sort': insertionSort,
+  'quick-sort': quickSort,
 };
 
 /**
@@ -344,7 +532,7 @@ const SORTS: Record<SortAlgorithm, (t: SortTracer, rounds?: SortRounds) => void>
 export function traceSort(
   model: ArrayModel,
   algorithm: SortAlgorithm,
-  rounds: SortRounds = {},
+  options: SortOptions = {},
 ): { trace: Trace<undefined>; model: ArrayModel } {
   return runTrace(
     {
@@ -354,7 +542,7 @@ export function traceSort(
       describe: describeSort,
     },
     (t) => {
-      SORTS[algorithm](t, rounds);
+      SORTS[algorithm](t, options);
       return undefined;
     },
   );

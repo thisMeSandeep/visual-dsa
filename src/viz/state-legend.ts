@@ -11,6 +11,7 @@ export const STATE_LABELS: Readonly<Record<ElementState, string>> = {
   new: 'New',
   collision: 'Collision',
   swapping: 'Swapping',
+  pivot: 'Pivot',
   visited: 'Visited',
   found: 'Found',
   sorted: 'Sorted',
@@ -24,6 +25,7 @@ export const LEGEND_ORDER: readonly ElementState[] = [
   'new',
   'collision',
   'swapping',
+  'pivot',
   'visited',
   'found',
   'sorted',
@@ -42,6 +44,11 @@ export const LEGEND_GROUPS: readonly {
     title: 'Look here',
     meaning:
       'Orange means “this one, now”: being compared, read or moved, just added, or colliding.',
+  },
+  {
+    states: ['pivot'],
+    title: 'Pivot',
+    meaning: 'Quick sort’s pivot: every other item in the range is compared with it.',
   },
   {
     states: ['visited'],

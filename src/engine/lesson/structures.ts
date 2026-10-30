@@ -31,8 +31,13 @@ import {
   traceSearch,
 } from '../algorithms/searching';
 import {
+  createMergeArray,
   createSortArray,
+  describeMerge,
   describeSort,
+  mergeToScene,
+  traceMergeSort,
+  type MergeModel,
   SORT_ALGORITHMS,
   sortToScene,
   traceSort,
@@ -340,9 +345,47 @@ function sortStructure(algorithm: SortAlgorithm): StructureDefinition<ArrayModel
       /** One round (a pass, or placing one item) after `{ from }` rounds already done. */
       pass: (model, input, at) =>
         traceSort(model, algorithm, { from: roundsDone(record(input, at), model, at), rounds: 1 }),
+      // Quick sort can also pick a random pivot for each range.
+      ...(algorithm === 'quick-sort'
+        ? {
+            sortRandom: (model: ArrayModel, input: unknown, at: string) => {
+              const fields = record(input, at);
+              const array = fields.values === undefined ? model : create(fields, at);
+              return traceSort(array, algorithm, { pivot: 'random' });
+            },
+          }
+        : {}),
     },
   };
 }
+
+/** Merge sort: an array of numbers ("5a" tags equal values) over its split levels. */
+const mergeSortStructure: StructureDefinition<MergeModel> = {
+  /** { values?: string[] } */
+  create: (input, at) => {
+    const values = optionalTextList(record(input, at), 'values', at);
+    return atSegment(at, () => createMergeArray(values));
+  },
+  toScene: (model) => mergeToScene(model),
+  describe: describeMerge,
+  operations: {
+    /**
+     * Sorts the current array, or `{ values }` (the sandbox's typed numbers). `{ depth: 1 }`
+     * splits once and merges the two halves as they are, for a lesson on merging.
+     */
+    sort: (model, input, at) => {
+      const fields = record(input, at);
+      const array =
+        fields.values === undefined
+          ? model
+          : atSegment(at, () => createMergeArray(optionalTextList(fields, 'values', at)));
+      const depth = optionalWholeNumber(fields, 'depth', at);
+      if (depth !== undefined && depth < 1)
+        throw new CompileError('"depth" must be at least 1', at);
+      return traceMergeSort(array, depth === undefined ? {} : { depth });
+    },
+  },
+};
 
 /** How many rounds a lesson says are done already: 0 to n − 1 for n items. */
 function roundsDone(input: Record<string, unknown>, model: ArrayModel, at: string): number {
@@ -536,6 +579,7 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   queue: queue as StructureDefinition<unknown>,
   array: array as StructureDefinition<unknown>,
   'sorted-array': sortedArray as StructureDefinition<unknown>,
+  'merge-sort': mergeSortStructure as StructureDefinition<unknown>,
   ...Object.fromEntries(
     SORT_ALGORITHMS.map((algorithm) => [
       algorithm,

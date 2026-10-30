@@ -16,6 +16,8 @@ export type ElementState =
   | 'new'
   | 'collision'
   | 'swapping'
+  /** quick sort's pivot: what the others are compared with */
+  | 'pivot'
   | 'visited'
   | 'found'
   | 'sorted'
@@ -30,6 +32,8 @@ export type Slot =
   | { type: 'source'; index: number }
   /** an array item lifted out above slot `index`, e.g. insertion sort's key over the gap */
   | { type: 'held'; index: number }
+  /** merge sort: an item split down to recursion level `level` (1 is just under the array) */
+  | { type: 'level'; level: number; index: number }
   /** linked-list nodes: place in the row, raised above it while being linked in or out */
   | { type: 'link'; index: number; raised: boolean }
   /** hash-table entries: their bucket and place in its chain; `old` while the table resizes */

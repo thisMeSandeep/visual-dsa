@@ -26,6 +26,8 @@ export const SIZES: VizSizes = {
   pointerLength: 16,
   pointerLabelWidth: 32,
   swapArc: 30,
+  levelGap: 18,
+  splitGap: 14,
   stackItemWidth: 132,
   stackPadding: 10,
   stackRadius: 18,

@@ -229,3 +229,56 @@ describe('running some rounds', () => {
     expect(keys(insertion.trace)).not.toContain('insertion.done');
   });
 });
+
+describe('quick sort', () => {
+  it('partitions around the last item, then sorts each side', () => {
+    const { trace, model } = sort(['3', '1', '2'], 'quick-sort');
+    // Pivot 2: 3 > 2 stays, 1 ≤ 2 swaps to index 0, the pivot swaps into index 1.
+    expect(lines(trace)).toEqual(['pivot', 'compare', 'compare', 'swap', 'place']);
+    expect(values(model)).toEqual(['1', '2', '3']);
+    expect(keys(trace)).toEqual(
+      expect.arrayContaining(['quick.big', 'quick.small', 'quick.place', 'quick.single']),
+    );
+  });
+
+  it('marks the pivot, points i up from below and j down, and dims outside the range', () => {
+    const { trace } = sort(['5', '9', '1', '7', '3', '8', '4'], 'quick-sort');
+    const compare = trace.steps.find((step) => step.codeLine === 'compare')!;
+    expect(states(compare.scene)[6]).toBe('pivot');
+    expect(states(compare.scene)[0]).toBe('active');
+    expect(pointers(compare.scene)).toEqual({ j: 'item-0', i: 'item-0' });
+    // The second partition works on the left side only: the pivot is sorted, the right dimmed.
+    const second = trace.steps.filter((step) => step.codeLine === 'pivot')[1]!;
+    expect(states(second.scene)).toContain('sorted');
+    expect(states(second.scene)).toContain('dimmed');
+  });
+
+  it('degrades to n(n − 1)/2 comparisons on sorted input with the last item as pivot', () => {
+    const { trace } = sort(['1', '2', '3', '4', '5', '6', '7'], 'quick-sort');
+    expect(trace.steps.at(-1)?.counters.comparisons).toBe(21);
+  });
+
+  it('does far fewer with a random pivot, the same way every time', () => {
+    const run = () =>
+      traceSort(createSortArray(['1', '2', '3', '4', '5', '6', '7']), 'quick-sort', {
+        pivot: 'random',
+      });
+    const { trace, model } = run();
+    expect(values(model)).toEqual(['1', '2', '3', '4', '5', '6', '7']);
+    expect(trace.steps.at(-1)!.counters.comparisons).toBeLessThan(21);
+    expect(lines(trace)).toContain('random-pivot');
+    expect(run().trace.steps.length).toBe(trace.steps.length);
+  });
+
+  it('shows one partition, then the rest with the first done out of sight', () => {
+    const start = createSortArray(['5', '9', '1', '7', '3', '8', '4']);
+    const first = traceSort(start, 'quick-sort', { rounds: 1 });
+    expect(lines(first.trace).filter((line) => line === 'pivot')).toHaveLength(1);
+    expect(keys(first.trace).at(-1)).toBe('quick.place');
+    const rest = traceSort(start, 'quick-sort', { from: 1 });
+    expect(rest.trace.steps[0]!.counters.comparisons).toBe(0);
+    expect(states(rest.trace.steps[0]!.scene)).toContain('sorted');
+    expect(values(rest.model)).toEqual(['1', '3', '4', '5', '7', '8', '9']);
+    expect(keys(rest.trace).at(-1)).toBe('sort.done.rest');
+  });
+});

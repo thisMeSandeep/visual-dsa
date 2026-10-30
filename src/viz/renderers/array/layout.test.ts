@@ -1,5 +1,12 @@
 import { createSortedArray, searchToScene } from '@/engine/algorithms/searching';
-import { createSortArray, sortToScene, traceSort } from '@/engine/algorithms/sorting';
+import {
+  createMergeArray,
+  createSortArray,
+  mergeToScene,
+  sortToScene,
+  traceMergeSort,
+  traceSort,
+} from '@/engine/algorithms/sorting';
 import { arrayToScene, createArray, traceArray } from '@/engine/structures/array';
 
 import type {
@@ -112,6 +119,32 @@ describe('layoutArray', () => {
   it('shows an item’s tag as its second line', () => {
     const { drawables } = layoutArray(arrayToScene(createSortArray(['5a', '3'])), SIZES);
     expect(byId<BoxDrawable>(drawables, 'item-0')).toMatchObject({ value: '5', detail: 'a' });
+  });
+
+  it('draws merge sort’s split levels under the array, centred and split apart', () => {
+    const model = createMergeArray(['6', '3', '8', '1']);
+    const rest = layoutArray(mergeToScene(model), SIZES);
+    const slot0 = byId<BoxDrawable>(rest.drawables, 'slot-0')!;
+    const level1 = [0, 1, 2, 3].map((i) => byId<BoxDrawable>(rest.drawables, `level-1-${i}`)!);
+    const level2 = [0, 1, 2, 3].map((i) => byId<BoxDrawable>(rest.drawables, `level-2-${i}`)!);
+    expect(level1.every((box) => box.state === 'dimmed' && box.y > slot0.y)).toBe(true);
+    expect(level2[0]!.y).toBeGreaterThan(level1[0]!.y);
+    // Level 1 has one split gap between index 1 and 2; level 2 one between each pair.
+    const step = SIZES.cellWidth + SIZES.gap;
+    expect(level1[2]!.x - level1[1]!.x).toBe(step + SIZES.splitGap);
+    expect(level1[1]!.x - level1[0]!.x).toBe(step);
+    expect(level2[1]!.x - level2[0]!.x).toBe(step + SIZES.splitGap);
+    // The array sits centred over the widest level.
+    expect(slot0.x - level2[0]!.x).toBe((3 * SIZES.splitGap) / 2);
+    expect(rest.width).toBeCloseTo(level2[3]!.x + SIZES.cellWidth + SIZES.stackPadding);
+
+    const { trace } = traceMergeSort(model);
+    const split = layoutArray(trace.steps[1]!.scene, SIZES);
+    expect(byId<BoxDrawable>(split.drawables, 'item-2')).toMatchObject({
+      x: level1[2]!.x,
+      y: level1[2]!.y,
+    });
+    expect(split.height).toBe(rest.height);
   });
 
   it('draws the old array above while growing, and the copied item down in the new one', () => {

@@ -15,6 +15,8 @@
  *    1000 1004 1008 1012 …                      ← memory addresses, when the lesson shows them
  *      ↑              ↑
  *     low           high                        ← `below` pointers (binary search's range)
+ *    [··] [··] [··]    [··] [··] [··]           ← merge sort's split levels, one row per level,
+ *    [··]   [··] [··]    …                         faint slots that items move down and up
  *
  * Every slot is drawn, empty or not, so free capacity is visible and a shift shows its gap.
  * Swapping items move along an arc, so they pass each other instead of overlapping.
@@ -24,6 +26,7 @@ import type { VizSizes } from '@/theme';
 
 import type { Drawable } from '../../canvas/types';
 import { roundedRect } from '../paths';
+import { levelGeometry, parseLevels } from './levels';
 
 export type ArrayLayout = { drawables: Drawable[]; width: number; height: number };
 
@@ -44,7 +47,11 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   const w = sizes.cellWidth;
   const h = sizes.cellHeight;
   const pad = sizes.stackPadding;
-  const slotX = (index: number) => pad + index * (w + sizes.gap);
+  // Merge sort's levels are wider than the array, so the array is centred over them.
+  const levels = parseLevels(meta.levels);
+  const geometry = levelGeometry(levels);
+  const originX = (geometry.maxGaps * sizes.splitGap) / 2;
+  const slotX = (index: number) => originX + pad + index * (w + sizes.gap);
   const frameRight = (slots: number) => slotX(slots) - sizes.gap + pad;
   const centre = (index: number) => slotX(index) + w / 2;
   const labelHeight = sizes.fontLabel + sizes.labelGap;
@@ -61,7 +68,13 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
       {
         kind: 'path',
         id: sourceFrameId(sourceCapacity),
-        path: roundedRect(0, sourceFrameTop, frameRight(sourceCapacity), sourceFrameBottom, pad),
+        path: roundedRect(
+          originX,
+          sourceFrameTop,
+          frameRight(sourceCapacity),
+          sourceFrameBottom,
+          pad,
+        ),
         tone: 'line',
         strokeWidth: 'normal',
       },
@@ -86,14 +99,24 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   const hasLaneBelow =
     meta.laneBelow !== undefined || pointers.some((pointer) => pointer.side === 'below');
   const laneTop = labelsBottom + sizes.labelGap;
-  const bottom = hasLaneBelow ? laneTop + labelHeight + sizes.pointerLength : labelsBottom;
+  const arrayBottom = hasLaneBelow ? laneTop + labelHeight + sizes.pointerLength : labelsBottom;
+
+  // Merge sort's split levels under the array: level d's row, and where index i sits in it.
+  const levelTop = (level: number) =>
+    arrayBottom + sizes.levelGap + (level - 1) * (h + sizes.levelGap);
+  const levelX = (level: number, index: number) =>
+    ((geometry.maxGaps - geometry.gapsAt(level)) * sizes.splitGap) / 2 +
+    pad +
+    index * (w + sizes.gap) +
+    geometry.gapsBefore(level, index) * sizes.splitGap;
+  const bottom = levels.length > 1 ? levelTop(levels.length - 1) + h : arrayBottom;
 
   if (growing) drawables.push(label('main-label', 'new array', sectionTop + sizes.fontLabel / 2));
   drawables.push(
     {
       kind: 'path',
       id: frameId(capacity),
-      path: roundedRect(0, frameTop, frameRight(capacity), frameBottom, pad),
+      path: roundedRect(originX, frameTop, frameRight(capacity), frameBottom, pad),
       tone: containerState === 'error' ? 'danger' : 'line-strong',
       strokeWidth: 'active',
     },
@@ -128,15 +151,41 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   }
 
   const cells = scene.elements.filter((e): e is Cell => e.kind === 'cell');
+  // Faint slots for every range at each level below the array.
+  levels.slice(1).forEach((segments, offset) => {
+    const level = offset + 1;
+    for (const [start, end] of segments) {
+      for (let index = start; index < end; index++) {
+        drawables.push({
+          kind: 'box',
+          id: `level-${level}-${index}`,
+          x: levelX(level, index),
+          y: levelTop(level),
+          width: w,
+          height: h,
+          state: 'dimmed',
+          value: '',
+        });
+      }
+    }
+  });
+
   const rowOf = { index: rowTop, source: sourceRowTop, held: sectionTop };
   for (const cell of cells) {
     const { slot } = cell;
-    if (slot.type !== 'index' && slot.type !== 'source' && slot.type !== 'held') continue;
+    if (
+      slot.type !== 'index' &&
+      slot.type !== 'source' &&
+      slot.type !== 'held' &&
+      slot.type !== 'level'
+    ) {
+      continue;
+    }
     drawables.push({
       kind: 'box',
       id: cell.id,
-      x: slotX(slot.index),
-      y: rowOf[slot.type],
+      x: slot.type === 'level' ? levelX(slot.level, slot.index) : slotX(slot.index),
+      y: slot.type === 'level' ? levelTop(slot.level) : rowOf[slot.type],
       width: w,
       height: h,
       state: cell.state,
@@ -189,7 +238,7 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
 
   return {
     drawables,
-    width: Math.max(frameRight(capacity), growing ? frameRight(sourceCapacity) : 0),
+    width: Math.max(frameRight(capacity) + originX, growing ? frameRight(sourceCapacity) : 0),
     height: bottom,
   };
 

@@ -273,6 +273,8 @@
   --viz-pointer-length: 16px; /* arrow from a pointer label to its element */
   --viz-pointer-label-width: 32px; /* space reserved for a pointer label such as "top" */
   --viz-swap-arc: 30px; /* how far two swapping cells rise and dip as they pass each other */
+  --viz-level-gap: 18px; /* merge sort: between the rows of its split levels */
+  --viz-split-gap: 14px; /* merge sort: extra space where a level splits a range in two */
 
   /* Stack renderer (VISUAL-SPEC §7): items are --viz-node-height tall */
   --viz-stack-item-width: 132px;

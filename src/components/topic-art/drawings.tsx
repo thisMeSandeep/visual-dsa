@@ -330,6 +330,62 @@ const insertionSort: Drawing = (p) => (
   </G>
 );
 
+/* Merge sort: two sorted halves below, merging up into the array smallest first. */
+const MERGE_TOP_X = [23, 43, 63, 83, 103, 123];
+const MERGE_HALVES = [
+  { x: 13, value: '' },
+  { x: 33, value: '6' },
+  { x: 53, value: '9' },
+  { x: 87, value: '' },
+  { x: 107, value: '5' },
+  { x: 127, value: '8' },
+];
+const emptySlot = (p: ArtPalette, x: number, y: number) => (
+  <Rect
+    key={`${x}-${y}`}
+    x={x}
+    y={y}
+    width={16}
+    height={18}
+    rx={3}
+    fill="none"
+    stroke={p.muted}
+    strokeDasharray="2.5 2.5"
+  />
+);
+const mergeSort: Drawing = (p) => (
+  <G>
+    {MERGE_TOP_X.map((x, i) =>
+      i < 2 ? sortCell(p, x, ['3', '4'][i] ?? '', p.ink, 14) : emptySlot(p, x, 14),
+    )}
+    {MERGE_HALVES.map(({ x, value }) =>
+      value === ''
+        ? emptySlot(p, x, 62)
+        : sortCell(p, x, value, value === '5' ? p.accent : p.ink, 62),
+    )}
+    <Path d="M 115 58 Q 104 40 74 35" stroke={p.accent} />
+    <Path d={head(72, 34, 78, 37)} stroke={p.accent} />
+    {label(p, 41, 94, 'sorted half')}
+    {label(p, 115, 94, 'sorted half')}
+  </G>
+);
+
+/* Quick sort: the pivot in its final place, smaller items left of it and bigger ones right. */
+const QUICK_X = [10, 30, 50, 70, 90, 110, 130];
+const QUICK_VALUES = ['2', '4', '3', '5', '9', '8', '7'];
+const quickSort: Drawing = (p) => (
+  <G>
+    {QUICK_X.map((x, i) => sortCell(p, x, QUICK_VALUES[i] ?? '', i === 3 ? p.accent : p.ink))}
+    <Path d="M 78 20 V 34" stroke={p.accent} />
+    <Path d={head(78, 36, 78, 30)} stroke={p.accent} />
+    {label(p, 78, 14, 'pivot', p.accent)}
+    <Path d="M 10 68 H 66" stroke={p.muted} />
+    <Path d="M 90 68 H 146" stroke={p.muted} />
+    {label(p, 38, 82, '≤ 5')}
+    {label(p, 118, 82, '> 5')}
+  </G>
+);
+
 export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'big-o': bigO,
   array,
@@ -342,4 +398,6 @@ export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'bubble-sort': bubbleSort,
   'selection-sort': selectionSort,
   'insertion-sort': insertionSort,
+  'merge-sort': mergeSort,
+  'quick-sort': quickSort,
 };

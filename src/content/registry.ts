@@ -52,6 +52,16 @@ import { meta as hashTable } from './topics/hash-table/meta';
 import { reference as hashTableReference } from './topics/hash-table/reference';
 import { quiz as hashTableQuiz } from './topics/hash-table/quiz';
 import { sandbox as hashTableSandbox } from './topics/hash-table/sandbox';
+import { lesson as mergeSortLesson } from './topics/merge-sort/lesson';
+import { meta as mergeSort } from './topics/merge-sort/meta';
+import { reference as mergeSortReference } from './topics/merge-sort/reference';
+import { quiz as mergeSortQuiz } from './topics/merge-sort/quiz';
+import { sandbox as mergeSortSandbox } from './topics/merge-sort/sandbox';
+import { lesson as quickSortLesson } from './topics/quick-sort/lesson';
+import { meta as quickSort } from './topics/quick-sort/meta';
+import { reference as quickSortReference } from './topics/quick-sort/reference';
+import { quiz as quickSortQuiz } from './topics/quick-sort/quiz';
+import { sandbox as quickSortSandbox } from './topics/quick-sort/sandbox';
 import { lesson as queueLesson } from './topics/queue/lesson';
 import { meta as queue } from './topics/queue/meta';
 import { reference as queueReference } from './topics/queue/reference';
@@ -81,6 +91,8 @@ export const TOPIC_IDS = [
   'bubble-sort',
   'selection-sort',
   'insertion-sort',
+  'merge-sort',
+  'quick-sort',
 ] as const;
 
 export type TopicId = (typeof TOPIC_IDS)[number];
@@ -98,6 +110,8 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   'bubble-sort': bubbleSort,
   'selection-sort': selectionSort,
   'insertion-sort': insertionSort,
+  'merge-sort': mergeSort,
+  'quick-sort': quickSort,
 };
 
 /**
@@ -116,6 +130,8 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'bubble-sort': bubbleSortLesson,
   'selection-sort': selectionSortLesson,
   'insertion-sort': insertionSortLesson,
+  'merge-sort': mergeSortLesson,
+  'quick-sort': quickSortLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -131,6 +147,8 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'bubble-sort': bubbleSortSandbox,
   'selection-sort': selectionSortSandbox,
   'insertion-sort': insertionSortSandbox,
+  'merge-sort': mergeSortSandbox,
+  'quick-sort': quickSortSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -146,6 +164,8 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'bubble-sort': bubbleSortQuiz,
   'selection-sort': selectionSortQuiz,
   'insertion-sort': insertionSortQuiz,
+  'merge-sort': mergeSortQuiz,
+  'quick-sort': quickSortQuiz,
 };
 
 /** Each topic's reference sheet (F-801 – F-803), under its topic id. */
@@ -161,6 +181,8 @@ export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
   'bubble-sort': bubbleSortReference,
   'selection-sort': selectionSortReference,
   'insertion-sort': insertionSortReference,
+  'merge-sort': mergeSortReference,
+  'quick-sort': quickSortReference,
 };
 
 /** All topics in Home order. */
