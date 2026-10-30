@@ -125,7 +125,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── algorithms/             #   searching/: binary search on the array model (the
 │   │   │                           #   `sorted-array` structure); sorting/: bubble, selection,
 │   │   │                           #   insertion and quick sort (one structure each, on the
-│   │   │                           #   array model) and merge.ts (merge sort's split levels)
+│   │   │                           #   array model) and merge.ts (merge sort's split levels);
+│   │   │                           #   patterns/: two pointers and sliding window
 │   │   ├── lesson/                 #   lesson compiler (recipe → steps), STRUCTURES
 │   │   ├── sandbox/                #   sandbox session: run, undo, reset, presets
 │   │   └── player/                 #   player state machine (pure reducer)
@@ -165,6 +166,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── player.ts               #   step duration, speeds, swipe threshold
 │   │   ├── motion.ts               #   durations, springs, press scale
 │   │   ├── engine.ts               #   step limits, input sizes, value ranges
+│   │   ├── patterns.ts             #   sliding window's default size
 │   │   ├── sandbox.ts              #   undo depth
 │   │   ├── practice.ts             #   quiz length, revise-list size
 │   │   ├── storage.ts              #   storage keys, schema versions

@@ -548,8 +548,8 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 | 11.1 | Binary search (A1) on the array renderer | `feat(binary-search): add binary search lesson, sandbox and quiz` |
 | 11.2 | Bubble, selection and insertion sort (A2–A4), as three separate topics | `feat(sorting): add bubble, selection and insertion sort` |
 | 11.3 | Merge and quick sort (A5, A6), as two separate topics | `feat(sorting): add merge sort and quick sort` |
-| 11.4 | Compare mode and race mode (F-901, F-904) | `feat(compare): add side-by-side compare and race modes` |
-| 11.5 | Two pointers and sliding window (A9, A10) | `feat(patterns): add two pointers and sliding window` |
+| 11.4 | Compare mode and race mode (F-901, F-904). *Skipped for now, after 11.3; to be done later* | `feat(compare): add side-by-side compare and race modes` |
+| 11.5 | Two pointers and sliding window (A9, A10), as two separate topics | `feat(patterns): add two pointers and sliding window` |
 | 11.6 | Recursion with the call-stack renderer (F2, F-504) | `feat(recursion): add recursion lesson and call stack view` |
 | 11.7 | Python, Java and C++ code, live variables, haptics (F-502, F-503, F-307) | `feat(code): add more languages, live variables and haptics` |
 
@@ -558,6 +558,8 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 **Step 11.2, as built:** three topics (Bubble Sort, Selection Sort, Insertion Sort), each with its own lesson, sandbox, quiz, reference sheet, code, glyph and card drawing. One engine, `engine/algorithms/sorting/`, registers each as a structure (`bubble-sort`, `selection-sort`, `insertion-sort`) with `sort` and `pass`; both take `{ from }` (rounds already done), so a lesson can show one pass or round per chapter on the same array. Values may carry a letter tag (`5a`) to show stability. The canvas gained swap arcs (VISUAL-SPEC §7) and a `held` slot for insertion sort's key. The sandbox gained a `values` input: a field of 2–12 numbers that presets and Random fill in, sorted by Sort.
 
 **Step 11.3, as built:** two topics, Merge Sort and Quick Sort. Merge sort has its own model (`engine/algorithms/sorting/merge.ts`): the array plus a row per recursion level, items moving down a level when their range splits and back up, smallest first, when halves merge; the array renderer draws the levels as faint slots under the array (`level` slots, meta `levels`, `src/viz/renderers/array/levels.ts`). `{ depth: 1 }` splits once, for the lesson on merging two sorted halves. Quick sort (Lomuto) joins the in-place sorts with a new `pivot` canvas state, `j` above and `i` below, dimming outside the range being partitioned; `sortRandom` uses a seeded random pivot, and its `from` replays partitions out of sight from the array given. Hoare's partition is described in the lesson and reference, not animated.
+
+**Step 11.5, as built:** two topics, Two Pointers and Sliding Window, in `engine/algorithms/patterns/` on the array model. Two pointers: `reverse` (from both ends), `pairSum` (sorted array; warns when unsorted) and `removeDuplicates` (`read` above, `write` below; the dropped tail is emptied). Sliding window: a model of the array plus k, with `maxSum`, `longestUnique` (numbers or single letters; a repeat is shown as a `collision`), `windowMax` (a monotonic deque: kept items `visited`, the front pointed at as `max`, its contents in the meta) and `widen`/`narrow` for k. The window's ends are `left` and `right` pointers below the row. Its sandbox has two tools, Fixed window and No repeats; the numbers field is now labelled "Numbers". Step 11.4 was skipped and stays open.
 
 ### v1.2: Trees
 | Step | Work | Commit |

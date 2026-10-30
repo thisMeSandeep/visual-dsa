@@ -5,6 +5,7 @@ import { engine } from './engine';
 import { features } from './features';
 import { motion } from './motion';
 import { navigation } from './navigation';
+import { patterns } from './patterns';
 import { player } from './player';
 import { practice } from './practice';
 import { sandbox } from './sandbox';
@@ -23,6 +24,7 @@ export const config = Object.freeze({
   features,
   motion,
   navigation,
+  patterns,
   player,
   practice,
   sandbox,

@@ -25,6 +25,16 @@ import {
   type ArrayModel,
 } from '../structures/array';
 import {
+  createPointerArray,
+  createWindowArray,
+  describePattern,
+  pointerToScene,
+  tracePointers,
+  traceWindow,
+  windowToScene,
+  type WindowModel,
+} from '../algorithms/patterns';
+import {
   createSortedArray,
   describeSearch,
   searchToScene,
@@ -387,6 +397,64 @@ const mergeSortStructure: StructureDefinition<MergeModel> = {
   },
 };
 
+/** Two pointers: an array of values, worked on from both ends or at two speeds. */
+const twoPointers: StructureDefinition<ArrayModel> = {
+  /** { values?: string[] } */
+  create: (input, at) => {
+    const values = optionalTextList(record(input, at), 'values', at);
+    return atSegment(at, () => createPointerArray(values));
+  },
+  toScene: (model) => pointerToScene(model),
+  describe: describePattern,
+  operations: {
+    reverse: (model) => tracePointers(model, { type: 'reverse' }),
+    /** { value }: the target sum (the sandbox's value field). */
+    pairSum: (model, input, at) => {
+      const value = text(record(input, at), 'value', at);
+      const target = Number(value);
+      if (!Number.isInteger(target)) throw new CompileError('"value" must be a whole number', at);
+      return tracePointers(model, { type: 'pairSum', target });
+    },
+    removeDuplicates: (model) => tracePointers(model, { type: 'removeDuplicates' }),
+  },
+};
+
+/**
+ * A sliding window over an array, with a fixed window size k. Each operation also takes
+ * `{ values }`, the sandbox's typed numbers, keeping k.
+ */
+const slidingWindow: StructureDefinition<WindowModel> = (() => {
+  const create = (input: unknown, at: string) => {
+    const fields = record(input, at);
+    const values = optionalTextList(fields, 'values', at);
+    const k = optionalWholeNumber(fields, 'k', at);
+    if (k !== undefined && (k < 1 || k > Math.max(values.length, 1))) {
+      throw new CompileError(`"k" must be 1–${Math.max(values.length, 1)}`, at);
+    }
+    return atSegment(at, () => createWindowArray(values, k));
+  };
+  const using = (model: WindowModel, input: unknown, at: string) => {
+    const fields = record(input, at);
+    if (fields.values === undefined) return model;
+    const values = optionalTextList(fields, 'values', at);
+    return atSegment(at, () => createWindowArray(values, model.k));
+  };
+  return {
+    /** { values?: string[], k?: number } */
+    create,
+    toScene: (model) => windowToScene(model),
+    describe: describePattern,
+    operations: {
+      maxSum: (model, input, at) => traceWindow(using(model, input, at), { type: 'maxSum' }),
+      windowMax: (model, input, at) => traceWindow(using(model, input, at), { type: 'windowMax' }),
+      longestUnique: (model, input, at) =>
+        traceWindow(using(model, input, at), { type: 'longestUnique' }),
+      widen: (model) => traceWindow(model, { type: 'setWindow', k: model.k + 1 }),
+      narrow: (model) => traceWindow(model, { type: 'setWindow', k: model.k - 1 }),
+    },
+  };
+})();
+
 /** How many rounds a lesson says are done already: 0 to n − 1 for n items. */
 function roundsDone(input: Record<string, unknown>, model: ArrayModel, at: string): number {
   const from = optionalWholeNumber(input, 'from', at) ?? 0;
@@ -580,6 +648,8 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   array: array as StructureDefinition<unknown>,
   'sorted-array': sortedArray as StructureDefinition<unknown>,
   'merge-sort': mergeSortStructure as StructureDefinition<unknown>,
+  'two-pointers': twoPointers as StructureDefinition<unknown>,
+  'sliding-window': slidingWindow as StructureDefinition<unknown>,
   ...Object.fromEntries(
     SORT_ALGORITHMS.map((algorithm) => [
       algorithm,

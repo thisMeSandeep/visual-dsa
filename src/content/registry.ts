@@ -72,6 +72,16 @@ import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
 import { reference as singlyLinkedListReference } from './topics/singly-linked-list/reference';
 import { quiz as singlyLinkedListQuiz } from './topics/singly-linked-list/quiz';
 import { sandbox as singlyLinkedListSandbox } from './topics/singly-linked-list/sandbox';
+import { lesson as twoPointersLesson } from './topics/two-pointers/lesson';
+import { meta as twoPointers } from './topics/two-pointers/meta';
+import { reference as twoPointersReference } from './topics/two-pointers/reference';
+import { quiz as twoPointersQuiz } from './topics/two-pointers/quiz';
+import { sandbox as twoPointersSandbox } from './topics/two-pointers/sandbox';
+import { lesson as slidingWindowLesson } from './topics/sliding-window/lesson';
+import { meta as slidingWindow } from './topics/sliding-window/meta';
+import { reference as slidingWindowReference } from './topics/sliding-window/reference';
+import { quiz as slidingWindowQuiz } from './topics/sliding-window/quiz';
+import { sandbox as slidingWindowSandbox } from './topics/sliding-window/sandbox';
 import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
 import { reference as stackReference } from './topics/stack/reference';
@@ -93,6 +103,8 @@ export const TOPIC_IDS = [
   'insertion-sort',
   'merge-sort',
   'quick-sort',
+  'two-pointers',
+  'sliding-window',
 ] as const;
 
 export type TopicId = (typeof TOPIC_IDS)[number];
@@ -112,6 +124,8 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   'insertion-sort': insertionSort,
   'merge-sort': mergeSort,
   'quick-sort': quickSort,
+  'two-pointers': twoPointers,
+  'sliding-window': slidingWindow,
 };
 
 /**
@@ -132,6 +146,8 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'insertion-sort': insertionSortLesson,
   'merge-sort': mergeSortLesson,
   'quick-sort': quickSortLesson,
+  'two-pointers': twoPointersLesson,
+  'sliding-window': slidingWindowLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -149,6 +165,8 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'insertion-sort': insertionSortSandbox,
   'merge-sort': mergeSortSandbox,
   'quick-sort': quickSortSandbox,
+  'two-pointers': twoPointersSandbox,
+  'sliding-window': slidingWindowSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -166,6 +184,8 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'insertion-sort': insertionSortQuiz,
   'merge-sort': mergeSortQuiz,
   'quick-sort': quickSortQuiz,
+  'two-pointers': twoPointersQuiz,
+  'sliding-window': slidingWindowQuiz,
 };
 
 /** Each topic's reference sheet (F-801 – F-803), under its topic id. */
@@ -183,6 +203,8 @@ export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
   'insertion-sort': insertionSortReference,
   'merge-sort': mergeSortReference,
   'quick-sort': quickSortReference,
+  'two-pointers': twoPointersReference,
+  'sliding-window': slidingWindowReference,
 };
 
 /** All topics in Home order. */

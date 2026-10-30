@@ -386,6 +386,48 @@ const quickSort: Drawing = (p) => (
   </G>
 );
 
+/* Two pointers: left and right closing in from both ends of a sorted row. */
+const POINTER_VALUES = ['1', '3', '4', '6', '8', '11', '14'];
+const twoPointers: Drawing = (p) => (
+  <G>
+    {QUICK_X.map((x, i) =>
+      i === 0 || i === 6
+        ? emptySlot(p, x, 42)
+        : sortCell(p, x, POINTER_VALUES[i] ?? '', i === 1 || i === 5 ? p.accent : p.ink),
+    )}
+    {label(p, 38, 14, 'left', p.accent)}
+    <Path d="M 38 20 V 34" stroke={p.accent} />
+    <Path d={head(38, 36, 38, 30)} stroke={p.accent} />
+    {label(p, 118, 14, 'right', p.accent)}
+    <Path d="M 118 20 V 34" stroke={p.accent} />
+    <Path d={head(118, 36, 118, 30)} stroke={p.accent} />
+    <Path d="M 38 72 H 62" stroke={p.muted} />
+    <Path d={head(64, 72, 58, 72)} stroke={p.muted} />
+    <Path d="M 118 72 H 94" stroke={p.muted} />
+    <Path d={head(92, 72, 98, 72)} stroke={p.muted} />
+    {label(p, 78, 88, 'closing in')}
+  </G>
+);
+
+/* Sliding window: a frame around three neighbours, moving right along the row. */
+const WINDOW_X = [6, 25, 44, 63, 82, 101, 120, 139];
+const WINDOW_VALUES = ['2', '1', '5', '1', '3', '2', '8', '1'];
+const slidingWindow: Drawing = (p) => (
+  <G>
+    {WINDOW_X.map((x, i) => (
+      <G key={x}>
+        <Rect x={x} y={42} width={15} height={18} rx={3} fill={p.cell} stroke={p.ink} />
+        {label(p, x + 7.5, 54, WINDOW_VALUES[i] ?? '', p.ink)}
+      </G>
+    ))}
+    <Rect x={59} y={36} width={60} height={30} rx={5} stroke={p.accent} />
+    <Path d="M 74 24 H 102" stroke={p.accent} />
+    <Path d={head(104, 24, 98, 24)} stroke={p.accent} />
+    {label(p, 89, 80, 'k = 3', p.accent)}
+    {label(p, 89, 94, 'sum 6')}
+  </G>
+);
+
 export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'big-o': bigO,
   array,
@@ -400,4 +442,6 @@ export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'insertion-sort': insertionSort,
   'merge-sort': mergeSort,
   'quick-sort': quickSort,
+  'two-pointers': twoPointers,
+  'sliding-window': slidingWindow,
 };

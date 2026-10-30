@@ -242,7 +242,7 @@ describe('Sandbox', () => {
 
   it('sorts the numbers in the field, filled from a preset or typed', async () => {
     await renderSandbox('insertion-sort');
-    const field = () => screen.getByLabelText('Numbers to sort');
+    const field = () => screen.getByLabelText('Numbers');
     expect(field().props.value).toBe('29 10 14 37 13 5 42 21');
 
     await preset('Sorted');

@@ -162,6 +162,73 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'merge.merged': 'Merged: **{items}** is one sorted run.',
   'merge.done': 'Sorted! Comparisons: {comparisons}.',
 
+  // Two pointers (engine/algorithms/patterns/two-pointers.ts)
+  'pointers.reverse.start':
+    'Reverse in place: **left** starts at the first item, **right** at the last.',
+  'pointers.reverse.swap': 'Swap **{a}** and **{b}**, then move both pointers one step in.',
+  'pointers.reverse.done':
+    '**left** and **right** have met in the middle, so it’s reversed. Swaps made: {swaps}.',
+  'pointers.reverse.trivial': 'With {size} items there’s nothing to reverse.',
+  'pointers.pair.start':
+    'Find two items that add up to **{target}**. **left** starts at the smallest, **right** at the biggest.',
+  'pointers.pair.small':
+    '{a} + {b} = **{sum}**, less than {target}. For a bigger sum, **left** moves right.',
+  'pointers.pair.big':
+    '{a} + {b} = **{sum}**, more than {target}. For a smaller sum, **right** moves left.',
+  'pointers.pair.found': '{a} + {b} = **{sum}**. Found the pair, at index {left} and {right}.',
+  'pointers.pair.none': '**left** and **right** have met: no two items add up to **{target}**.',
+  'pointers.pair.unsorted':
+    'The pointers have met with no pair for **{target}**. But the array isn’t sorted, so one may be missed.',
+  'pointers.pair.too-short': 'With {size} items there’s no pair to add up to **{target}**.',
+  'pointers.dedupe.start':
+    'Remove repeats in place. **{value}** is kept; **write** marks where the next new value goes.',
+  'pointers.dedupe.repeat': '**{value}** is the same as the last value kept: skip it.',
+  'pointers.dedupe.keep':
+    '**{value}** is new: copy it down to index {write}, and **write** moves on.',
+  'pointers.dedupe.keep-in-place':
+    '**{value}** is new, and it’s already at index {write}: keep it, and **write** moves on.',
+  'pointers.dedupe.done':
+    'The first {count} items are the unique values; the other {dropped} are dropped. One pass, no new array.',
+  'pointers.dedupe.trivial': 'With {size} items there can’t be any repeats.',
+
+  // Sliding window (engine/algorithms/patterns/sliding-window.ts)
+  'window.sum.start': 'A window of **{k}**: add up the first {k} items. Sum: **{sum}**.',
+  'window.sum.slide':
+    'Slide right: add **{entering}**, take away **{leaving}**. Sum: **{sum}**, without adding the rest again.',
+  'window.sum.slide.best':
+    'Slide right: add **{entering}**, take away **{leaving}**. Sum: **{sum}**, the best so far.',
+  'window.sum.done':
+    'The biggest sum of {k} in a row is **{best}**, at index {start} to {end}. One pass: **O(n)**.',
+  'window.too-small': 'A window of {k} doesn’t fit in {size} items: there’s nothing to slide.',
+  'window.not-numbers': 'This needs numbers to add up, and **{value}** isn’t one.',
+  'window.empty': 'The array is empty, so there’s no window.',
+  'window.unique.start':
+    'Find the longest run with no repeats. The window starts empty, at index 0.',
+  'window.unique.grow':
+    'Add **{value}**: it’s not in the window yet, so the window grows to {length}.',
+  'window.unique.grow.best':
+    'Add **{value}**: no repeat, so the window grows to {length}, the longest so far.',
+  'window.unique.repeat':
+    '**{value}** is already in the window. Shrink it from the left until it isn’t.',
+  'window.unique.shrink': 'Drop **{value}** from the left. The window is now {length} long.',
+  'window.unique.shrink.empty':
+    'Drop **{value}** from the left. For a moment, the window is empty.',
+  'window.unique.done':
+    'The longest run with no repeats has **{best}** items, index {start} to {end}. Each item went in and out once.',
+  'window.max.start':
+    'Find the biggest item in each window of **{k}**. The **deque** keeps only items that could still be the biggest.',
+  'window.max.expire':
+    '**{value}** has slid out of the window, so it leaves the front of the deque.',
+  'window.max.pop':
+    '**{value}** ≤ **{incoming}** and leaves sooner, so it can never be the biggest again: pop it.',
+  'window.max.push': 'Push **{value}** onto the back of the deque. Deque: {deque}.',
+  'window.max.max':
+    'Window {start} to {end}: the biggest is at the front of the deque, **{value}**.',
+  'window.max.done':
+    'Window maxima: **{maxima}**. Each item joined and left the deque at most once: **O(n)**.',
+  'window.k': 'The window is now **{k}** items wide.',
+  'window.k.limit': 'The window can’t be {k} items wide: it must be 1 to {size}.',
+
   // Linked lists (engine/structures/linked-list/operations.ts)
   'list.create': 'Make a new node for **{value}**. Nothing points to it yet.',
   'list.search.compare':

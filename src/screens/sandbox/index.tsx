@@ -491,7 +491,7 @@ function Playground({
         ) : primary?.input === 'values' ? (
           <View className="flex-row items-start gap-2">
             <TextField
-              label="Numbers to sort"
+              label="Numbers"
               labelHidden
               value={text}
               onChangeText={(next) => {

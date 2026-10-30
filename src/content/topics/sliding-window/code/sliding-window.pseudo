@@ -1,0 +1,38 @@
+// The biggest sum of k neighbours.
+function maxSum(a, k)
+  sum = a[0] + a[1] + … + a[k - 1] // @line sum-start
+  best = sum // @line sum-start
+  for right from k to length(a) - 1
+    sum = sum + a[right] - a[right - k] // @line sum-slide
+    best = max(best, sum) // @line sum-slide
+  end for
+  return best // @line sum-done
+end function
+
+// The longest run with no repeated value.
+function longestUnique(a)
+  seen = empty set, left = 0, best = 0 // @line unique-start
+  for right from 0 to length(a) - 1
+    while a[right] is in seen
+      remove a[left] from seen, left = left + 1 // @line unique-shrink
+    end while
+    add a[right] to seen // @line unique-grow
+    best = max(best, right - left + 1) // @line unique-grow
+  end for
+  return best // @line unique-done
+end function
+
+// The biggest item in each window of k. The deque holds
+// indices whose values go down from front to back.
+function windowMax(a, k)
+  deque = empty, maxima = empty // @line max-start
+  for right from 0 to length(a) - 1
+    if front(deque) < right - k + 1 then remove front // @line max-expire
+    while deque isn't empty and a[back(deque)] <= a[right]
+      remove back // @line max-pop
+    end while
+    add right at the back // @line max-push
+    if right >= k - 1 then add a[front(deque)] to maxima // @line max-record
+  end for
+  return maxima
+end function

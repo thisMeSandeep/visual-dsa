@@ -1,5 +1,13 @@
 import { compileLesson } from '@/engine/lesson/compile';
-import type { Trace } from '@/engine/core/types';
+import type { Caption, Trace } from '@/engine/core/types';
+import {
+  createPointerArray,
+  createWindowArray,
+  tracePointers,
+  traceWindow,
+  type PointerOperation,
+  type WindowOperation,
+} from '@/engine/algorithms/patterns';
 import {
   createSortedArray,
   traceSearch,
@@ -196,6 +204,46 @@ describe('merge sort captions', () => {
           expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
         }
       }
+    }
+  });
+});
+
+describe('two pointers and sliding window captions', () => {
+  const check = (steps: readonly { caption: Caption }[]) => {
+    for (const step of steps) {
+      if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+      const text = captionText(step.caption);
+      expect(text).not.toMatch(/\{\w+\}/);
+      expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
+    }
+  };
+
+  it('has a caption for every key the patterns use, with every placeholder filled', () => {
+    const pointerCases: [string[], PointerOperation][] = [
+      [['1', '2', '3'], { type: 'reverse' }],
+      [['1'], { type: 'reverse' }],
+      [['1', '3', '4', '6'], { type: 'pairSum', target: 7 }],
+      [['1', '3', '4', '6'], { type: 'pairSum', target: 99 }],
+      [['8', '1', '6'], { type: 'pairSum', target: 7 }],
+      [['1'], { type: 'pairSum', target: 7 }],
+      [['1', '1', '2', '3', '3'], { type: 'removeDuplicates' }],
+      [['1'], { type: 'removeDuplicates' }],
+    ];
+    for (const [values, operation] of pointerCases) {
+      check(tracePointers(createPointerArray(values), operation).trace.steps);
+    }
+    const windowCases: [string[], number, WindowOperation][] = [
+      [['2', '1', '5', '1', '3'], 2, { type: 'maxSum' }],
+      [['a', 'b'], 2, { type: 'maxSum' }],
+      [[], 1, { type: 'maxSum' }],
+      [['a', 'b', 'a', 'c', 'b', 'b'], 1, { type: 'longestUnique' }],
+      [[], 1, { type: 'longestUnique' }],
+      [['1', '3', '2', '5', '4'], 3, { type: 'windowMax' }],
+      [['1', '2'], 1, { type: 'setWindow', k: 2 }],
+      [['1', '2'], 1, { type: 'setWindow', k: 5 }],
+    ];
+    for (const [values, k, operation] of windowCases) {
+      check(traceWindow(createWindowArray(values, k), operation).trace.steps);
     }
   });
 });

@@ -412,10 +412,12 @@ All sorting and searching topics use the `array` renderer with comparison/swap c
 #### A9 · Two Pointers (P1)
 **Chapters:** Pointers from both ends · Pair sum in a sorted array · Removing duplicates in place · When the pattern applies
 **Complexity:** O(n) time · O(1) space
+*As built:* reverse and pair sum use `left` and `right` from above; remove duplicates uses `read` above and `write` below. Sandbox: Pair sum (a typed target), Reverse, Remove repeats; presets sorted, repeats, unsorted (to see a pair missed), two items.
 
 #### A10 · Sliding Window (P1)
 **Chapters:** Fixed-size window (max sum of k) · Variable window (longest substring without repeats) · Expanding and shrinking · Monotonic deque for window maximum (links to L7)
 **Complexity:** O(n) time
+*As built:* the window's ends are `left` and `right` below the row; the lesson's variable window runs on letters, the sandbox's on numbers. Sandbox: two tools, Fixed window (Max sum, Max of each, k − 1, k + 1) and No repeats (Longest).
 
 #### A11 · Backtracking (P2)
 Renderer: `grid` (board) + `tree` (decision tree)

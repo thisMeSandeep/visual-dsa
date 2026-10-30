@@ -32,6 +32,8 @@ describe('registered content', () => {
       'insertion-sort',
       'merge-sort',
       'quick-sort',
+      'two-pointers',
+      'sliding-window',
     ]);
   });
 });
