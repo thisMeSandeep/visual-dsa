@@ -65,6 +65,14 @@ import {
   type SampleId,
 } from '../foundations/big-o';
 import {
+  createRecursion,
+  describeRecursion,
+  recursionToScene,
+  traceRecursion,
+  type RecursionModel,
+  type RecursiveFunction,
+} from '../foundations/recursion';
+import {
   createTable,
   describeHashTable,
   hashToScene,
@@ -455,6 +463,33 @@ const slidingWindow: StructureDefinition<WindowModel> = (() => {
   };
 })();
 
+/**
+ * Recursion: a call stack (and, for Fibonacci, a call tree) for one recursive function at a
+ * time. Each function runs on the model's n (the sandbox's presets), or `{ n }` when given.
+ */
+const recursionStructure: StructureDefinition<RecursionModel> = (() => {
+  const run = (type: RecursiveFunction) => (model: RecursionModel, input: unknown, at: string) => {
+    const n = optionalWholeNumber(record(input, at), 'n', at);
+    return traceRecursion(model, n === undefined ? { type } : { type, n });
+  };
+  return {
+    /** { n?: number } */
+    create: (input, at) => {
+      const n = optionalWholeNumber(record(input, at), 'n', at);
+      if (n !== undefined && n < 0) throw new CompileError('"n" must be 0 or more', at);
+      return createRecursion(n);
+    },
+    toScene: (model) => recursionToScene(model),
+    describe: describeRecursion,
+    operations: {
+      factorial: run('fact'),
+      fib: run('fib'),
+      fibMemo: run('fibMemo'),
+      noBaseCase: run('broken'),
+    },
+  };
+})();
+
 /** How many rounds a lesson says are done already: 0 to n − 1 for n items. */
 function roundsDone(input: Record<string, unknown>, model: ArrayModel, at: string): number {
   const from = optionalWholeNumber(input, 'from', at) ?? 0;
@@ -649,6 +684,7 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   'sorted-array': sortedArray as StructureDefinition<unknown>,
   'merge-sort': mergeSortStructure as StructureDefinition<unknown>,
   'two-pointers': twoPointers as StructureDefinition<unknown>,
+  recursion: recursionStructure as StructureDefinition<unknown>,
   'sliding-window': slidingWindow as StructureDefinition<unknown>,
   ...Object.fromEntries(
     SORT_ALGORITHMS.map((algorithm) => [

@@ -8,6 +8,7 @@ import { navigation } from './navigation';
 import { patterns } from './patterns';
 import { player } from './player';
 import { practice } from './practice';
+import { recursion } from './recursion';
 import { sandbox } from './sandbox';
 import { storage } from './storage';
 import { structures } from './structures';
@@ -27,6 +28,7 @@ export const config = Object.freeze({
   patterns,
   player,
   practice,
+  recursion,
   sandbox,
   storage,
   structures,

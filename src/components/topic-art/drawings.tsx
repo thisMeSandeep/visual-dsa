@@ -428,6 +428,41 @@ const slidingWindow: Drawing = (p) => (
   </G>
 );
 
+/* Recursion: frames piled on the call stack, and the call tree beside them. */
+const FRAMES = [
+  { y: 66, text: 'fact(3)' },
+  { y: 47, text: 'fact(2)' },
+  { y: 28, text: 'fact(1)' },
+];
+const recursion: Drawing = (p) => (
+  <G>
+    {FRAMES.map(({ y, text }, i) => (
+      <G key={y}>
+        <Rect
+          x={14}
+          y={y}
+          width={62}
+          height={15}
+          rx={3}
+          fill={p.cell}
+          stroke={i === 2 ? p.accent : p.ink}
+        />
+        {label(p, 45, y + 11, text, i === 2 ? p.accent : p.ink)}
+      </G>
+    ))}
+    <Path d="M 10 86 H 80" stroke={p.ink} />
+    {label(p, 45, 18, 'call stack')}
+    <Path d="M 122 32 L 106 56 M 128 32 L 144 56" stroke={p.muted} />
+    <Rect x={113} y={18} width={24} height={14} rx={3} fill={p.cell} stroke={p.ink} />
+    {label(p, 125, 28, 'f(3)', p.ink)}
+    <Rect x={94} y={56} width={24} height={14} rx={3} fill={p.cell} stroke={p.accent} />
+    {label(p, 106, 66, 'f(2)', p.accent)}
+    <Rect x={132} y={56} width={24} height={14} rx={3} fill={p.cell} stroke={p.ink} />
+    {label(p, 144, 66, 'f(1)', p.ink)}
+    {label(p, 125, 88, 'calls')}
+  </G>
+);
+
 export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'big-o': bigO,
   array,
@@ -444,4 +479,5 @@ export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'quick-sort': quickSort,
   'two-pointers': twoPointers,
   'sliding-window': slidingWindow,
+  recursion,
 };

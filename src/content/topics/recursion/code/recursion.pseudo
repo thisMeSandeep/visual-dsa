@@ -1,0 +1,27 @@
+function fact(n)
+  if n <= 1 then return 1 // @line fact-base
+  rest = fact(n - 1) // @line fact-call
+  return n × rest // @line fact-return
+end function
+
+function fib(n)
+  if n <= 1 then return n // @line fib-base
+  a = fib(n - 1) // @line fib-left
+  b = fib(n - 2) // @line fib-right
+  return a + b // @line fib-return
+end function
+
+// Memoised: each answer is saved the first time.
+function fibMemo(n, memo)
+  if n is in memo then return memo[n] // @line memo-hit
+  if n <= 1 then return n // @line memo-base
+  a = fibMemo(n - 1, memo) // @line memo-left
+  b = fibMemo(n - 2, memo) // @line memo-right
+  memo[n] = a + b // @line memo-store
+  return memo[n] // @line memo-store
+end function
+
+// Broken: no base case, so it never stops.
+function brokenFact(n)
+  return n × brokenFact(n - 1) // @line broken-call
+end function

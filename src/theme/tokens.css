@@ -276,6 +276,11 @@
   --viz-level-gap: 18px; /* merge sort: between the rows of its split levels */
   --viz-split-gap: 14px; /* merge sort: extra space where a level splits a range in two */
 
+  /* Call-stack renderer (recursion): frames are --viz-frame-width × --viz-cell-height, tree nodes
+     --viz-call-node-width × --viz-node-height, levels --viz-level-gap apart */
+  --viz-frame-width: 168px;
+  --viz-call-node-width: 64px;
+
   /* Stack renderer (VISUAL-SPEC §7): items are --viz-node-height tall */
   --viz-stack-item-width: 132px;
   --viz-stack-padding: 10px; /* inside the U-shaped container */

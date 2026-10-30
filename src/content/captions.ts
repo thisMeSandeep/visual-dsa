@@ -381,6 +381,29 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'bigo.done.halving':
     'Done: **{count}** halvings for n = {n}: log₂ n, rounded down. The dot sits on the **{label}** curve.',
 
+  // Recursion (engine/foundations/recursion/operations.ts)
+  'recursion.call.fact':
+    'Call **fact({n})**. {n} is more than 1, so it needs **fact({m})** first: {n} × fact({m}).',
+  'recursion.base.fact':
+    'Call **fact({n})**. {n} ≤ 1 is the **base case**: it returns 1 straight away, with no more calls.',
+  'recursion.return.fact':
+    '**fact({m})** returned {child}, so fact({n}) = {n} × {child} = **{result}**. It returns that.',
+  'recursion.call.fib':
+    'Call **fib({n})** = fib({a}) + fib({b}). It calls **fib({a})** first and waits.',
+  'recursion.base.fib': 'Call **fib({n})**: a **base case**, so it returns {n} straight away.',
+  'recursion.resume.fib': 'fib({a}) returned **{left}**. Now fib({n}) calls **fib({b})**.',
+  'recursion.return.fib':
+    'fib({b}) returned **{right}**, so fib({n}) = {left} + {right} = **{result}**.',
+  'recursion.return.memo':
+    'fib({n}) = {left} + {right} = **{result}**. Save it in the **memo** before returning.',
+  'recursion.memo.hit': '**fib({n})** is already in the memo: **{result}**. No more calls needed.',
+  'recursion.call.broken':
+    'Call **fact({n})**. With no base case, it always calls **fact({m})** next, and waits.',
+  'recursion.overflow':
+    'The stack is full after {depth} frames, with no base case in sight. That’s a **stack overflow**.',
+  'recursion.too-big': '**{label}** would be too big to draw. Try n from 0 to {max}.',
+  'recursion.done': '**{label}** = {result}. Calls made: {calls}. Deepest stack: {depth}.',
+
   // Queue (engine/structures/queue/operations.ts)
   'queue.enqueue.check': 'Enqueue **{value}**. First, check there’s a free slot.',
   'queue.enqueued': '**{value}** joins at the **rear**.',

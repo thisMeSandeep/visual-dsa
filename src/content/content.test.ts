@@ -34,6 +34,7 @@ describe('registered content', () => {
       'quick-sort',
       'two-pointers',
       'sliding-window',
+      'recursion',
     ]);
   });
 });

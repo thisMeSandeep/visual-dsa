@@ -91,6 +91,11 @@ export const GLYPHS = {
     'M6.5 10h11a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-11a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1z',
     'M9 5.5h6M13.5 4l1.5 1.5l-1.5 1.5',
   ],
+  recursion: [
+    'M3.5 2.5h17a1 1 0 0 1 1 1v17a1 1 0 0 1 -1 1h-17a1 1 0 0 1 -1 -1v-17a1 1 0 0 1 1 -1z',
+    'M7.5 6.5h9a1 1 0 0 1 1 1v9a1 1 0 0 1 -1 1h-9a1 1 0 0 1 -1 -1v-9a1 1 0 0 1 1 -1z',
+    'M11 10h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1z',
+  ],
 } as const;
 
 export type GlyphName = keyof typeof GLYPHS;

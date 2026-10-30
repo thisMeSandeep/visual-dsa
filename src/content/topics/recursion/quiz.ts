@@ -1,0 +1,130 @@
+import type { Quiz } from '../../schema';
+
+/** Recursion quiz (ALGORITHM-CATALOG F2). Each question links to its chapter. */
+export const quiz = {
+  topicId: 'recursion',
+  questions: [
+    {
+      id: 'base-case',
+      kind: 'multiple-choice',
+      prompt: 'What does a base case do?',
+      options: [
+        { id: 'answer', text: 'Answers a small input directly, without calling itself' },
+        { id: 'first', text: 'Runs first, before any other call' },
+        { id: 'loop', text: 'Turns the recursion into a loop' },
+        { id: 'memo', text: 'Saves answers for later' },
+      ],
+      answer: 'answer',
+      explanation: 'It’s where the calls stop: without one, the function never returns.',
+      chapterId: 'base-case',
+    },
+    {
+      id: 'frames',
+      kind: 'multiple-choice',
+      prompt: 'While fact(1) runs inside fact(4), how many frames are on the call stack?',
+      options: [
+        { id: 'four', text: '4' },
+        { id: 'one', text: '1' },
+        { id: 'two', text: '2' },
+        { id: 'five', text: '5' },
+      ],
+      answer: 'four',
+      explanation:
+        'fact(4), fact(3), fact(2) and fact(1) are all still running, each waiting on the next.',
+      chapterId: 'call-stack',
+    },
+    {
+      id: 'lifo',
+      kind: 'true-false',
+      prompt: 'The last call made is the first to return.',
+      answer: true,
+      explanation: 'The call stack is a stack: last in, first out.',
+      chapterId: 'call-stack',
+    },
+    {
+      id: 'fact-space',
+      kind: 'complexity',
+      prompt: 'How much stack space does recursive fact(n) use?',
+      options: [
+        { id: 'constant', text: 'O(1)' },
+        { id: 'log', text: 'O(log n)' },
+        { id: 'linear', text: 'O(n)' },
+        { id: 'exponential', text: 'O(2ⁿ)' },
+      ],
+      answer: 'linear',
+      explanation: 'At the deepest point, n frames are waiting on the stack.',
+      chapterId: 'factorial',
+    },
+    {
+      id: 'fact-value',
+      kind: 'multiple-choice',
+      prompt: 'fact(3) is waiting for fact(2), which returns 2. What does fact(3) return?',
+      options: [
+        { id: 'six', text: '6' },
+        { id: 'five', text: '5' },
+        { id: 'two', text: '2' },
+        { id: 'three', text: '3' },
+      ],
+      answer: 'six',
+      explanation: 'fact(3) = 3 × fact(2) = 3 × 2 = 6.',
+      chapterId: 'factorial',
+    },
+    {
+      id: 'fib-calls',
+      kind: 'multiple-choice',
+      prompt: 'How many times does plain recursive fib(5) call fib(2)?',
+      options: [
+        { id: 'three', text: '3' },
+        { id: 'one', text: '1' },
+        { id: 'two', text: '2' },
+        { id: 'five', text: '5' },
+      ],
+      answer: 'three',
+      explanation: 'Once under fib(4)’s fib(3), once under fib(4), and once under fib(5)’s fib(3).',
+      chapterId: 'fibonacci',
+    },
+    {
+      id: 'fib-time',
+      kind: 'complexity',
+      prompt: 'How does plain recursive fib(n) grow?',
+      options: [
+        { id: 'linear', text: 'O(n)' },
+        { id: 'quadratic', text: 'O(n²)' },
+        { id: 'exponential', text: 'O(2ⁿ)' },
+        { id: 'log', text: 'O(log n)' },
+      ],
+      answer: 'exponential',
+      explanation:
+        'Each call makes two more, and the same calls repeat: the count roughly doubles per n.',
+      chapterId: 'fibonacci',
+    },
+    {
+      id: 'memo-time',
+      kind: 'complexity',
+      prompt: 'With memoisation, how long does fib(n) take?',
+      options: [
+        { id: 'linear', text: 'O(n)' },
+        { id: 'exponential', text: 'O(2ⁿ)' },
+        { id: 'quadratic', text: 'O(n²)' },
+        { id: 'constant', text: 'O(1)' },
+      ],
+      answer: 'linear',
+      explanation: 'Each fib(k) is worked out once and looked up after that.',
+      chapterId: 'memoisation',
+    },
+    {
+      id: 'overflow',
+      kind: 'multiple-choice',
+      prompt: 'What happens to a recursive function with no base case?',
+      options: [
+        { id: 'overflow', text: 'The stack fills up: a stack overflow' },
+        { id: 'zero', text: 'It returns 0' },
+        { id: 'once', text: 'It runs once and stops' },
+        { id: 'loop', text: 'It runs forever without using memory' },
+      ],
+      answer: 'overflow',
+      explanation: 'Every call adds a frame and none return, so the stack runs out of room.',
+      chapterId: 'stack-overflow',
+    },
+  ],
+} satisfies Quiz;

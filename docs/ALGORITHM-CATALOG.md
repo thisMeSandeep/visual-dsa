@@ -113,6 +113,7 @@ Renderer: `call-stack` (frames growing and shrinking) + `tree` (recursion tree)
 **Sandbox:** run `factorial(n)`, `fib(n)` or `sum(array)`. Step into and out of each call. Toggle memoisation for `fib`.
 
 **Complexity:** factorial O(n) time and O(n) stack · naive fib O(2ⁿ) · memoised fib O(n)
+*As built:* the `call-stack` renderer draws the stack and, for Fibonacci, its own small call tree (the full `tree` renderer comes with v1.2). The sandbox runs factorial, Fibonacci, Fibonacci with a memo, and a factorial with no base case, for n set by presets (fact up to 7, fib up to 6). `sum(array)` was left out: it teaches the same as factorial.
 
 ---
 

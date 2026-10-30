@@ -561,6 +561,8 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 
 **Step 11.5, as built:** two topics, Two Pointers and Sliding Window, in `engine/algorithms/patterns/` on the array model. Two pointers: `reverse` (from both ends), `pairSum` (sorted array; warns when unsorted) and `removeDuplicates` (`read` above, `write` below; the dropped tail is emptied). Sliding window: a model of the array plus k, with `maxSum`, `longestUnique` (numbers or single letters; a repeat is shown as a `collision`), `windowMax` (a monotonic deque: kept items `visited`, the front pointed at as `max`, its contents in the meta) and `widen`/`narrow` for k. The window's ends are `left` and `right` pointers below the row. Its sandbox has two tools, Fixed window and No repeats; the numbers field is now labelled "Numbers". Step 11.4 was skipped and stays open.
 
+**Step 11.6, as built:** the Recursion topic (Foundations), on a new `call-stack` renderer (`viz/renderers/call-stack/`): frames stack upwards on the left (running `active`, returning `found` with its result, waiting plain), and for Fibonacci the call tree sits to the right (done calls `visited`, memo hits `found`). The engine (`engine/foundations/recursion/`) dry-runs each function first, so every call's column in the tree and the stack's tallest point are known from the start and nothing moves as calls appear. Functions: factorial, Fibonacci, Fibonacci with a memo, and a factorial with no base case that overflows; sandbox presets pick n. The catalog's `sum(array)` is left out (it teaches what factorial does). The general `tree` renderer, with pan and zoom, is still Step 12.1.
+
 ### v1.2: Trees
 | Step | Work | Commit |
 |---|---|---|

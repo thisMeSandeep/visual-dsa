@@ -28,6 +28,8 @@ export const SIZES: VizSizes = {
   swapArc: 30,
   levelGap: 18,
   splitGap: 14,
+  frameWidth: 168,
+  callNodeWidth: 64,
   stackItemWidth: 132,
   stackPadding: 10,
   stackRadius: 18,

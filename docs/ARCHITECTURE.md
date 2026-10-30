@@ -110,6 +110,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   ├── queue/
 │   │   │   ├── hash-table/
 │   │   │   ├── growth-chart/
+│   │   │   ├── call-stack/         #     recursion: frames, plus a small call tree
 │   │   │   └── registry.ts         #     renderer id → component
 │   │   ├── scenes/                 #   hand-built analogy scenes (browser-back…)
 │   │   ├── code-panel/
@@ -118,7 +119,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   ├── engine/                     # PURE TypeScript: no React / RN imports
 │   │   ├── core/                   #   types, tracer, scene builders, rng, limits,
 │   │   │                           #   renderer.ts (RENDERER_IDS)
-│   │   ├── foundations/            #   big-o/: growth curves, n, sample functions to count
+│   │   ├── foundations/            #   big-o/: growth curves, n, sample functions to count;
+│   │   │                           #   recursion/: calls, the call stack and call tree
 │   │   ├── structures/             #   array/, linked-list/, stack/, queue/, hash-table/
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts
@@ -167,6 +169,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── motion.ts               #   durations, springs, press scale
 │   │   ├── engine.ts               #   step limits, input sizes, value ranges
 │   │   ├── patterns.ts             #   sliding window's default size
+│   │   ├── recursion.ts            #   largest n per function, overflow depth
 │   │   ├── sandbox.ts              #   undo depth
 │   │   ├── practice.ts             #   quiz length, revise-list size
 │   │   ├── storage.ts              #   storage keys, schema versions

@@ -63,7 +63,7 @@ This list is based on [IDEA.md](./IDEA.md). Each feature has an ID so other docs
 | F-501 | Synced code highlighting | The line currently running is highlighted alongside the animation. | P0 |
 | F-502 | Multiple languages | Pseudocode, JavaScript, Python, Java, C++. Switch at any time while the highlight stays in sync. | P0 (pseudo + 1 lang), P1 (rest) |
 | F-503 | Live variables | A watch panel shows variable values at the current step (`i = 3`, `top = 5`, `load = 0.6`). | P1 |
-| F-504 | Call stack view | For recursive algorithms, shows the stack of calls growing and shrinking. | P2 |
+| F-504 | Call stack view | For recursive algorithms, shows the stack of calls growing and shrinking. *(Built early, with Recursion in Step 11.6.)* | P2 |
 | F-505 | Copy code | Copy the full implementation to the clipboard. | P0 |
 | F-506 | Collapsible / split view | The code panel docks below the canvas in portrait and beside it in landscape. Can be collapsed. | P0 |
 

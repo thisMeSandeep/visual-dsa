@@ -32,6 +32,11 @@ import { meta as bubbleSort } from './topics/bubble-sort/meta';
 import { reference as bubbleSortReference } from './topics/bubble-sort/reference';
 import { quiz as bubbleSortQuiz } from './topics/bubble-sort/quiz';
 import { sandbox as bubbleSortSandbox } from './topics/bubble-sort/sandbox';
+import { lesson as recursionLesson } from './topics/recursion/lesson';
+import { meta as recursion } from './topics/recursion/meta';
+import { reference as recursionReference } from './topics/recursion/reference';
+import { quiz as recursionQuiz } from './topics/recursion/quiz';
+import { sandbox as recursionSandbox } from './topics/recursion/sandbox';
 import { lesson as selectionSortLesson } from './topics/selection-sort/lesson';
 import { meta as selectionSort } from './topics/selection-sort/meta';
 import { reference as selectionSortReference } from './topics/selection-sort/reference';
@@ -105,6 +110,7 @@ export const TOPIC_IDS = [
   'quick-sort',
   'two-pointers',
   'sliding-window',
+  'recursion',
 ] as const;
 
 export type TopicId = (typeof TOPIC_IDS)[number];
@@ -126,6 +132,7 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   'quick-sort': quickSort,
   'two-pointers': twoPointers,
   'sliding-window': slidingWindow,
+  recursion: recursion,
 };
 
 /**
@@ -148,6 +155,7 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'quick-sort': quickSortLesson,
   'two-pointers': twoPointersLesson,
   'sliding-window': slidingWindowLesson,
+  recursion: recursionLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -167,6 +175,7 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'quick-sort': quickSortSandbox,
   'two-pointers': twoPointersSandbox,
   'sliding-window': slidingWindowSandbox,
+  recursion: recursionSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -186,6 +195,7 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'quick-sort': quickSortQuiz,
   'two-pointers': twoPointersQuiz,
   'sliding-window': slidingWindowQuiz,
+  recursion: recursionQuiz,
 };
 
 /** Each topic's reference sheet (F-801 – F-803), under its topic id. */
@@ -205,6 +215,7 @@ export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
   'quick-sort': quickSortReference,
   'two-pointers': twoPointersReference,
   'sliding-window': slidingWindowReference,
+  recursion: recursionReference,
 };
 
 /** All topics in Home order. */

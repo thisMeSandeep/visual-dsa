@@ -1,6 +1,11 @@
 import { compileLesson } from '@/engine/lesson/compile';
 import type { Caption, Trace } from '@/engine/core/types';
 import {
+  createRecursion,
+  traceRecursion,
+  type RecursiveFunction,
+} from '@/engine/foundations/recursion';
+import {
   createPointerArray,
   createWindowArray,
   tracePointers,
@@ -244,6 +249,22 @@ describe('two pointers and sliding window captions', () => {
     ];
     for (const [values, k, operation] of windowCases) {
       check(traceWindow(createWindowArray(values, k), operation).trace.steps);
+    }
+  });
+});
+
+describe('recursion captions', () => {
+  it('has a caption for every key recursion uses, with every placeholder filled', () => {
+    const functions: RecursiveFunction[] = ['fact', 'fib', 'fibMemo', 'broken'];
+    for (const type of functions) {
+      for (const n of [0, 1, 3, 99]) {
+        for (const step of traceRecursion(createRecursion(), { type, n }).trace.steps) {
+          if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+          const text = captionText(step.caption);
+          expect(text).not.toMatch(/\{\w+\}/);
+          expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
+        }
+      }
     }
   });
 });
