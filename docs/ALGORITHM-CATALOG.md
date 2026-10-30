@@ -160,7 +160,7 @@ Glyph: three chained boxes · Renderer: `linked-list`
 7. Search
 8. Reverse a list *(classic interview problem)*
 
-**Sandbox:** `insertHead(x)`, `insertTail(x)`, `insertAfter(node, x)`, `delete(x)`, `search(x)`, `reverse()`. Toggle: keep a tail pointer.
+**Sandbox:** `insertHead(x)`, `insertTail(x)`, `insertAfter(node, x)`, `delete(x)`, `search(x)`, `reverse()`, with a Node field beside the value field. The tail-pointer toggle is two tools, **Head only** and **Head and tail**.
 
 | Operation | Time |
 |---|---|
@@ -172,7 +172,7 @@ Glyph: three chained boxes · Renderer: `linked-list`
 | Space | O(n) |
 
 **States:** active (current pointer), new, found, dimmed, error (value not found)
-**Presets:** empty, single node, delete head, delete tail, long list (10 nodes, needs scrolling)
+**Presets:** a few nodes (its hint suggests deleting the head and the tail), empty, single node, long list (8 nodes, so it fits until pan and zoom arrive in Step 12.1)
 **Practice ideas:** "After `prev.next = cur.next`, which node is unreachable?" · "During reverse, what does `prev` point to after step 3?"
 
 ---
@@ -182,7 +182,7 @@ Renderer: `linked-list` (two arrows per link)
 
 **Chapters:** `prev` pointers · Insert at both ends · Delete a known node in O(1) · Traverse backwards · Trade-off: extra memory per node
 
-**Sandbox:** the L2 operations plus `insertBefore(node, x)` and `traverseBackward()`.
+**Sandbox:** the L2 operations (without reverse) plus `insertBefore(node, x)`, `traverse()` and `traverseBackward()`. It always keeps a tail pointer.
 
 **Complexity:** insert/delete at either end O(1) · delete a known node O(1) · search O(n) · space O(n) (two pointers per node)
 

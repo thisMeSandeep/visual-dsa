@@ -25,6 +25,14 @@ import {
   type ArrayModel,
 } from '../structures/array';
 import {
+  createList,
+  describeList,
+  listToScene,
+  traceList,
+  type ListKind,
+  type ListModel,
+} from '../structures/linked-list';
+import {
   createQueue,
   describeQueue,
   queueToScene,
@@ -254,10 +262,65 @@ function addressesFrom(input: unknown, at: string): ArrayAddresses {
   };
 }
 
+/** Linked lists, singly (the default) or doubly, with or without a tail pointer. */
+const LIST_KINDS: readonly ListKind[] = ['singly', 'doubly'];
+const linkedList: StructureDefinition<ListModel> = {
+  /** { values?: string[] (head first), kind?: 'singly' | 'doubly', tail?: boolean } */
+  create: (input, at) => {
+    const fields = record(input, at);
+    const values = optionalTextList(fields, 'values', at);
+    const { kind, tail } = fields;
+    if (kind !== undefined && !LIST_KINDS.includes(kind as ListKind)) {
+      throw new CompileError(`"kind" must be one of ${LIST_KINDS.join(', ')}`, at);
+    }
+    if (tail !== undefined && typeof tail !== 'boolean') {
+      throw new CompileError('"tail" must be true or false', at);
+    }
+    return atSegment(at, () =>
+      createList(values, {
+        ...(kind === undefined ? {} : { kind: kind as ListKind }),
+        ...(tail === undefined ? {} : { hasTail: tail }),
+      }),
+    );
+  },
+  toScene: (model) => listToScene(model),
+  describe: describeList,
+  operations: {
+    insertHead: (model, input, at) =>
+      traceList(model, { type: 'insertHead', value: text(record(input, at), 'value', at) }),
+    insertTail: (model, input, at) =>
+      traceList(model, { type: 'insertTail', value: text(record(input, at), 'value', at) }),
+    insertAfter: (model, input, at) => {
+      const fields = record(input, at);
+      return traceList(model, {
+        type: 'insertAfter',
+        target: text(fields, 'target', at),
+        value: text(fields, 'value', at),
+      });
+    },
+    insertBefore: (model, input, at) => {
+      const fields = record(input, at);
+      return traceList(model, {
+        type: 'insertBefore',
+        target: text(fields, 'target', at),
+        value: text(fields, 'value', at),
+      });
+    },
+    delete: (model, input, at) =>
+      traceList(model, { type: 'delete', value: text(record(input, at), 'value', at) }),
+    search: (model, input, at) =>
+      traceList(model, { type: 'search', value: text(record(input, at), 'value', at) }),
+    traverse: (model) => traceList(model, { type: 'traverse' }),
+    traverseBackward: (model) => traceList(model, { type: 'traverseBackward' }),
+    reverse: (model) => traceList(model, { type: 'reverse' }),
+  },
+};
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
   brackets: brackets as StructureDefinition<unknown>,
   queue: queue as StructureDefinition<unknown>,
   array: array as StructureDefinition<unknown>,
+  'linked-list': linkedList as StructureDefinition<unknown>,
 };

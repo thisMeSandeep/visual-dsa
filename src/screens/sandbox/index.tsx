@@ -38,7 +38,7 @@ import { SceneView } from '@/viz/scene-view';
 import { ScreenPlaceholder } from '../placeholder';
 import { parseExpression } from './expression-input';
 import { parseIndex } from './index-input';
-import { parseValue } from './value-input';
+import { parseTarget, parseValue } from './value-input';
 
 /**
  * Sandbox / Play mode (F-601–F-603, F-606): run any operation on a live structure. A topic can
@@ -74,10 +74,21 @@ type Preset = SandboxConfig['presets'][number];
 
 const UNDONE = 'Undone: back to before the last change.';
 
-const takesIndex = (operation: Operation) =>
-  operation.input === 'index' || operation.input === 'index-value';
+/** Operations that take a key: an index (array) or the node to insert next to (lists). */
+const takesKey = (operation: Operation) =>
+  operation.input === 'index' ||
+  operation.input === 'index-value' ||
+  operation.input === 'target-value';
 const takesValue = (operation: Operation) =>
-  operation.input === 'value' || operation.input === 'index-value';
+  operation.input === 'value' ||
+  operation.input === 'index-value' ||
+  operation.input === 'target-value';
+
+/** The key field's name and how its text is checked, for each kind of key. */
+const KEY_FIELDS = {
+  index: { label: 'Index', parse: parseIndex },
+  target: { label: 'Node', parse: parseTarget },
+} as const;
 
 /** Splits `items` into rows of `size`, for a grid of buttons. */
 const rows = <T,>(items: readonly T[], size: number): T[][] =>
@@ -121,10 +132,16 @@ function Playground({
     primary?.input === 'expression' ? presetExpression(firstPreset) : '',
   );
   const [problem, setProblem] = useState<string>();
-  // Tools with index operations (the array) get a second field for the index.
-  const indexed = sandbox.operations.some(takesIndex);
-  const [indexText, setIndexText] = useState('');
-  const [indexProblem, setIndexProblem] = useState<string>();
+  // Tools whose operations take a key (the array's index, a list's node) get a second field.
+  const keyed = sandbox.operations.some(takesKey);
+  const keyField =
+    KEY_FIELDS[
+      sandbox.operations.some((operation) => operation.input === 'target-value')
+        ? 'target'
+        : 'index'
+    ];
+  const [keyText, setKeyText] = useState('');
+  const [keyProblem, setKeyProblem] = useState<string>();
   const [rng] = useState(() => createRng(Date.now()));
 
   // Each operation's trace plays from its first step at the learner's speed.
@@ -144,13 +161,13 @@ function Playground({
     const fields: Record<string, unknown> = {};
     // Check every field the operation needs, so both problems show at once.
     let ok = true;
-    if (takesIndex(operation)) {
-      const parsed = parseIndex(indexText);
-      if (parsed.ok) fields.index = parsed.index;
-      else {
-        setIndexProblem(parsed.problem);
+    if (takesKey(operation)) {
+      const parsed = keyField.parse(keyText);
+      if (!parsed.ok) {
+        setKeyProblem(parsed.problem);
         ok = false;
-      }
+      } else if ('index' in parsed) fields.index = parsed.index;
+      else fields.target = parsed.value;
     }
     if (takesValue(operation)) {
       const parsed = parseValue(text);
@@ -173,7 +190,7 @@ function Playground({
     if (takesValue(operation)) setText('');
     if (typeof fields.expression === 'string') setText(fields.expression);
     setProblem(undefined);
-    setIndexProblem(undefined);
+    setKeyProblem(undefined);
     const input = operation.input ? fields : undefined;
     const result = definition.operations[operation.id]!(session.model, input, 'sandbox');
     setSession(applyOperation(session, result));
@@ -287,21 +304,21 @@ function Playground({
           }}
         />
 
-        {indexed ? (
+        {keyed ? (
           <>
             <View className="flex-row items-start gap-2">
               <TextField
-                label="Index"
+                label={keyField.label}
                 labelHidden
-                value={indexText}
+                value={keyText}
                 onChangeText={(next) => {
-                  setIndexText(next);
-                  setIndexProblem(undefined);
+                  setKeyText(next);
+                  setKeyProblem(undefined);
                 }}
-                error={indexProblem}
+                error={keyProblem}
                 keyboardType="number-pad"
                 returnKeyType="done"
-                placeholder="Index"
+                placeholder={keyField.label}
                 className="w-24"
               />
               <TextField
@@ -397,7 +414,7 @@ function Playground({
           <Button label={primary.label} size="compact" onPress={() => run(primary)} />
         ) : null}
 
-        {!indexed && secondary.length > 0 ? (
+        {!keyed && secondary.length > 0 ? (
           <View className="flex-row gap-2">
             {secondary.map((operation) => (
               <Button

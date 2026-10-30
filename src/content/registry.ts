@@ -10,13 +10,19 @@ import { meta as array } from './topics/array/meta';
 import { quiz as arrayQuiz } from './topics/array/quiz';
 import { sandbox as arraySandbox } from './topics/array/sandbox';
 import { meta as bigO } from './topics/big-o/meta';
+import { lesson as doublyLinkedListLesson } from './topics/doubly-linked-list/lesson';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
+import { quiz as doublyLinkedListQuiz } from './topics/doubly-linked-list/quiz';
+import { sandbox as doublyLinkedListSandbox } from './topics/doubly-linked-list/sandbox';
 import { meta as hashTable } from './topics/hash-table/meta';
 import { lesson as queueLesson } from './topics/queue/lesson';
 import { meta as queue } from './topics/queue/meta';
 import { quiz as queueQuiz } from './topics/queue/quiz';
 import { sandbox as queueSandbox } from './topics/queue/sandbox';
+import { lesson as singlyLinkedListLesson } from './topics/singly-linked-list/lesson';
 import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
+import { quiz as singlyLinkedListQuiz } from './topics/singly-linked-list/quiz';
+import { sandbox as singlyLinkedListSandbox } from './topics/singly-linked-list/sandbox';
 import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
 import { quiz as stackQuiz } from './topics/stack/quiz';
@@ -54,6 +60,8 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   stack: stackLesson,
   queue: queueLesson,
   array: arrayLesson,
+  'singly-linked-list': singlyLinkedListLesson,
+  'doubly-linked-list': doublyLinkedListLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -61,6 +69,8 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   stack: stackSandbox,
   queue: queueSandbox,
   array: arraySandbox,
+  'singly-linked-list': singlyLinkedListSandbox,
+  'doubly-linked-list': doublyLinkedListSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -68,6 +78,8 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   stack: stackQuiz,
   queue: queueQuiz,
   array: arrayQuiz,
+  'singly-linked-list': singlyLinkedListQuiz,
+  'doubly-linked-list': doublyLinkedListQuiz,
 };
 
 /** All topics in Home order. */

@@ -28,6 +28,8 @@ export type Slot =
   | { type: 'index'; index: number }
   /** the old, smaller array a dynamic array copies from while it grows */
   | { type: 'source'; index: number }
+  /** linked-list nodes: place in the row, raised above it while being linked in or out */
+  | { type: 'link'; index: number; raised: boolean }
   /** hash-table chain nodes */
   | { type: 'bucket'; bucket: number; chainIndex: number }
   /** lists, trees and graphs: laid out by the renderer */

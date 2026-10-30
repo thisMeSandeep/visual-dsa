@@ -261,6 +261,10 @@
   /* Queue renderer: slots are --viz-cell-width × --viz-cell-height */
   --viz-queue-arc: 18px; /* how far the circular buffer's wrap-around arc dips below the row */
 
+  /* Linked-list renderer: nodes are --viz-cell-width × --viz-node-height */
+  --viz-link-gap: 36px; /* between nodes: room for the next (and prev) arrows */
+  --viz-link-offset: 6px; /* a doubly linked list's next arrow sits this far above centre, prev below */
+
   /* Input row: an expression read left to right above a structure (bracket checker) */
   --viz-char-width: 28px;
   --viz-char-height: 40px;

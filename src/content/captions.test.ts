@@ -7,6 +7,13 @@ import {
   type ArrayOperation,
 } from '@/engine/structures/array';
 
+import {
+  createList,
+  traceList,
+  type ListModel,
+  type ListOperation,
+} from '@/engine/structures/linked-list';
+
 import { CAPTIONS, captionSegments, captionText } from './captions';
 import { chapterTitles } from './registry';
 import { lesson as stackRecipe } from './topics/stack/lesson';
@@ -93,5 +100,54 @@ describe('array captions', () => {
       keys(traceArray(model, operation).trace),
     );
     expect(used.filter((key) => !(key in CAPTIONS))).toEqual([]);
+  });
+});
+
+describe('linked-list captions', () => {
+  it('has a caption for every key the operations use, with every placeholder filled', () => {
+    const singly = (items: string[], hasTail = false) => createList(items, { hasTail });
+    const doubly = (items: string[]) => createList(items, { kind: 'doubly' });
+    const cases: [ListModel, ListOperation][] = [
+      [singly(['1', '2']), { type: 'insertHead', value: '0' }],
+      [singly([]), { type: 'insertHead', value: '0' }],
+      [doubly(['1']), { type: 'insertHead', value: '0' }],
+      [singly(['1', '2']), { type: 'insertTail', value: '3' }],
+      [singly(['1'], true), { type: 'insertTail', value: '3' }],
+      [singly([]), { type: 'insertTail', value: '3' }],
+      [doubly(['1']), { type: 'insertTail', value: '3' }],
+      [singly(['1', '2']), { type: 'insertAfter', target: '1', value: '3' }],
+      [singly(['1', '2']), { type: 'insertAfter', target: '2', value: '3' }],
+      [singly(['1']), { type: 'insertAfter', target: '9', value: '3' }],
+      [doubly(['1', '2']), { type: 'insertAfter', target: '1', value: '3' }],
+      [doubly(['1', '2']), { type: 'insertAfter', target: '2', value: '3' }],
+      [doubly(['1', '2']), { type: 'insertBefore', target: '2', value: '3' }],
+      [doubly(['1', '2']), { type: 'insertBefore', target: '1', value: '3' }],
+      [doubly(['1']), { type: 'insertBefore', target: '9', value: '3' }],
+      [singly(['1']), { type: 'insertBefore', target: '1', value: '3' }],
+      [singly(['1', '2', '3']), { type: 'delete', value: '2' }],
+      [singly(['1', '2']), { type: 'delete', value: '1' }],
+      [singly(['1']), { type: 'delete', value: '1' }],
+      [singly(['1', '2'], true), { type: 'delete', value: '2' }],
+      [singly(['1']), { type: 'delete', value: '9' }],
+      [singly([]), { type: 'delete', value: '9' }],
+      [doubly(['1', '2', '3']), { type: 'delete', value: '2' }],
+      [doubly(['1', '2']), { type: 'delete', value: '1' }],
+      [doubly(['1', '2']), { type: 'delete', value: '2' }],
+      [singly(['1']), { type: 'search', value: '1' }],
+      [singly(['1']), { type: 'search', value: '9' }],
+      [singly([]), { type: 'search', value: '9' }],
+      [singly(['1']), { type: 'traverse' }],
+      [singly([]), { type: 'traverse' }],
+      [doubly(['1']), { type: 'traverseBackward' }],
+      [singly(['1']), { type: 'traverseBackward' }],
+      [singly(['1', '2']), { type: 'reverse' }],
+      [singly(['1']), { type: 'reverse' }],
+    ];
+    for (const [model, operation] of cases) {
+      for (const step of traceList(model, operation).trace.steps) {
+        if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+        expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
+      }
+    }
   });
 });

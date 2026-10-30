@@ -119,6 +119,8 @@ const VIZ_SIZE_VARS = {
   stackPadding: '--viz-stack-padding',
   stackRadius: '--viz-stack-radius',
   queueArc: '--viz-queue-arc',
+  linkGap: '--viz-link-gap',
+  linkOffset: '--viz-link-offset',
   charWidth: '--viz-char-width',
   charHeight: '--viz-char-height',
   charGap: '--viz-char-gap',

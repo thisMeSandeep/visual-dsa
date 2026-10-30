@@ -25,3 +25,12 @@ export function parseValue(text: string): ParsedValue {
   if (problem) return { ok: false, problem: captionText(problem.message).replaceAll('**', '') };
   return { ok: true, value: String(value) };
 }
+
+/**
+ * Checks the node a list operation inserts next to (F-606): typed like a value, with its own
+ * prompt when the field is empty.
+ */
+export function parseTarget(text: string): ParsedValue {
+  if (text.trim() === '') return { ok: false, problem: 'Type the node to insert next to, like 7.' };
+  return parseValue(text);
+}

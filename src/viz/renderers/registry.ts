@@ -8,6 +8,7 @@ import type { RendererId } from '@/engine/core/renderer';
 
 import { AnalogyRenderer } from './analogy/renderer';
 import { ArrayRenderer } from './array/renderer';
+import { LinkedListRenderer } from './linked-list/renderer';
 import { QueueRenderer } from './queue/renderer';
 import { StackRenderer } from './stack/renderer';
 import type { RendererProps } from './types';
@@ -17,4 +18,5 @@ export const RENDERERS: Partial<Record<RendererId, ComponentType<RendererProps>>
   analogy: AnalogyRenderer,
   queue: QueueRenderer,
   array: ArrayRenderer,
+  'linked-list': LinkedListRenderer,
 };

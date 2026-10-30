@@ -1,0 +1,83 @@
+// Each node holds a value, next and prev.
+// head points at the first node, tail at the last.
+
+function insertHead(value)
+  node = new Node(value) // @line head-create
+  node.next = head // @line head-link
+  if head is not null then head.prev = node // @line head-link-back
+  head = node // @line head-move
+  if tail is null then tail = node // @line head-move
+end function
+
+function insertTail(value)
+  node = new Node(value) // @line tail-create
+  if tail is null then
+    head = node // @line tail-empty
+    tail = node // @line tail-empty
+    return
+  end if
+  tail.next = node // @line tail-link
+  node.prev = tail // @line tail-link-back
+  tail = node // @line tail-move
+end function
+
+function search(value)
+  cur = head
+  while cur is not null
+    if cur.value is value then // @line search-compare
+      return cur // @line search-found
+    end if
+    cur = cur.next // @line search-compare
+  end while
+  return null // @line search-not-found
+end function
+
+function insertAfter(target, value)
+  cur = search(target)
+  if cur is null then error "Not in the list" // @line after-not-found
+  node = new Node(value) // @line after-create
+  node.next = cur.next // @line after-link
+  node.prev = cur // @line after-link
+  if cur.next is not null then cur.next.prev = node // @line after-relink
+  else tail = node // @line after-relink
+  cur.next = node // @line after-relink
+end function
+
+function insertBefore(target, value)
+  cur = search(target)
+  if cur is null then error "Not in the list" // @line before-not-found
+  node = new Node(value) // @line before-create
+  node.next = cur // @line before-link
+  node.prev = cur.prev // @line before-link
+  if cur.prev is not null then cur.prev.next = node // @line before-relink
+  else head = node // @line before-relink
+  cur.prev = node // @line before-relink
+end function
+
+function delete(value)
+  cur = head
+  while cur is not null and cur.value is not value // @line delete-find
+    cur = cur.next // @line delete-find
+  end while
+  if cur is null then return // @line delete-not-found
+  if cur.prev is not null then cur.prev.next = cur.next // @line unlink-forward
+  else head = cur.next // @line unlink-forward
+  if cur.next is not null then cur.next.prev = cur.prev // @line unlink-back
+  else tail = cur.prev // @line unlink-back
+end function
+
+function traverse(visit)
+  cur = head
+  while cur is not null
+    visit(cur.value) // @line traverse-visit
+    cur = cur.next
+  end while
+end function
+
+function traverseBackward(visit)
+  cur = tail
+  while cur is not null
+    visit(cur.value) // @line back-visit
+    cur = cur.prev
+  end while
+end function

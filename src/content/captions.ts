@@ -65,6 +65,82 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'array.traversed': 'All {size} items visited once, front to back. Traversal is **O(n)**.',
   'array.traverse.empty': 'The array is empty: nothing to visit.',
 
+  // Linked lists (engine/structures/linked-list/operations.ts)
+  'list.create': 'Make a new node for **{value}**. Nothing points to it yet.',
+  'list.search.compare':
+    'Is **cur** ({current}) the **{value}** we’re looking for? No: follow **next**.',
+  'list.search.found': '**cur** holds **{value}**. Found it.',
+  'list.search.not-found':
+    '**cur** fell off the end (null): **{value}** isn’t in the list. That took **O(n)**.',
+  'list.search.empty': 'The list is empty (head is null), so **{value}** isn’t in it.',
+  'list.head.link': 'Point its **next** at the current head, {head}.',
+  'list.head.link-back': 'And point {head}’s **prev** back at the new node.',
+  'list.first': 'The list was empty: **{value}** is now the only node.',
+  'list.head.moved': 'Move **head** to the new node. Nothing else moved: **O(1)**.',
+  'list.walk.start': 'No tail pointer, so start **cur** at the head, {value}, and walk.',
+  'list.walk': 'Its next isn’t null, so follow it: **cur** is at {value}.',
+  'list.walk.end': '**cur** is at {value}, whose next is null: the last node.',
+  'list.tail.link':
+    'The **tail** pointer finds the last node, {last}, at once. Point its **next** at the new node.',
+  'list.tail.link.walked': 'Point {last}’s **next** at the new node.',
+  'list.tail.link-back': 'And point the new node’s **prev** back at {last}.',
+  'list.tail.moved': 'Move **tail** to the new node. No walking: **O(1)** with a tail pointer.',
+  'list.tail.walked':
+    'Done, but reaching the end took {count} steps: **O(n)** without a tail pointer.',
+  'list.after.not-found': '**{target}** isn’t in the list, so there’s nothing to insert after.',
+  'list.after.link': 'Point the new node’s **next** at {next}, the node after {target}.',
+  'list.after.link.last': '{target} is last, so the new node’s **next** stays null.',
+  'list.after.link.doubly': 'Point the new node’s **next** at {next} and its **prev** at {target}.',
+  'list.after.link.last.doubly':
+    '{target} is last: the new node’s **prev** points at it, and its **next** stays null.',
+  'list.after.relinked':
+    'Now point {target}’s **next** at **{value}**. Pointers changed; nothing moved.',
+  'list.after.relinked.doubly':
+    'Now {target}’s **next** and the following node’s **prev** point at **{value}**. Nothing moved.',
+  'list.before.singly':
+    'A singly linked list has no **prev** pointers, so it can’t step back from {target}.',
+  'list.before.not-found': '**{target}** isn’t in the list, so there’s nothing to insert before.',
+  'list.before.link': 'Point the new node’s **next** at {target} and its **prev** at {prev}.',
+  'list.before.link.first':
+    'Point the new node’s **next** at {target}. {target} is the head, so its **prev** stays null.',
+  'list.before.relinked': 'Now {prev}’s **next** and {target}’s **prev** point at **{value}**.',
+  'list.before.relinked.head':
+    'Now {target}’s **prev** points at **{value}**, and **head** moves to it.',
+  'list.delete.empty': 'The list is empty, so there’s no **{value}** to delete.',
+  'list.delete.found': '**cur** holds **{value}**. This is the node to remove.',
+  'list.delete.not-found': '**{value}** isn’t in the list, so nothing is deleted.',
+  'list.delete.only': '**{value}** is the only node: **head** becomes null.',
+  'list.delete.head': '**{value}** is the head: move **head** on to {next}.',
+  'list.delete.unlink': 'Point {prev}’s **next** past **{value}**, straight to {next}.',
+  'list.delete.unlink.tail':
+    'Point {prev}’s **next** past **{value}**, to null, and move **tail** back to {prev}.',
+  'list.delete.forward': 'Point {prev}’s **next** past **{value}**, to {next}.',
+  'list.delete.forward.head': '**{value}** is the head: move **head** on to {next}.',
+  'list.delete.back':
+    'Point {next}’s **prev** past **{value}**, back to {prev}. The node knew both neighbours: **O(1)**.',
+  'list.delete.back.tail': '**{value}** is the tail: move **tail** back to {prev}.',
+  'list.delete.freed': 'Nothing points to **{value}** any more, so it’s gone.',
+  'list.back.singly':
+    'A singly linked list has no **prev** pointers: it can only be walked from the head.',
+  'list.traverse.empty': 'The list is empty: head is null, so there’s nothing to visit.',
+  'list.visit': 'Visit **{value}**.',
+  'list.traversed':
+    '**cur** reached null: all {count} nodes visited, from the head. That’s **O(n)**.',
+  'list.traversed.back':
+    '**cur** reached null: all {count} nodes visited backwards, from the tail.',
+  'list.reverse.short': 'With fewer than two nodes, the list is already its own reverse.',
+  'list.reverse.save': 'Save **next** = {next}, so the rest of the list isn’t lost.',
+  'list.reverse.save.last': '{cur} is the last node: **next** is null.',
+  'list.reverse.flip': 'Flip {cur}’s **next** to point back at **prev**, {prev}.',
+  'list.reverse.flip.first':
+    'Flip {cur}’s **next** to **prev**, which is null: {cur} will be the new tail.',
+  'list.reverse.advance': 'Step forward: **prev** = {prev}, **cur** = {cur}.',
+  'list.reverse.advance.end':
+    'Step forward: **prev** = {prev}, and **cur** is null. Every arrow is flipped.',
+  'list.reverse.head':
+    'Make **head** point at **prev**, {head}. Each node was visited once: **O(n)**.',
+  'list.reverse.done': 'Redrawn with the head on the left: the same nodes, in reverse order.',
+
   // Queue (engine/structures/queue/operations.ts)
   'queue.enqueue.check': 'Enqueue **{value}**. First, check there’s a free slot.',
   'queue.enqueued': '**{value}** joins at the **rear**.',

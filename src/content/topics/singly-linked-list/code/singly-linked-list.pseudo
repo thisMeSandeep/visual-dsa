@@ -1,0 +1,84 @@
+// Each node holds a value and next.
+// head points at the first node; tail, if kept,
+// at the last. The last node's next is null.
+
+function insertHead(value)
+  node = new Node(value) // @line head-create
+  node.next = head // @line head-link
+  head = node // @line head-move
+  if keeping a tail and tail is null then tail = node // @line head-move
+end function
+
+function insertTail(value)
+  node = new Node(value) // @line tail-create
+  if head is null then
+    head = node // @line tail-empty
+    if keeping a tail then tail = node // @line tail-empty
+    return
+  end if
+  if keeping a tail then
+    last = tail
+  else
+    last = head
+    while last.next is not null: last = last.next // @line walk
+  end if
+  last.next = node // @line tail-link
+  if keeping a tail then tail = node // @line tail-move
+end function
+
+function search(value)
+  cur = head
+  while cur is not null
+    if cur.value is value then // @line search-compare
+      return cur // @line search-found
+    end if
+    cur = cur.next // @line search-compare
+  end while
+  return null // @line search-not-found
+end function
+
+function insertAfter(target, value)
+  cur = search(target)
+  if cur is null then error "Not in the list" // @line after-not-found
+  node = new Node(value) // @line after-create
+  node.next = cur.next // @line after-link
+  cur.next = node // @line after-relink
+  if tail is cur then tail = node // @line after-relink
+end function
+
+function delete(value)
+  prev = null
+  cur = head
+  while cur is not null and cur.value is not value // @line delete-find
+    prev = cur // @line delete-find
+    cur = cur.next // @line delete-find
+  end while
+  if cur is null then return // @line delete-not-found
+  if prev is null then
+    head = cur.next // @line unlink-head
+  else
+    prev.next = cur.next // @line unlink
+  end if
+  if tail is cur then tail = prev // @line unlink
+end function
+
+function traverse(visit)
+  cur = head
+  while cur is not null
+    visit(cur.value) // @line traverse-visit
+    cur = cur.next
+  end while
+end function
+
+function reverse()
+  if keeping a tail then tail = head
+  prev = null
+  cur = head
+  while cur is not null
+    next = cur.next // @line reverse-save
+    cur.next = prev // @line reverse-flip
+    prev = cur // @line reverse-advance
+    cur = next // @line reverse-advance
+  end while
+  head = prev // @line reverse-head
+end function

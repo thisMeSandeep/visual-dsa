@@ -441,6 +441,7 @@ feat(array): add array engine, renderer, lesson, sandbox and quiz
 
 ### Step 9.3: Linked lists (singly and doubly)
 - Engine: insert at head/tail/after/before, delete, search, reverse, and backward traversal. Renderer: `linked-list` with single and double arrows and a tail-pointer toggle. Lessons L2 and L3.
+- Also: one pointer-based engine serves both lists; a node being linked in or out is raised above the row (a `link` slot in scenes). The sandbox key field takes a node (`target-value` input) as well as an index.
 
 **Commit:**
 ```

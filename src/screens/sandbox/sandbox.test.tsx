@@ -135,6 +135,24 @@ describe('Sandbox', () => {
     expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled();
   });
 
+  it('inserts after a typed node in a linked list, and switches to the tail-pointer tool', async () => {
+    await renderSandbox('singly-linked-list');
+    expect(stat('Head', '12')).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/^Tail:/)).toBeNull();
+
+    await press('Add after');
+    expect(screen.getByText('Type the node to insert next to, like 7.')).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByLabelText('Node'), '7');
+    await fireEvent.changeText(valueField(), '21');
+    await press('Add after');
+    await playToEnd();
+    expect(stat('Size', '4')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Head and tail' }));
+    expect(stat('Tail', '30')).toBeOnTheScreen();
+  });
+
   it('says when a topic has no sandbox yet', async () => {
     await renderSandbox('hash-table');
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
