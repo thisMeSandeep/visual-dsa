@@ -8,6 +8,7 @@ import { COLOR_TOKENS, useColors, useVizSizes } from '@/theme';
 import { MOVE_EASING, useAnimatedNumber } from './animated-values';
 import {
   AnimatedBox,
+  AnimatedCallout,
   AnimatedLine,
   AnimatedPath,
   AnimatedText,
@@ -111,5 +112,7 @@ function DrawableView({
       return <AnimatedLine drawable={drawable} exiting={exiting} context={context} />;
     case 'path':
       return <AnimatedPath drawable={drawable} exiting={exiting} context={context} />;
+    case 'callout':
+      return <AnimatedCallout drawable={drawable} exiting={exiting} context={context} />;
   }
 }

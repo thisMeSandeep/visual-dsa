@@ -3,7 +3,7 @@ import { useFont, type SkFont } from '@shopify/react-native-skia';
 import { useVizSizes } from '@/theme';
 import { FONT_FILES } from '@/theme/fonts';
 
-export type VizFonts = Record<'value' | 'detail' | 'label' | 'index', SkFont>;
+export type VizFonts = Record<'value' | 'detail' | 'label' | 'index' | 'callout', SkFont>;
 
 /**
  * The canvas's fonts: the same mono files the UI uses (loaded through Skia,
@@ -15,9 +15,10 @@ export function useVizFonts(): VizFonts | null {
   const detail = useFont(FONT_FILES['app-mono'], sizes.fontDetail);
   const label = useFont(FONT_FILES['app-mono-medium'], sizes.fontLabel);
   const index = useFont(FONT_FILES['app-mono'], sizes.fontIndex);
+  const callout = useFont(FONT_FILES['app-mono-medium'], sizes.fontCallout);
 
-  if (!value || !detail || !label || !index) return null;
-  return { value, detail, label, index };
+  if (!value || !detail || !label || !index || !callout) return null;
+  return { value, detail, label, index, callout };
 }
 
 /** Distance from a text block's vertical centre to its baseline. */

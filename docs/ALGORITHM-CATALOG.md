@@ -266,7 +266,7 @@ Glyph: bucket column with a chain · Renderer: `hash-table` (vertical bucket lis
 9. Open addressing: linear probing *(quadratic probing and double hashing as P1 extensions)*
 10. Tombstones (deleting under open addressing)
 
-**Sandbox:** `put(key, value)`, `get(key)`, `remove(key)`. Parameters: table size (5–16), hash function (sum of char codes, polynomial, or "bad hash" to force collisions), collision strategy (chaining / linear probing), resize threshold.
+**Sandbox:** `put(key, value)`, `get(key)`, `remove(key)`, with a Key field (a name of up to 6 letters) beside the value field. The collision strategy is the tool (Chaining / Probing); the presets set the hash function (sum of char codes, polynomial ×31, or "bad hash" counting letters), the table size (2–12 buckets, so the column fits a phone) and how near the 0.75 resize threshold it starts.
 
 | Operation | Average | Worst |
 |---|---|---|
@@ -277,7 +277,7 @@ Glyph: bucket column with a chain · Renderer: `hash-table` (vertical bucket lis
 | Space | O(n + m) for m buckets | |
 
 **States:** active (target bucket), collision, new (inserted node), found, dimmed (tombstone), error (key not found)
-**Presets:** empty, many collisions (bad hash), near the resize threshold, delete then search past a tombstone
+**Presets:** Chaining: sum hash, better (polynomial) hash, bad hash (many collisions), near resize. Probing: sum hash, tombstone (delete then search past it), bad hash, near resize. There's no empty preset: Remove empties a table.
 **Practice ideas:** "h(Kat) = 17, size = 6. Which bucket?" · "Load factor is 0.75 and the limit is 0.75. What happens on the next insert?" · "Under linear probing, where does Leo land if buckets 3 and 4 are full?"
 
 ---

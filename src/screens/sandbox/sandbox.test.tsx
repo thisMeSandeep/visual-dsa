@@ -153,8 +153,25 @@ describe('Sandbox', () => {
     expect(stat('Tail', '30')).toBeOnTheScreen();
   });
 
-  it('says when a topic has no sandbox yet', async () => {
+  it('puts a typed key and value into a hash table, and explains a bad key', async () => {
     await renderSandbox('hash-table');
+    expect(stat('Keys', '3')).toBeOnTheScreen();
+    const keyField = () => screen.getByLabelText('Key');
+
+    await fireEvent.changeText(keyField(), 'R2D2');
+    await press('Get');
+    expect(screen.getByText('Keys are names made of letters, like Sid.')).toBeOnTheScreen();
+
+    await fireEvent.changeText(keyField(), 'Kat');
+    await fireEvent.changeText(valueField(), '9');
+    await press('Put');
+    await playToEnd();
+    expect(stat('Keys', '4')).toBeOnTheScreen();
+    expect(stat('Load', '0.57')).toBeOnTheScreen();
+  });
+
+  it('says when a topic has no sandbox yet', async () => {
+    await renderSandbox('big-o');
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
 

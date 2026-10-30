@@ -148,14 +148,17 @@ export type LessonRecipe = z.infer<typeof LessonRecipeSchema>;
  * What an operation asks for. 'value' is a number typed in or picked at random; 'index' is a
  * position such as 2 (array get and removeAt); 'index-value' is both (array set and insert);
  * 'target-value' is the node to insert next to and a value (list insertAfter and insertBefore);
+ * 'key' is a hash-table key such as Sid (get, remove) and 'key-value' a key and a value (put);
  * 'expression' is a short line of text such as `((5+3)+1)` (the bracket checker), which presets
- * can fill in. A tool's operations use index keys or target keys, not both.
+ * can fill in. A tool's operations use one kind of key: index, target or key.
  */
 export const SANDBOX_INPUTS = [
   'value',
   'index',
   'index-value',
   'target-value',
+  'key',
+  'key-value',
   'expression',
 ] as const;
 

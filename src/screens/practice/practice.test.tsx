@@ -77,7 +77,7 @@ describe('Topic quiz', () => {
   });
 
   it('explains a topic without a quiz yet', async () => {
-    await render(<TopicPractice topicId="hash-table" />);
+    await render(<TopicPractice topicId="big-o" />);
     expect(screen.getByText(/arrives with its topic/)).toBeOnTheScreen();
   });
 });

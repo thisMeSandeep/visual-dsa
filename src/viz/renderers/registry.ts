@@ -8,6 +8,7 @@ import type { RendererId } from '@/engine/core/renderer';
 
 import { AnalogyRenderer } from './analogy/renderer';
 import { ArrayRenderer } from './array/renderer';
+import { HashTableRenderer } from './hash-table/renderer';
 import { LinkedListRenderer } from './linked-list/renderer';
 import { QueueRenderer } from './queue/renderer';
 import { StackRenderer } from './stack/renderer';
@@ -19,4 +20,5 @@ export const RENDERERS: Partial<Record<RendererId, ComponentType<RendererProps>>
   queue: QueueRenderer,
   array: ArrayRenderer,
   'linked-list': LinkedListRenderer,
+  'hash-table': HashTableRenderer,
 };

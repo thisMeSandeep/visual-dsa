@@ -14,7 +14,10 @@ import { lesson as doublyLinkedListLesson } from './topics/doubly-linked-list/le
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { quiz as doublyLinkedListQuiz } from './topics/doubly-linked-list/quiz';
 import { sandbox as doublyLinkedListSandbox } from './topics/doubly-linked-list/sandbox';
+import { lesson as hashTableLesson } from './topics/hash-table/lesson';
 import { meta as hashTable } from './topics/hash-table/meta';
+import { quiz as hashTableQuiz } from './topics/hash-table/quiz';
+import { sandbox as hashTableSandbox } from './topics/hash-table/sandbox';
 import { lesson as queueLesson } from './topics/queue/lesson';
 import { meta as queue } from './topics/queue/meta';
 import { quiz as queueQuiz } from './topics/queue/quiz';
@@ -62,6 +65,7 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   array: arrayLesson,
   'singly-linked-list': singlyLinkedListLesson,
   'doubly-linked-list': doublyLinkedListLesson,
+  'hash-table': hashTableLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -71,6 +75,7 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   array: arraySandbox,
   'singly-linked-list': singlyLinkedListSandbox,
   'doubly-linked-list': doublyLinkedListSandbox,
+  'hash-table': hashTableSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -80,6 +85,7 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   array: arrayQuiz,
   'singly-linked-list': singlyLinkedListQuiz,
   'doubly-linked-list': doublyLinkedListQuiz,
+  'hash-table': hashTableQuiz,
 };
 
 /** All topics in Home order. */

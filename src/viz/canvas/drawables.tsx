@@ -19,7 +19,13 @@ import type { ColorToken, VizSizes } from '@/theme';
 import { STATE_PAINT } from '../state-style';
 import { FADE_EASING, MOVE_EASING, useAnimatedColor, useAnimatedNumber } from './animated-values';
 import type { CanvasTimings } from './timing';
-import type { BoxDrawable, LineDrawable, PathDrawable, TextDrawable } from './types';
+import type {
+  BoxDrawable,
+  CalloutDrawable,
+  LineDrawable,
+  PathDrawable,
+  TextDrawable,
+} from './types';
 import { centredBaseline, type VizFonts } from './use-viz-fonts';
 
 export type DrawableContext = {
@@ -208,6 +214,40 @@ export function AnimatedPath({ drawable, exiting, context }: Props<PathDrawable>
         strokeWidth={strokeWidth}
         strokeCap="round"
         strokeJoin="round"
+      />
+    </Group>
+  );
+}
+
+/* Callout: a note on a chip ---------------------------------------------------------------------- */
+
+export function AnimatedCallout({ drawable, exiting, context }: Props<CalloutDrawable>) {
+  const { fonts, sizes, timings, colors } = context;
+  const font = fonts.callout;
+  const width = font.measureText(drawable.text).width + 2 * sizes.calloutPadX;
+  const height = font.getSize() + 2 * sizes.calloutPadY;
+
+  const x = useAnimatedNumber(drawable.x, timings.move, MOVE_EASING);
+  const y = useAnimatedNumber(drawable.y - height / 2, timings.move, MOVE_EASING);
+  const presence = usePresenceProgress(exiting, timings);
+  const transform = useDerivedValue(() => [{ translateX: x.get() }, { translateY: y.get() }]);
+
+  return (
+    <Group transform={transform} opacity={presence}>
+      <RoundedRect
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        r={sizes.radius}
+        color={colors['signal-soft']}
+      />
+      <Text
+        x={sizes.calloutPadX}
+        y={height / 2 + centredBaseline(font)}
+        text={drawable.text}
+        font={font}
+        color={colors.ink}
       />
     </Group>
   );

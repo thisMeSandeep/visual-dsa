@@ -141,6 +141,49 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
     'Make **head** point at **prev**, {head}. Each node was visited once: **O(n)**.',
   'list.reverse.done': 'Redrawn with the head on the left: the same nodes, in reverse order.',
 
+  // Hash table (engine/structures/hash-table/operations.ts)
+  'hash.fn.sum': 'Add up the letter codes of **{key}**: h("{key}") = {hash}.',
+  'hash.fn.polynomial':
+    'Mix the letter codes of **{key}**, multiplying by {base} at each letter: h("{key}") = {hash}.',
+  'hash.fn.length': 'This **bad hash** only counts the letters of **{key}**: h("{key}") = {hash}.',
+  'hash.index': '{hash} mod {size} = {bucket}, so **{key}** belongs in bucket {bucket}.',
+  'hash.resize.check':
+    '{count} keys in {size} buckets would make the **load factor** {load}, over the limit of {limit}.',
+  'hash.resize': 'So first, make a bigger table: {to} buckets instead of {from}.',
+  'hash.rehash': '**Rehash** {key}: with {size} buckets it belongs in bucket {bucket}.',
+  'hash.rehash.probed': '**Rehash** {key}: bucket {home} is taken, so it probes on to {bucket}.',
+  'hash.resized':
+    'All {count} keys moved: **O(n)**, but only now and then, so put is still **O(1)** on average.',
+  'hash.updated': '**{key}** is already here, so its value changes from {old} to {value}.',
+  'hash.collision':
+    'Bucket {bucket} already holds **{other}**: a **collision**. Is {other} the key **{key}**? No.',
+  'hash.chain.next': 'Is **{other}** the key **{key}**? No: next in the chain.',
+  'hash.placed': 'Bucket {bucket} is empty, so **{key}** goes straight in.',
+  'hash.chain.appended':
+    '**{key}** isn’t in the chain yet, so it joins the end of bucket {bucket}’s chain.',
+  'hash.probe.tombstone':
+    'Bucket {bucket} has a **tombstone**. Remember it, but check on: **{key}** may be further along.',
+  'hash.collision.probe':
+    'Bucket {bucket} holds **{other}**: a **collision**. Probe the next bucket, {next}.',
+  'hash.probe.next': 'Bucket {bucket} holds **{other}**. Try bucket {next}.',
+  'hash.probe.reuse':
+    '**{key}** isn’t in the table, so it takes the tombstone’s place in bucket {bucket}.',
+  'hash.probe.placed':
+    'Bucket {bucket} is empty: **{key}** goes in here, away from its home bucket.',
+  'hash.full': 'All {size} buckets are taken, so **{key}** has nowhere to go: the table is full.',
+  'hash.found': 'Found **{key}**: {value}.',
+  'hash.missing.chain': 'The chain ends without **{key}**, so it isn’t in the table.',
+  'hash.missing.empty': 'Bucket {bucket} is empty, so **{key}** isn’t in the table.',
+  'hash.missing.everywhere': 'Every bucket has been checked: **{key}** isn’t in the table.',
+  'hash.probe.skip': 'Bucket {bucket} holds **{other}**, not **{key}**. Probe on to {next}.',
+  'hash.probe.past-tombstone':
+    'Bucket {bucket} is a **tombstone**: a key was removed here, so keep going to {next}.',
+  'hash.remove.missing': '**{key}** isn’t in the table, so there’s nothing to remove.',
+  'hash.chain.removed':
+    'Unlink **{key}** from bucket {bucket}’s chain. The rest of the chain closes up.',
+  'hash.tombstone':
+    '**{key}** is replaced by a **tombstone**, not emptied, so searches for keys further on keep going.',
+
   // Queue (engine/structures/queue/operations.ts)
   'queue.enqueue.check': 'Enqueue **{value}**. First, check there’s a free slot.',
   'queue.enqueued': '**{value}** joins at the **rear**.',

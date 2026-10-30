@@ -249,6 +249,8 @@
   --viz-font-detail: 12px; /* second line in a node, e.g. a phone number (Mono 400) */
   --viz-font-label: 13px; /* pointer labels: top, head, j (Mono 500) */
   --viz-font-index: 12px; /* indices and bucket numbers (Mono 400) */
+  --viz-font-callout: 15px; /* callouts such as h("Sid") = 288 (Mono 500) */
+  --viz-mono-advance: 0.6; /* width of one mono character, in ems: to size callouts in layouts */
   --viz-label-gap: 4px; /* space between a cell and its index or pointer label */
   --viz-pointer-length: 16px; /* arrow from a pointer label to its element */
   --viz-pointer-label-width: 32px; /* space reserved for a pointer label such as "top" */
@@ -264,6 +266,13 @@
   /* Linked-list renderer: nodes are --viz-cell-width × --viz-node-height */
   --viz-link-gap: 36px; /* between nodes: room for the next (and prev) arrows */
   --viz-link-offset: 6px; /* a doubly linked list's next arrow sits this far above centre, prev below */
+
+  /* Hash-table renderer: buckets are --viz-bucket-width × --viz-bucket-height, rows --viz-node-height */
+  --viz-entry-width: 84px; /* a key over its value, in a chain or an open-addressing slot */
+
+  /* Callouts (VISUAL-SPEC §7): mono text on a signal-soft chip */
+  --viz-callout-pad-x: 12px;
+  --viz-callout-pad-y: 8px;
 
   /* Input row: an expression read left to right above a structure (bracket checker) */
   --viz-char-width: 28px;

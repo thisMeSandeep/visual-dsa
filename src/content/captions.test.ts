@@ -8,6 +8,12 @@ import {
 } from '@/engine/structures/array';
 
 import {
+  createTable,
+  traceHashTable,
+  type HashModel,
+  type HashOperation,
+} from '@/engine/structures/hash-table';
+import {
   createList,
   traceList,
   type ListModel,
@@ -145,6 +151,49 @@ describe('linked-list captions', () => {
     ];
     for (const [model, operation] of cases) {
       for (const step of traceList(model, operation).trace.steps) {
+        if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+        expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
+      }
+    }
+  });
+});
+
+describe('hash-table captions', () => {
+  it('has a caption for every key the operations use, with every placeholder filled', () => {
+    const chained = (entries: Record<string, string>, size = 5) => createTable(entries, { size });
+    const probed = (entries: Record<string, string>, removed: string[] = []) =>
+      createTable(entries, { size: 5, strategy: 'probing', removed, loadLimit: 1 });
+    const cases: [HashModel, HashOperation][] = [
+      [chained({}), { type: 'put', key: 'Sid', value: '1' }],
+      [chained({ Sid: '1', Jim: '2' }), { type: 'put', key: 'Kat', value: '3' }],
+      [chained({ Sid: '1' }), { type: 'put', key: 'Sid', value: '3' }],
+      [chained({ Ann: '1', Ben: '2', Mia: '3' }, 4), { type: 'put', key: 'Sid', value: '4' }],
+      [createTable({ Sid: '1' }, { hashFunction: 'polynomial' }), { type: 'hash', key: 'Jim' }],
+      [createTable({}, { hashFunction: 'length' }), { type: 'hash', key: 'Jim' }],
+      [probed({ Sid: '1', Jim: '2' }), { type: 'put', key: 'Kat', value: '3' }],
+      [probed({ Sid: '1', Jim: '2', Kat: '3' }, ['Jim']), { type: 'put', key: 'Leo', value: '4' }],
+      [
+        createTable({ Ann: '1', Ben: '2' }, { size: 2, strategy: 'probing', loadLimit: 5 }),
+        { type: 'put', key: 'Sid', value: '3' },
+      ],
+      [
+        createTable({ Sid: '1', Jim: '2', Ann: '3' }, { size: 4, strategy: 'probing' }),
+        { type: 'put', key: 'Ben', value: '4' },
+      ],
+      [chained({ Sid: '1', Jim: '2' }), { type: 'get', key: 'Jim' }],
+      [chained({ Sid: '1' }), { type: 'get', key: 'Kat' }],
+      [chained({}), { type: 'get', key: 'Kat' }],
+      [probed({ Sid: '1', Jim: '2', Kat: '3' }, ['Jim']), { type: 'get', key: 'Kat' }],
+      [
+        createTable({ Ann: '1', Ben: '2' }, { size: 2, strategy: 'probing' }),
+        { type: 'get', key: 'Sid' },
+      ],
+      [chained({ Sid: '1' }), { type: 'remove', key: 'Sid' }],
+      [chained({ Sid: '1' }), { type: 'remove', key: 'Kat' }],
+      [probed({ Sid: '1' }), { type: 'remove', key: 'Sid' }],
+    ];
+    for (const [model, operation] of cases) {
+      for (const step of traceHashTable(model, operation).trace.steps) {
         if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
         expect(captionText(step.caption)).not.toMatch(/\{\w+\}/);
       }

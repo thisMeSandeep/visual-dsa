@@ -25,6 +25,16 @@ import {
   type ArrayModel,
 } from '../structures/array';
 import {
+  createTable,
+  describeHashTable,
+  hashToScene,
+  traceHashTable,
+  keyProblem,
+  type HashFunctionId,
+  type HashModel,
+  type HashStrategy,
+} from '../structures/hash-table';
+import {
   createList,
   describeList,
   listToScene,
@@ -316,6 +326,85 @@ const linkedList: StructureDefinition<ListModel> = {
   },
 };
 
+/** Hash tables: chaining or linear probing, with a choice of hash function. */
+const HASH_STRATEGIES: readonly HashStrategy[] = ['chaining', 'probing'];
+const HASH_FUNCTIONS: readonly HashFunctionId[] = ['sum', 'polynomial', 'length'];
+const hashTable: StructureDefinition<HashModel> = {
+  /**
+   * { entries?: { [key]: value } (put in order), size?: number, strategy?, hash?, loadLimit?,
+   *   removed?: string[] (keys removed after, leaving tombstones when probing) }
+   */
+  create: (input, at) => {
+    const fields = record(input, at);
+    const entries = textRecord(fields, 'entries', at);
+    const size = optionalWholeNumber(fields, 'size', at);
+    const removed = optionalTextList(fields, 'removed', at);
+    const { strategy, hash, loadLimit } = fields;
+    if (strategy !== undefined && !HASH_STRATEGIES.includes(strategy as HashStrategy)) {
+      throw new CompileError(`"strategy" must be one of ${HASH_STRATEGIES.join(', ')}`, at);
+    }
+    if (hash !== undefined && !HASH_FUNCTIONS.includes(hash as HashFunctionId)) {
+      throw new CompileError(`"hash" must be one of ${HASH_FUNCTIONS.join(', ')}`, at);
+    }
+    if (loadLimit !== undefined && typeof loadLimit !== 'number') {
+      throw new CompileError('"loadLimit" must be a number', at);
+    }
+    return atSegment(at, () =>
+      createTable(entries, {
+        removed,
+        ...(size === undefined ? {} : { size }),
+        ...(strategy === undefined ? {} : { strategy: strategy as HashStrategy }),
+        ...(hash === undefined ? {} : { hashFunction: hash as HashFunctionId }),
+        ...(loadLimit === undefined ? {} : { loadLimit }),
+      }),
+    );
+  },
+  toScene: (model) => hashToScene(model),
+  describe: describeHashTable,
+  operations: {
+    put: (model, input, at) => {
+      const fields = record(input, at);
+      return traceHashTable(model, {
+        type: 'put',
+        key: hashKey(fields, at),
+        value: text(fields, 'value', at),
+      });
+    },
+    get: (model, input, at) =>
+      traceHashTable(model, { type: 'get', key: hashKey(record(input, at), at) }),
+    remove: (model, input, at) =>
+      traceHashTable(model, { type: 'remove', key: hashKey(record(input, at), at) }),
+    hash: (model, input, at) =>
+      traceHashTable(model, { type: 'hash', key: hashKey(record(input, at), at) }),
+  },
+};
+
+/** A key that can go in a table: letters only, short enough to draw. */
+function hashKey(input: Record<string, unknown>, at: string): string {
+  const key = text(input, 'key', at);
+  const problem = keyProblem(key);
+  if (problem) throw new CompileError(problem, at);
+  return key;
+}
+
+function textRecord(
+  input: Record<string, unknown>,
+  key: string,
+  at: string,
+): Record<string, string> {
+  const value = input[key];
+  if (value === undefined) return {};
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value) ||
+    !Object.values(value).every((item) => typeof item === 'string')
+  ) {
+    throw new CompileError(`"${key}" must map keys to strings`, at);
+  }
+  return value as Record<string, string>;
+}
+
 /** Every structure a lesson can use, by the name recipes refer to. */
 export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> = {
   stack: stack as StructureDefinition<unknown>,
@@ -323,4 +412,5 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   queue: queue as StructureDefinition<unknown>,
   array: array as StructureDefinition<unknown>,
   'linked-list': linkedList as StructureDefinition<unknown>,
+  'hash-table': hashTable as StructureDefinition<unknown>,
 };

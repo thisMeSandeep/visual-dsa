@@ -450,6 +450,7 @@ feat(linked-list): add singly and doubly linked lists with lessons and quizzes
 
 ### Step 9.4: Hash table
 - Engine: put, get, remove, chaining, linear probing, tombstones, load factor and resize, plus selectable hash functions. Renderer: `hash-table` with buckets, chains, probe arrows and tombstones. Lesson H1 (10 chapters), including the phone book example.
+- Also: a `callout` drawable (`h("Sid") = 288`), an `old` flag on bucket slots for the table being resized away from, and a Key field in the sandbox (`key` and `key-value` inputs).
 
 **Commit:**
 ```

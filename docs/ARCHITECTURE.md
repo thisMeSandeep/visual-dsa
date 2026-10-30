@@ -216,7 +216,7 @@ type Slot =
   | { type: 'index'; index: number }                       // array, stack, queue
   | { type: 'source'; index: number }                      // the old array a dynamic array copies from as it grows
   | { type: 'link'; index: number; raised: boolean }       // linked-list node: its place in the row, raised while linked in or out
-  | { type: 'bucket'; bucket: number; chainIndex: number } // hash table
+  | { type: 'bucket'; bucket: number; chainIndex: number; old?: boolean } // hash table (old: in the table being resized away from)
   | { type: 'node' }                                       // list, tree, graph (laid out by renderer)
   | { type: 'input'; index: number };                      // a character of an input read left to right
 
@@ -446,7 +446,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
                                   line / path, stable ids     ids for exitMs)   (shared values)
 ```
 
-1. **Layout** (`viz/renderers/<name>/layout.ts`, from Step 4.2) is a pure function: scene + token sizes → `Drawable[]` (`viz/canvas/types.ts`). There are four kinds: `box` (cell or node, value plus optional detail line), `text` (index, pointer name, callout), `line` (edge or arrow, with optional arrowhead) and `path` (a fixed shape such as the stack container). Sizes, gaps and wrapping follow VISUAL-SPEC §7. Trees and graphs use their own layout algorithms (TECH-STACK §3e). Layout functions are unit-tested.
+1. **Layout** (`viz/renderers/<name>/layout.ts`, from Step 4.2) is a pure function: scene + token sizes → `Drawable[]` (`viz/canvas/types.ts`). There are five kinds: `box` (cell or node, value plus optional detail line), `text` (index, pointer name, label), `line` (edge or arrow, with optional arrowhead), `path` (a fixed shape such as the stack container) and `callout` (a note such as `h("Sid") = 288` on a `signal-soft` chip, measured on the canvas). Sizes, gaps and wrapping follow VISUAL-SPEC §7. Trees and graphs use their own layout algorithms (TECH-STACK §3e). Layout functions are unit-tested.
 2. **Presence** (`viz/canvas/use-presence.ts`) keeps a drawable whose id disappeared for the exit duration, marked `exiting`, in its old place, so it can fade out. It returns the same state when nothing left or came back, so a caller that builds a new array every render can't loop.
 3. **Animation** (`viz/canvas/drawables.tsx`, `animated-values.ts`) gives each drawable its own Reanimated shared values (position, size, opacity, colour, stroke width) that animate whenever its target changes:
    - **present in both steps:** move and resize with ease-in-out, and restyle colours with a cross-fade.
@@ -460,7 +460,7 @@ Step N ─▶ layout(scene, sizes) ─▶ Drawable[] ─▶ VizCanvas ─▶ use
 8. **Gestures** (P1): pinch and pan update a canvas transform. Taps are hit-tested against the layout result, which the graph editor (F-604) uses.
 9. **Accessibility:** `VizCanvas` is a single accessible image whose label is the current step's `a11y` summary, announced on step change.
 
-**Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its component. `SceneView` (`viz/scene-view.tsx`) draws any scene with the renderer it names, and shows a plain message for a renderer that doesn't exist yet. Each renderer is a pure `layout<Name>(scene, sizes)` returning drawables plus the content's natural size, wrapped in a component that hands them to `VizCanvas`. `VizCanvas` scales content down to fit its viewport (never up) and centres it (`viz/canvas/fit.ts`). Adding a topic that reuses an existing renderer needs no viz code at all. The stack renderer (Step 4.2) is the reference.
+**Renderer registry:** `viz/renderers/registry.ts` maps a `RendererId` to its component. `SceneView` (`viz/scene-view.tsx`) draws any scene with the renderer it names, and shows a plain message for a renderer that doesn't exist yet. Each renderer is a pure `layout<Name>(scene, sizes)` returning drawables plus the content's natural size, wrapped in a component that hands them to `VizCanvas`. `VizCanvas` scales content down to fit its viewport (never up) and centres it (`viz/canvas/fit.ts`); the fit animates with the step, so content that grows (an array doubling, a table resizing) zooms out smoothly. Adding a topic that reuses an existing renderer needs no viz code at all. The stack renderer (Step 4.2) is the reference.
 
 **Analogy scenes** (`viz/scenes/`) are hand-built real-world examples (browser back button, phone book). Each is an `AnalogyScene`: a `stepCount` and a pure `layout(step, sizes)` that returns drawables for one of its fixed pictures. They use the same drawables as the renderers, so the canvas animates between pictures for free (a page keeps its id while it slides from the browser window into the back stack). The `analogy` renderer looks the scene up in `SCENES` by `scene.meta.sceneId` and draws `meta.sceneStep`. Content can't import viz, so `bun run validate:content` (`scripts/lib/check-scenes.ts`) checks every lesson `scene` segment names a scene in `SCENES` and gives exactly `stepCount` captions.
 

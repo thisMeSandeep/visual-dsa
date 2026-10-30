@@ -56,4 +56,15 @@ export type PathDrawable = {
   strokeWidth: 'normal' | 'active';
 };
 
-export type Drawable = BoxDrawable | TextDrawable | LineDrawable | PathDrawable;
+/** A short note on a signal-soft chip, e.g. h("Sid") = 288 (VISUAL-SPEC §7 "Callout"). */
+export type CalloutDrawable = {
+  kind: 'callout';
+  id: string;
+  /** Left edge of the chip. */
+  x: number;
+  /** Vertical centre of the chip. */
+  y: number;
+  text: string;
+};
+
+export type Drawable = BoxDrawable | TextDrawable | LineDrawable | PathDrawable | CalloutDrawable;

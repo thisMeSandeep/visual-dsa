@@ -38,6 +38,7 @@ import { SceneView } from '@/viz/scene-view';
 import { ScreenPlaceholder } from '../placeholder';
 import { parseExpression } from './expression-input';
 import { parseIndex } from './index-input';
+import { parseKey } from './key-input';
 import { parseTarget, parseValue } from './value-input';
 
 /**
@@ -74,21 +75,57 @@ type Preset = SandboxConfig['presets'][number];
 
 const UNDONE = 'Undone: back to before the last change.';
 
-/** Operations that take a key: an index (array) or the node to insert next to (lists). */
+/**
+ * Operations that take a key: an index (array), the node to insert next to (lists), or a
+ * hash-table key.
+ */
 const takesKey = (operation: Operation) =>
   operation.input === 'index' ||
   operation.input === 'index-value' ||
-  operation.input === 'target-value';
+  operation.input === 'target-value' ||
+  operation.input === 'key' ||
+  operation.input === 'key-value';
 const takesValue = (operation: Operation) =>
   operation.input === 'value' ||
   operation.input === 'index-value' ||
-  operation.input === 'target-value';
+  operation.input === 'target-value' ||
+  operation.input === 'key-value';
 
-/** The key field's name and how its text is checked, for each kind of key. */
+type KeyRead = { ok: true; fields: Record<string, unknown> } | { ok: false; problem: string };
+
+/** Each kind of key field: its name, keyboard, and how its text becomes operation input. */
 const KEY_FIELDS = {
-  index: { label: 'Index', parse: parseIndex },
-  target: { label: 'Node', parse: parseTarget },
+  index: {
+    label: 'Index',
+    numeric: true,
+    read: (text: string): KeyRead => {
+      const parsed = parseIndex(text);
+      return parsed.ok ? { ok: true, fields: { index: parsed.index } } : parsed;
+    },
+  },
+  target: {
+    label: 'Node',
+    numeric: true,
+    read: (text: string): KeyRead => {
+      const parsed = parseTarget(text);
+      return parsed.ok ? { ok: true, fields: { target: parsed.value } } : parsed;
+    },
+  },
+  key: {
+    label: 'Key',
+    numeric: false,
+    read: (text: string): KeyRead => {
+      const parsed = parseKey(text);
+      return parsed.ok ? { ok: true, fields: { key: parsed.key } } : parsed;
+    },
+  },
 } as const;
+
+const keyKind = (operations: readonly Operation[]): keyof typeof KEY_FIELDS => {
+  if (operations.some((op) => op.input === 'key' || op.input === 'key-value')) return 'key';
+  if (operations.some((op) => op.input === 'target-value')) return 'target';
+  return 'index';
+};
 
 /** Splits `items` into rows of `size`, for a grid of buttons. */
 const rows = <T,>(items: readonly T[], size: number): T[][] =>
@@ -132,14 +169,9 @@ function Playground({
     primary?.input === 'expression' ? presetExpression(firstPreset) : '',
   );
   const [problem, setProblem] = useState<string>();
-  // Tools whose operations take a key (the array's index, a list's node) get a second field.
+  // Tools whose operations take a key (an index, a list node, a hash key) get a second field.
   const keyed = sandbox.operations.some(takesKey);
-  const keyField =
-    KEY_FIELDS[
-      sandbox.operations.some((operation) => operation.input === 'target-value')
-        ? 'target'
-        : 'index'
-    ];
+  const keyField = KEY_FIELDS[keyKind(sandbox.operations)];
   const [keyText, setKeyText] = useState('');
   const [keyProblem, setKeyProblem] = useState<string>();
   const [rng] = useState(() => createRng(Date.now()));
@@ -162,12 +194,12 @@ function Playground({
     // Check every field the operation needs, so both problems show at once.
     let ok = true;
     if (takesKey(operation)) {
-      const parsed = keyField.parse(keyText);
-      if (!parsed.ok) {
-        setKeyProblem(parsed.problem);
+      const read = keyField.read(keyText);
+      if (read.ok) Object.assign(fields, read.fields);
+      else {
+        setKeyProblem(read.problem);
         ok = false;
-      } else if ('index' in parsed) fields.index = parsed.index;
-      else fields.target = parsed.value;
+      }
     }
     if (takesValue(operation)) {
       const parsed = parseValue(text);
@@ -316,10 +348,12 @@ function Playground({
                   setKeyProblem(undefined);
                 }}
                 error={keyProblem}
-                keyboardType="number-pad"
+                keyboardType={keyField.numeric ? 'number-pad' : 'default'}
+                autoCapitalize={keyField.numeric ? 'none' : 'words'}
+                autoCorrect={false}
                 returnKeyType="done"
                 placeholder={keyField.label}
-                className="w-24"
+                className={keyField.numeric ? 'w-24' : 'w-32'}
               />
               <TextField
                 label={`Value (${valueRange.min}–${valueRange.max})`}

@@ -197,7 +197,7 @@ describe('Lesson player', () => {
   });
 
   it('explains when a topic has no lesson yet', async () => {
-    await renderLesson(<Lesson topicId="hash-table" />);
+    await renderLesson(<Lesson topicId="big-o" />);
     expect(screen.getByText(/written in a later step/)).toBeOnTheScreen();
   });
 });

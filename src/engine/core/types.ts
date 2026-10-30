@@ -30,8 +30,8 @@ export type Slot =
   | { type: 'source'; index: number }
   /** linked-list nodes: place in the row, raised above it while being linked in or out */
   | { type: 'link'; index: number; raised: boolean }
-  /** hash-table chain nodes */
-  | { type: 'bucket'; bucket: number; chainIndex: number }
+  /** hash-table entries: their bucket and place in its chain; `old` while the table resizes */
+  | { type: 'bucket'; bucket: number; chainIndex: number; old?: boolean }
   /** lists, trees and graphs: laid out by the renderer */
   | { type: 'node' }
   /** characters of an input read left to right, e.g. the bracket checker's expression */

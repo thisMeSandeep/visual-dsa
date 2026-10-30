@@ -1,0 +1,101 @@
+// Which bucket a key belongs in.
+function bucketOf(key, size)
+  h = 0
+  for each letter in key: h = h + code(letter) // @line hash-fn
+  return h mod size // @line hash-index
+end function
+// A better hash mixes the letters: h = h × 31 + code.
+
+// --- Separate chaining: each bucket holds a chain ---
+
+function put(key, value)
+  if key is new and (count + 1) / size > loadLimit then // @line c-resize-check
+    resize() // @line c-resize-done
+  end if
+  chain = buckets[bucketOf(key, size)]
+  for each entry in chain
+    if entry.key is key then // @line c-put-compare
+      entry.value = value // @line c-put-update
+      return
+    end if
+  end for
+  add (key, value) to the end of chain // @line c-put-append
+  count = count + 1 // @line c-put-append
+end function
+
+function get(key)
+  chain = buckets[bucketOf(key, size)]
+  for each entry in chain
+    if entry.key is key then // @line c-get-compare
+      return entry.value // @line c-get-found
+    end if
+  end for
+  return nothing // @line c-get-missing
+end function
+
+function remove(key)
+  chain = buckets[bucketOf(key, size)]
+  for each entry in chain
+    if entry.key is key then // @line c-remove-compare
+      unlink entry from chain // @line c-remove-unlink
+      return
+    end if
+  end for
+  // not in the table: nothing to remove // @line c-remove-missing
+end function
+
+function resize()
+  old = buckets // @line c-resize
+  buckets = size × 2 empty chains // @line c-resize
+  for each entry in old
+    add entry to buckets[bucketOf(entry.key, size)] // @line c-rehash
+  end for
+end function
+
+// --- Linear probing: one key per bucket ---
+
+function put(key, value)
+  if key is new and (count + 1) / size > loadLimit then // @line p-resize-check
+    resize() // @line p-resize-done
+  end if
+  reuse = none
+  for each i from bucketOf(key, size), wrapping round
+    if slots[i] is a tombstone then
+      if reuse is none then reuse = i // @line p-put-tombstone
+    else if slots[i] is empty then
+      slots[reuse or i] = (key, value) // @line p-put-place
+      return
+    else if slots[i].key is key then // @line p-put-probe
+      slots[i].value = value // @line p-put-update
+      return
+    end if
+  end for
+  if reuse is none then error "The table is full" // @line p-full
+  slots[reuse] = (key, value) // @line p-put-place
+end function
+
+function get(key)
+  for each i from bucketOf(key, size), wrapping round // @line p-get-probe
+    if slots[i] is empty then return nothing // @line p-get-missing
+    if slots[i].key is key then return slots[i].value // @line p-get-found
+  end for
+  return nothing // @line p-get-missing
+end function
+
+function remove(key)
+  for each i from bucketOf(key, size), wrapping round // @line p-remove-probe
+    if slots[i] is empty then return // @line p-remove-missing
+    if slots[i].key is key then
+      slots[i] = tombstone // @line p-remove-mark
+      return
+    end if
+  end for
+end function
+
+function resize()
+  old = slots // @line p-resize
+  slots = size × 2 empty slots // @line p-resize
+  for each key in old, skipping tombstones
+    put(key, value) again // @line p-rehash
+  end for
+end function
