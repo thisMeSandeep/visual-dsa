@@ -68,7 +68,6 @@ src/app/
   (tabs)/
     index.tsx                 # Home (F-101)
     practice.tsx              # Revise list / quizzes
-    progress.tsx              # Stats & progress
     settings.tsx
   topic/[topicId]/
     index.tsx                 # Topic detail (F-102)

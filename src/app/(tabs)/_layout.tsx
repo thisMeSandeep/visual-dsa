@@ -11,7 +11,6 @@ import { useColor } from '@/theme';
 const TABS: readonly TabItem[] = [
   { name: 'index', title: 'Learn', icon: 'learn' },
   { name: 'practice', title: 'Practice', icon: 'practice' },
-  { name: 'progress', title: 'Progress', icon: 'progress' },
   { name: 'settings', title: 'Settings', icon: 'settings' },
 ];
 

@@ -18,7 +18,7 @@ describe('Practice tab', () => {
     expect(screen.getByText('Nothing to revise')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Revise now' })).toBeNull();
     await fireEvent.press(
-      screen.getByRole('button', { name: 'Stack quiz, 10 questions · not tried yet' }),
+      screen.getByRole('button', { name: 'Stack quiz, 10 questions, not tried yet' }),
     );
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/topic/[topicId]/practice',
@@ -38,8 +38,11 @@ describe('Practice tab', () => {
     expect(screen.getByText('2 questions to revise')).toBeOnTheScreen();
     expect(screen.getByText('peek() removes the top item from the stack.')).toBeOnTheScreen();
     expect(
-      screen.getByRole('button', { name: 'Stack quiz, 10 questions · best 8/10' }),
+      screen.getByRole('button', { name: 'Stack quiz, 10 questions, best score 8 of 10' }),
     ).toBeOnTheScreen();
+    expect(screen.getByText('8/10')).toBeOnTheScreen();
+    // Every MVP topic has a quiz, each with its own row.
+    expect(screen.getByRole('button', { name: /^Big O Notation quiz/ })).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Revise now' }));
     expect(router.push).toHaveBeenCalledWith('/revise');

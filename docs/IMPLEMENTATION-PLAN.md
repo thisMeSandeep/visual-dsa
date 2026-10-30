@@ -135,7 +135,7 @@ feat(ui): add base components from the visual spec
 
 ### Step 2.1: Routes and tabs
 **Goal:** the full route map from ARCHITECTURE §8, with placeholder screens.
-- `(tabs)` layout: Learn, Practice, Progress, Settings, with Phosphor tab icons (fill when active).
+- `(tabs)` layout: Learn, Practice, Progress, Settings, with Phosphor tab icons (fill when active). *(After Step 10.1 the Progress tab was removed until it has real content: Learn, Practice, Settings.)*
 - `topic/[topicId]` stack: index, learn, play, practice. The chapters and reference routes open as form sheets.
 - Route files only read params and render a screen from `src/screens/`.
 
@@ -568,7 +568,7 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 | 13.1 | `graph` renderer and graph editor (F-604) | `feat(viz): add graph renderer and editor` |
 | 13.2 | Graph basics, BFS, DFS (G1–G3) | `feat(graphs): add graph basics, BFS and DFS` |
 | 13.3 | Topological sort and Dijkstra with the table renderer (G4, G5) | `feat(graphs): add topological sort and Dijkstra` |
-| 13.4 | Streaks, bookmarks and reminders (F-1002, F-1003) | `feat(progress): add streaks, bookmarks and reminders` |
+| 13.4 | Streaks, bookmarks and reminders (F-1002, F-1003), and the Progress tab back: per-topic progress, mastery and streaks | `feat(progress): add streaks, bookmarks and reminders` |
 
 ### Later (P2)
 Trie, Red-Black and segment trees; MST, union-find and Bellman-Ford; heap, counting and radix sort; backtracking, DP and greedy; narration, shareable scenarios, achievements, stats dashboard, cloud sync and localisation. These will be planned in detail when v1.3 ships.

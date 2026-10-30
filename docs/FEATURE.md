@@ -112,7 +112,7 @@ This list is based on [IDEA.md](./IDEA.md). Each feature has an ID so other docs
 
 | ID | Feature | Description | Priority |
 |---|---|---|---|
-| F-1001 | Per-topic progress | Lessons completed, quiz score, and a mastery level per topic. | P0 |
+| F-1001 | Per-topic progress | Lessons completed, quiz score, and a mastery level per topic. Chapters done show on Home's topic cards and the best quiz score on the Practice tab; there's no separate Progress tab until streaks and stats arrive (Step 13.4). A mastery level waits for that tab. | P0 |
 | F-1002 | Bookmarks | Bookmark any lesson step to come back to later. | P1 |
 | F-1003 | Streaks | Daily learning streak with a gentle reminder notification (opt-in). | P1 |
 | F-1004 | Achievements | Badges for milestones (first sandbox run, all sorting done, 7-day streak). | P2 |

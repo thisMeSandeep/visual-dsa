@@ -64,7 +64,6 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   ├── _layout.tsx         #   Learn · Practice · Progress · Settings
 │   │   │   ├── index.tsx           #   Home
 │   │   │   ├── practice.tsx
-│   │   │   ├── progress.tsx
 │   │   │   └── settings.tsx
 │   │   └── topic/[topicId]/
 │   │       ├── _layout.tsx         #   stack for the topic (lesson locked to landscape)
@@ -548,7 +547,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | Route | Screen | Presentation |
 |---|---|---|
 | `/` | Home (`screens/home`) | Tab "Learn" |
-| `/practice`, `/progress`, `/settings` | `screens/practice-hub`, `progress`, `settings` | Tabs |
+| `/practice`, `/settings` | `screens/practice-hub`, `settings` | Tabs (there's no Progress tab until Step 13.4: chapter progress is on Home's cards, best scores on Practice) |
 | `/topic/[topicId]` | Redirects to `learn` (there's no separate topic page) | — |
 | `/topic/[topicId]/learn` (`?chapter=<id>`, `?step=N`) | Lesson player: resumes by default; `chapter` opens a chapter, `step` (1-based) opens a step and wins over both | Stack push, full screen, **landscape** |
 | `/topic/[topicId]/play` | Sandbox | Stack push |

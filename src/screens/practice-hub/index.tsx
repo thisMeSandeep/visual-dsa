@@ -87,7 +87,10 @@ function ReviseCard() {
   );
 }
 
-/** Every topic with a quiz, with its question count and best score. */
+/**
+ * Every topic with a quiz, with its best score so far on the right (F-1001): green when it's
+ * perfect, a dash before the first try.
+ */
 function TopicQuizzes() {
   const topics = useProgress((state) => state.topics);
   const withQuiz = TOPICS.flatMap((meta) => {
@@ -103,14 +106,15 @@ function TopicQuizzes() {
       <View className="gap-3">
         {withQuiz.map(({ meta, count }) => {
           const score = topics[meta.id]?.quiz;
-          const detail = score
-            ? `${plural(count, 'question', 'questions')} · best ${score.best}/${score.total}`
-            : `${plural(count, 'question', 'questions')} · not tried yet`;
+          const questions = plural(count, 'question', 'questions');
+          const perfect = score !== undefined && score.best === score.total;
           return (
             <PressableScale
               key={meta.id}
               accessibilityRole="button"
-              accessibilityLabel={`${meta.title} quiz, ${detail}`}
+              accessibilityLabel={`${meta.title} quiz, ${questions}, ${
+                score ? `best score ${score.best} of ${score.total}` : 'not tried yet'
+              }`}
               onPress={() =>
                 router.push({ pathname: '/topic/[topicId]/practice', params: { topicId: meta.id } })
               }
@@ -121,13 +125,18 @@ function TopicQuizzes() {
                 <AppText variant="body" weight="bold">
                   {meta.title}
                 </AppText>
-                <AppText variant="label">{detail}</AppText>
+                <AppText variant="label">{questions}</AppText>
+              </View>
+              <View className="items-end gap-0.5">
+                <AppText variant="value" tone={perfect ? 'success-ink' : score ? 'ink' : 'muted'}>
+                  {score ? `${score.best}/${score.total}` : '–'}
+                </AppText>
+                <AppText variant="label">{score ? 'best' : 'not tried'}</AppText>
               </View>
               <Icon name="step-forward" size="sm" tone="muted" />
             </PressableScale>
           );
         })}
-        <AppText variant="label">More quizzes arrive with each topic.</AppText>
       </View>
     </View>
   );
