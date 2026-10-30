@@ -1,3 +1,4 @@
+import { config } from '@/config';
 import type { ColorToken } from '@/theme';
 
 import { AppText, type TextTone, type TextVariant } from './app-text';
@@ -22,8 +23,8 @@ const VARIANTS = {
 const SIZES = {
   /** Height 56: main actions. */
   md: { box: 'h-14 rounded-lg px-6', text: 'body' },
-  /** Height 52: buttons in a row or grid. */
-  compact: { box: 'h-13 rounded-lg px-5', text: 'body-sm' },
+  /** Height 52: buttons in a row or grid, often three to a row, so they keep their sides tight. */
+  compact: { box: 'h-13 rounded-lg px-3', text: 'body-sm' },
   /** Height 44 capsule, used inside cards (Resume). */
   pill: { box: 'h-11 rounded-full px-5', text: 'body-sm' },
 } as const satisfies Record<string, { box: string; text: TextVariant }>;
@@ -70,7 +71,16 @@ export function Button({
       }`}
     >
       {icon ? <Icon name={icon} size="xs" tone={tone} weight={iconWeight} /> : null}
-      <AppText variant={text} weight="bold" tone={tone}>
+      {/* One line, always: a long label shrinks a little rather than wrapping ("Dequeu / e"). */}
+      <AppText
+        variant={text}
+        weight="bold"
+        tone={tone}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={config.app.minimumLabelScale}
+        className="shrink"
+      >
         {label}
       </AppText>
     </PressableScale>

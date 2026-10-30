@@ -42,8 +42,10 @@ export default function RootLayout() {
     // (edge to edge) instead of white.
     <GestureHandlerRootView style={[styles.root, { backgroundColor: background }]}>
       {/* Tracks the keyboard's real position on both platforms (edge to edge included), for
-          KeyboardAvoidingView from react-native-keyboard-controller. */}
-      <KeyboardProvider>
+          KeyboardAvoidingView from react-native-keyboard-controller. SDK 58 is always edge to
+          edge on Android, but Expo Go doesn't report it, so the provider would pad the app by
+          the system bars (white bands above and below). The bars are translucent: say so. */}
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
         <SafeAreaProvider>
           {/* Uniwind's safe-area classes (pt-safe, pb-safe…) need the current insets. */}
           <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>

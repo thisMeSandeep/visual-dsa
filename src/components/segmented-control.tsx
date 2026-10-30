@@ -1,5 +1,7 @@
 import { View } from 'react-native';
 
+import { config } from '@/config';
+
 import { AppText } from './app-text';
 import { Icon } from './icon';
 import type { IconName } from './icons';
@@ -64,6 +66,9 @@ export function SegmentedControl<T extends string | number>({
               weight={selected ? 'bold' : 'medium'}
               tone={selected ? 'primary' : 'ink-2'}
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={config.app.minimumLabelScale}
+              className="shrink"
             >
               {option.label}
             </AppText>
