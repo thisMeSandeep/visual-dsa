@@ -36,8 +36,8 @@ const LABEL_OUT = FadeOut.duration(slideMs);
 
 /**
  * The app's tab bar (VISUAL-SPEC §6 "Tab bar"): a capsule floating above the bottom edge, with a
- * hairline outline like the topic cards. The current tab is wide, with its filled icon and name;
- * the others show just their icon (named for screen readers).
+ * hairline outline like the topic cards. The current tab is as wide as its filled icon and name;
+ * the others show just their icon (named for screen readers). The tabs spread across the bar.
  *
  * The soft cobalt pill is its own layer behind the tabs. Each tab's frame is measured with
  * onLayout, and on a switch the pill slides and resizes to the new tab on the UI thread while
@@ -82,7 +82,7 @@ export function FloatingTabBar({
     <View pointerEvents="box-none" className="absolute inset-x-0 bottom-0 px-4 pb-safe-offset-3">
       <View
         accessibilityRole="tablist"
-        className="flex-row items-center gap-1 rounded-full border-hairline border-line-strong bg-surface-raised p-1.5"
+        className="flex-row items-center justify-between rounded-full border-hairline border-line-strong bg-surface-raised p-1.5"
       >
         <Animated.View
           pointerEvents="none"
@@ -107,7 +107,6 @@ export function FloatingTabBar({
             <Animated.View
               key={route.key}
               layout={reducedMotion ? undefined : REFLOW}
-              className={focused ? 'flex-1' : ''}
               onLayout={(event) => {
                 const frame = event.nativeEvent.layout;
                 setFrames((current) => ({ ...current, [route.key]: frame }));
