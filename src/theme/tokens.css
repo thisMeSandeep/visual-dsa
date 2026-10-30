@@ -272,6 +272,7 @@
   --viz-label-gap: 4px; /* space between a cell and its index or pointer label */
   --viz-pointer-length: 16px; /* arrow from a pointer label to its element */
   --viz-pointer-label-width: 32px; /* space reserved for a pointer label such as "top" */
+  --viz-swap-arc: 30px; /* how far two swapping cells rise and dip as they pass each other */
 
   /* Stack renderer (VISUAL-SPEC §7): items are --viz-node-height tall */
   --viz-stack-item-width: 132px;

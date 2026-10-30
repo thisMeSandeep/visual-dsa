@@ -94,6 +94,45 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'binary-search.last.done':
     'Nothing is left. The **last {value}** is the one remembered, at index {result}. Checks made: {checks}.',
 
+  // Sorting (engine/algorithms/sorting/operations.ts)
+  'sort.trivial.empty': 'An empty array is already sorted: there’s nothing to do.',
+  'sort.trivial.one': 'One item is already sorted: there’s nothing to compare it with.',
+  'sort.done': 'Sorted! Comparisons: {comparisons}. Swaps: {swaps}.',
+  'sort.done.rest': 'Sorted! These last rounds took comparisons: {comparisons}, swaps: {swaps}.',
+  'bubble.start':
+    'Bubble sort {size} items: compare each pair of neighbours, and swap them if they’re out of order.',
+  'bubble.compare.swap': 'Compare **{a}** and **{b}**. {a} is bigger, so they swap.',
+  'bubble.compare.keep': 'Compare **{a}** and **{b}**. They’re in order, so leave them.',
+  'bubble.swapped': '**{a}** moves one place right, **{b}** one place left.',
+  'bubble.pass-done':
+    'Pass {pass} done: **{value}**, the biggest of the rest, has bubbled to index {index}. It’s in place.',
+  'bubble.last-pass': 'Pass {pass} done: the last two items are in place, so everything is.',
+  'bubble.early-exit':
+    'Pass {pass} made **no swaps**, so every pair is in order. The array is sorted: stop early.',
+  'selection.start':
+    'Selection sort {size} items: find the smallest, swap it to the front, then repeat on the rest.',
+  'selection.scan':
+    'Find the smallest from index {i} to {last}. **min** starts on **{value}**, at index {i}.',
+  'selection.new-min': '**{value}** is smaller than **{min}**: it’s the new **min**.',
+  'selection.not-smaller': '**{value}** isn’t smaller than **{min}**. Keep looking.',
+  'selection.in-place':
+    'The smallest, **{min}**, is already at index {i}. No swap needed: it’s in place.',
+  'selection.swap':
+    'The smallest is **{min}**. Swap it with **{value}** at index {i}: {min} is now in place.',
+  'insertion.start':
+    'Insertion sort {size} items: take each item in turn and slide it into place among those before it.',
+  'insertion.take':
+    'Take out **{key}**, the item at index {i}. Everything to its left is sorted so far.',
+  'insertion.shift': '**{value}** is bigger than **{key}**, so shift it one place right.',
+  'insertion.insert':
+    '**{value}** isn’t bigger than **{key}**, so {key} drops into the gap at index {index}.',
+  'insertion.stay':
+    '**{value}** isn’t bigger than **{key}**, so {key} goes back where it was. Nothing moved.',
+  'insertion.front': 'Nothing is left to compare, so **{key}** drops in at the front, index 0.',
+  'insertion.done': 'Sorted! Comparisons: {comparisons}. Shifts: {shifts}.',
+  'insertion.done.rest':
+    'Sorted! These last rounds took comparisons: {comparisons}, shifts: {shifts}.',
+
   // Linked lists (engine/structures/linked-list/operations.ts)
   'list.create': 'Make a new node for **{value}**. Nothing points to it yet.',
   'list.search.compare':

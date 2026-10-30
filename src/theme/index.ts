@@ -124,6 +124,7 @@ const VIZ_SIZE_VARS = {
   labelGap: '--viz-label-gap',
   pointerLength: '--viz-pointer-length',
   pointerLabelWidth: '--viz-pointer-label-width',
+  swapArc: '--viz-swap-arc',
   stackItemWidth: '--viz-stack-item-width',
   stackPadding: '--viz-stack-padding',
   stackRadius: '--viz-stack-radius',

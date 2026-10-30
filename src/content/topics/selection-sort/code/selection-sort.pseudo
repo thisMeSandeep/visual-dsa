@@ -1,0 +1,16 @@
+// Sorts a in place, smallest first.
+
+function selectionSort(a)
+  n = length(a)
+  for i from 0 to n - 2
+    min = i // @line scan
+    for j from i + 1 to n - 1
+      if a[j] < a[min] then // @line compare
+        min = j // @line new-min
+      end if
+    end for
+    if min != i then // @line place
+      swap a[i] and a[min] // @line swap
+    end if
+  end for
+end function

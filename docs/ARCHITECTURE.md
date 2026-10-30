@@ -123,7 +123,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts
 │   │   ├── algorithms/             #   searching/: binary search on the array model (the
-│   │   │                           #   `sorted-array` structure); sorting/ next (P1)
+│   │   │                           #   `sorted-array` structure); sorting/: bubble, selection
+│   │   │                           #   and insertion sort (one structure each)
 │   │   ├── lesson/                 #   lesson compiler (recipe → steps), STRUCTURES
 │   │   ├── sandbox/                #   sandbox session: run, undo, reset, presets
 │   │   └── player/                 #   player state machine (pure reducer)
@@ -500,7 +501,7 @@ type SandboxSession<Model> = {
 3. A player store plays the trace at the learner's speed, and the final model becomes the new current model. Only a change is remembered for Undo, so a peek or a push that overflowed leaves nothing to undo.
 4. Errors (overflow, underflow, not found) are steps in the trace with the `error` state (F-606), not alerts.
 5. Undo, Reset and loading a preset show the structure at rest (`restingStep`, shared with the lesson compiler) with a caption: the preset's hint, or "Undone". Reset and loading a preset can themselves be undone.
-6. Each topic's `content/topics/<topic>/sandbox.ts` is a list of **tools** (`SandboxToolsSchema`; the first opens by default, and a segmented switch at the top of the dock appears when there's more than one, each switch starting that tool fresh). A tool (`SandboxSchema`) has an id and label, the structure, the operations in button order (the first is the primary action; `input: 'value'` adds the value field and Random, `input: 'expression'` adds a text field that presets fill in), the presets (setup input plus a hint; the first is where the tool opens) and the stat pills (keys read from the scene's `meta`, e.g. the stack's `size`, `capacity` and `top`). `validate:content` checks every tool's structure and operations exist and every preset builds; issue paths start with the tool's index.
+6. Each topic's `content/topics/<topic>/sandbox.ts` is a list of **tools** (`SandboxToolsSchema`; the first opens by default, and a segmented switch at the top of the dock appears when there's more than one, each switch starting that tool fresh). A tool (`SandboxSchema`) has an id and label, the structure, the operations in button order (the first is the primary action; `input: 'value'` adds the value field and Random, `input: 'expression'` adds a text field that presets fill in, `input: 'values'` a field of numbers to sort that presets and Random fill in, checked by `screens/sandbox/values-input.ts`), the presets (setup input plus a hint; the first is where the tool opens) and the stat pills (keys read from the scene's `meta`, e.g. the stack's `size`, `capacity` and `top`). `validate:content` checks every tool's structure and operations exist and every preset builds; issue paths start with the tool's index.
 7. The Stack has two tools: the stack itself and the **bracket checker** (Step 7.2). The checker's Check runs `brackets.check` with `{ expression }`, which checks a new expression instead of the current one; the typed text is checked first (`screens/sandbox/expression-input.ts`: spaces dropped, not empty, at most `config.structures.brackets.maxLength` characters and `config.engine.maxItems` opening brackets).
 
 ### 6.5 Practice

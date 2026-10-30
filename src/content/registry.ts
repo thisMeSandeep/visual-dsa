@@ -27,6 +27,21 @@ import { meta as bigO } from './topics/big-o/meta';
 import { reference as bigOReference } from './topics/big-o/reference';
 import { quiz as bigOQuiz } from './topics/big-o/quiz';
 import { sandbox as bigOSandbox } from './topics/big-o/sandbox';
+import { lesson as bubbleSortLesson } from './topics/bubble-sort/lesson';
+import { meta as bubbleSort } from './topics/bubble-sort/meta';
+import { reference as bubbleSortReference } from './topics/bubble-sort/reference';
+import { quiz as bubbleSortQuiz } from './topics/bubble-sort/quiz';
+import { sandbox as bubbleSortSandbox } from './topics/bubble-sort/sandbox';
+import { lesson as selectionSortLesson } from './topics/selection-sort/lesson';
+import { meta as selectionSort } from './topics/selection-sort/meta';
+import { reference as selectionSortReference } from './topics/selection-sort/reference';
+import { quiz as selectionSortQuiz } from './topics/selection-sort/quiz';
+import { sandbox as selectionSortSandbox } from './topics/selection-sort/sandbox';
+import { lesson as insertionSortLesson } from './topics/insertion-sort/lesson';
+import { meta as insertionSort } from './topics/insertion-sort/meta';
+import { reference as insertionSortReference } from './topics/insertion-sort/reference';
+import { quiz as insertionSortQuiz } from './topics/insertion-sort/quiz';
+import { sandbox as insertionSortSandbox } from './topics/insertion-sort/sandbox';
 import { lesson as doublyLinkedListLesson } from './topics/doubly-linked-list/lesson';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
 import { reference as doublyLinkedListReference } from './topics/doubly-linked-list/reference';
@@ -63,6 +78,9 @@ export const TOPIC_IDS = [
   'queue',
   'hash-table',
   'binary-search',
+  'bubble-sort',
+  'selection-sort',
+  'insertion-sort',
 ] as const;
 
 export type TopicId = (typeof TOPIC_IDS)[number];
@@ -77,6 +95,9 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   queue,
   'hash-table': hashTable,
   'binary-search': binarySearch,
+  'bubble-sort': bubbleSort,
+  'selection-sort': selectionSort,
+  'insertion-sort': insertionSort,
 };
 
 /**
@@ -92,6 +113,9 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'hash-table': hashTableLesson,
   'big-o': bigOLesson,
   'binary-search': binarySearchLesson,
+  'bubble-sort': bubbleSortLesson,
+  'selection-sort': selectionSortLesson,
+  'insertion-sort': insertionSortLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -104,6 +128,9 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'hash-table': hashTableSandbox,
   'big-o': bigOSandbox,
   'binary-search': binarySearchSandbox,
+  'bubble-sort': bubbleSortSandbox,
+  'selection-sort': selectionSortSandbox,
+  'insertion-sort': insertionSortSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -116,6 +143,9 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'hash-table': hashTableQuiz,
   'big-o': bigOQuiz,
   'binary-search': binarySearchQuiz,
+  'bubble-sort': bubbleSortQuiz,
+  'selection-sort': selectionSortQuiz,
+  'insertion-sort': insertionSortQuiz,
 };
 
 /** Each topic's reference sheet (F-801 – F-803), under its topic id. */
@@ -128,6 +158,9 @@ export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
   'hash-table': hashTableReference,
   'big-o': bigOReference,
   'binary-search': binarySearchReference,
+  'bubble-sort': bubbleSortReference,
+  'selection-sort': selectionSortReference,
+  'insertion-sort': insertionSortReference,
 };
 
 /** All topics in Home order. */

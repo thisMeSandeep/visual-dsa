@@ -1,4 +1,5 @@
 import { createSortedArray, searchToScene } from '@/engine/algorithms/searching';
+import { createSortArray, sortToScene, traceSort } from '@/engine/algorithms/sorting';
 import { arrayToScene, createArray, traceArray } from '@/engine/structures/array';
 
 import type {
@@ -84,6 +85,33 @@ describe('layoutArray', () => {
     const plain = layoutArray(arrayToScene(model), SIZES);
     expect(resting.height).toBe(searching.height);
     expect(plain.height).toBeLessThan(resting.height);
+  });
+
+  it('lifts a held item above its slot, with room kept for it at rest', () => {
+    const { trace } = traceSort(createSortArray(['3', '1', '2']), 'insertion-sort');
+    const { drawables, height } = layoutArray(trace.steps[1]!.scene, SIZES);
+    const key = byId<BoxDrawable>(drawables, 'item-1')!;
+    const slot = byId<BoxDrawable>(drawables, 'slot-1')!;
+    expect(key.x).toBe(slot.x);
+    expect(key.y + key.height).toBeLessThan(slot.y);
+    const rest = layoutArray(
+      sortToScene('insertion-sort')(createSortArray(['3', '1', '2'])),
+      SIZES,
+    );
+    expect(rest.height).toBe(height);
+  });
+
+  it('moves swapping items along an arc, and only those', () => {
+    const { trace } = traceSort(createSortArray(['3', '1', '2']), 'bubble-sort');
+    const swapping = layoutArray(trace.steps[2]!.scene, SIZES).drawables;
+    expect(byId<BoxDrawable>(swapping, 'item-0')).toMatchObject({ arc: true });
+    expect(byId<BoxDrawable>(swapping, 'item-1')).toMatchObject({ arc: true });
+    expect(byId<BoxDrawable>(swapping, 'item-2')?.arc).toBeUndefined();
+  });
+
+  it('shows an item’s tag as its second line', () => {
+    const { drawables } = layoutArray(arrayToScene(createSortArray(['5a', '3'])), SIZES);
+    expect(byId<BoxDrawable>(drawables, 'item-0')).toMatchObject({ value: '5', detail: 'a' });
   });
 
   it('draws the old array above while growing, and the copied item down in the new one', () => {

@@ -5,6 +5,7 @@ import {
   traceSearch,
   type SearchOperation,
 } from '@/engine/algorithms/searching';
+import { createSortArray, SORT_ALGORITHMS, traceSort } from '@/engine/algorithms/sorting';
 import {
   CURVE_IDS,
   createGrowth,
@@ -140,6 +141,32 @@ describe('binary search captions', () => {
         const text = captionText(step.caption);
         expect(text).not.toMatch(/\{\w+\}/);
         expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
+      }
+    }
+  });
+});
+
+describe('sorting captions', () => {
+  it('has a caption for every key the sorts use, with every placeholder filled', () => {
+    const arrays = [
+      [],
+      ['4'],
+      ['3', '1', '2'],
+      ['1', '2', '3'],
+      ['5a', '3', '5b', '1'],
+      ['3', '2', '1'],
+    ];
+    for (const algorithm of SORT_ALGORITHMS) {
+      for (const values of arrays) {
+        for (const rounds of [{}, { rounds: 1 }, { from: 1 }]) {
+          const { trace } = traceSort(createSortArray(values), algorithm, rounds);
+          for (const step of trace.steps) {
+            if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+            const text = captionText(step.caption);
+            expect(text).not.toMatch(/\{\w+\}/);
+            expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
+          }
+        }
       }
     }
   });

@@ -11,6 +11,8 @@ export type ArrayItem = Readonly<{
   /** Stable across steps so the canvas can animate this exact item (never reused). */
   id: string;
   value: string;
+  /** Tells equal values apart, e.g. the a and b of two 5s when showing a sort is unstable. */
+  tag?: string;
 }>;
 
 /** Memory addresses to show under the indices: slot i is at base + i × stride. */

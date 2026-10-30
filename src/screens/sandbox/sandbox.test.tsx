@@ -239,4 +239,28 @@ describe('Sandbox', () => {
     await preset('Unbalanced');
     expect(screen.getByLabelText('Expression').props.value).toBe('(()');
   });
+
+  it('sorts the numbers in the field, filled from a preset or typed', async () => {
+    await renderSandbox('insertion-sort');
+    const field = () => screen.getByLabelText('Numbers to sort');
+    expect(field().props.value).toBe('29 10 14 37 13 5 42 21');
+
+    await preset('Sorted');
+    expect(field().props.value).toBe('4 12 19 27 33 41 48 56');
+
+    await fireEvent.changeText(field(), '3, 1 2');
+    await press('Sort');
+    await playToEnd();
+    expect(field().props.value).toBe('3 1 2');
+    expect(screen.getByText('Sorted! Comparisons: 3. Shifts: 2.')).toBeOnTheScreen();
+
+    await fireEvent.changeText(field(), '7');
+    await press('Sort');
+    expect(
+      screen.getByText('Type at least 2 numbers, so there’s something to sort.'),
+    ).toBeOnTheScreen();
+
+    await press('Random numbers');
+    expect(field().props.value.split(' ')).toHaveLength(config.structures.sorting.randomCount);
+  });
 });

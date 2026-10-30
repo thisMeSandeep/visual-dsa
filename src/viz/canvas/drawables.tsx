@@ -17,7 +17,13 @@ import { useDerivedValue } from 'react-native-reanimated';
 import type { ColorToken, VizSizes } from '@/theme';
 
 import { STATE_PAINT } from '../state-style';
-import { FADE_EASING, MOVE_EASING, useAnimatedColor, useAnimatedNumber } from './animated-values';
+import {
+  FADE_EASING,
+  MOVE_EASING,
+  useAnimatedColor,
+  useAnimatedNumber,
+  useArcLift,
+} from './animated-values';
 import type { CanvasTimings } from './timing';
 import type {
   BoxDrawable,
@@ -57,6 +63,7 @@ export function AnimatedBox({ drawable, exiting, context }: Props<BoxDrawable>) 
   const y = useAnimatedNumber(drawable.y, timings.move, MOVE_EASING);
   const width = useAnimatedNumber(drawable.width, timings.move, MOVE_EASING);
   const height = useAnimatedNumber(drawable.height, timings.move, MOVE_EASING);
+  const lift = useArcLift(drawable.x, drawable.arc ?? false, sizes.swapArc, timings.move);
   const presence = usePresenceProgress(exiting, timings);
   const dim = useAnimatedNumber(
     paint.dimmed ? sizes.dimmedOpacity : 1,
@@ -77,7 +84,7 @@ export function AnimatedBox({ drawable, exiting, context }: Props<BoxDrawable>) 
   // Scale around the box's centre so entering boxes grow in place.
   const transform = useDerivedValue(() => [
     { translateX: x.get() + width.get() / 2 },
-    { translateY: y.get() + height.get() / 2 },
+    { translateY: y.get() + lift.get() + height.get() / 2 },
     { scale: enterScale + (1 - enterScale) * presence.get() },
     { translateX: -width.get() / 2 },
     { translateY: -height.get() / 2 },

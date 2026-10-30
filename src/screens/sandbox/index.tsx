@@ -43,6 +43,7 @@ import { parseIndex } from './index-input';
 import { parseKey } from './key-input';
 import { SliderRow } from './slider-row';
 import { parseTarget, parseValue } from './value-input';
+import { parseValues, randomValues } from './values-input';
 
 /**
  * Sandbox / Play mode (F-601–F-603, F-606): run any operation on a live structure. A topic can
@@ -137,10 +138,15 @@ const rows = <T,>(items: readonly T[], max: number): T[][] => {
   return Array.from({ length: count }, (_, row) => items.slice(row * size, (row + 1) * size));
 };
 
-/** The expression a bracket-checker preset starts with, to show in the field. */
-const presetExpression = (preset: Preset): string => {
-  const input = preset.input as { expression?: unknown } | undefined;
-  return typeof input?.expression === 'string' ? input.expression : '';
+/** Operations whose field the presets fill in: an expression, or a sort's numbers. */
+const presetFilled = (operation: Operation | undefined) =>
+  operation?.input === 'expression' || operation?.input === 'values';
+
+/** What a preset puts in the field: the bracket checker's expression, or a sort's numbers. */
+const presetText = (preset: Preset): string => {
+  const input = preset.input as { expression?: unknown; values?: unknown } | undefined;
+  if (typeof input?.expression === 'string') return input.expression;
+  return Array.isArray(input?.values) ? input.values.join(' ') : '';
 };
 
 function Playground({
@@ -171,10 +177,8 @@ function Playground({
   const slider = sandbox.operations.find((operation) => operation.input === 'slider');
   const buttons = sandbox.operations.filter((operation) => operation !== slider);
   const [primary, ...secondary] = buttons;
-  // The expression field starts filled with the preset's expression, ready to check.
-  const [text, setText] = useState(() =>
-    primary?.input === 'expression' ? presetExpression(firstPreset) : '',
-  );
+  // An expression or numbers field starts filled from the preset, ready to run.
+  const [text, setText] = useState(() => (presetFilled(primary) ? presetText(firstPreset) : ''));
   const [problem, setProblem] = useState<string>();
   // Tools whose operations take a key (an index, a list node, a hash key) get a second field.
   const keyed = sandbox.operations.some(takesKey);
@@ -226,12 +230,20 @@ function Playground({
         setProblem(parsed.problem);
         ok = false;
       }
+    } else if (operation.input === 'values') {
+      const parsed = parseValues(text);
+      if (parsed.ok) fields.values = parsed.values;
+      else {
+        setProblem(parsed.problem);
+        ok = false;
+      }
     }
     if (!ok) return;
 
-    // A value is used up; an index and an expression stay, ready to run again.
+    // A value is used up; an index, an expression and a sort's numbers stay, ready to run again.
     if (takesValue(operation)) setText('');
     if (typeof fields.expression === 'string') setText(fields.expression);
+    if (Array.isArray(fields.values)) setText(fields.values.join(' '));
     setProblem(undefined);
     setKeyProblem(undefined);
     const input = operation.input ? fields : undefined;
@@ -242,8 +254,8 @@ function Playground({
   const choosePreset = (next: Preset) => {
     setPreset(next);
     setSession(loadPreset(session, build(next), restWith(next.hint)));
-    if (primary?.input === 'expression') {
-      setText(presetExpression(next));
+    if (presetFilled(primary)) {
+      setText(presetText(next));
       setProblem(undefined);
     }
   };
@@ -472,6 +484,36 @@ function Playground({
               returnKeyType="done"
               onSubmitEditing={() => run(primary)}
               placeholder="Expression, e.g. (1+2)*3"
+              className="flex-1"
+            />
+            <Button label={primary.label} size="compact" onPress={() => run(primary)} />
+          </View>
+        ) : primary?.input === 'values' ? (
+          <View className="flex-row items-start gap-2">
+            <TextField
+              label="Numbers to sort"
+              labelHidden
+              value={text}
+              onChangeText={(next) => {
+                setText(next);
+                setProblem(undefined);
+              }}
+              error={problem}
+              keyboardType="numbers-and-punctuation"
+              autoCorrect={false}
+              returnKeyType="done"
+              onSubmitEditing={() => run(primary)}
+              placeholder="Numbers, e.g. 5 3 8 1"
+              accessory={
+                <IconButton
+                  icon="random"
+                  label="Random numbers"
+                  onPress={() => {
+                    setText(randomValues(rng));
+                    setProblem(undefined);
+                  }}
+                />
+              }
               className="flex-1"
             />
             <Button label={primary.label} size="compact" onPress={() => run(primary)} />

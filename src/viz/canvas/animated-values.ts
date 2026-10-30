@@ -3,12 +3,13 @@
  * the per-frame work runs on the UI thread (expo-animation skill, step 6). `.get()` / `.set()`
  * keep this compatible with the React Compiler.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Easing,
   interpolateColor,
   useDerivedValue,
   useSharedValue,
+  withSequence,
   withTiming,
   type DerivedValue,
   type SharedValue,
@@ -62,4 +63,27 @@ export function useAnimatedColor(target: string, duration: number): DerivedValue
   }, [target, duration, from, to, progress, color]);
 
   return color;
+}
+
+/**
+ * A vertical offset for a box that moves sideways along an arc (two cells swapping): it rises
+ * to −height when x increases and dips to +height when x decreases, then settles back to 0,
+ * over the same duration as the move. 0 when `enabled` is off or motion is instant.
+ */
+export function useArcLift(
+  x: number,
+  enabled: boolean,
+  height: number,
+  duration: number,
+): SharedValue<number> {
+  const lift = useSharedValue(0);
+  const lastX = useRef(x);
+  useEffect(() => {
+    const dx = x - lastX.current;
+    lastX.current = x;
+    if (!enabled || dx === 0 || duration <= 0) return;
+    const half = { duration: duration / 2, easing: MOVE_EASING };
+    lift.set(withSequence(withTiming(dx > 0 ? -height : height, half), withTiming(0, half)));
+  }, [x, enabled, height, duration, lift]);
+  return lift;
 }

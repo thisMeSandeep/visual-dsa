@@ -31,6 +31,12 @@ export const structures = {
     /** Slots in a new queue. At most config.engine.maxItems. */
     defaultCapacity: 6,
   },
+  sorting: {
+    /** Fewest values the sort sandbox takes: with one there's nothing to compare. */
+    minItems: 2,
+    /** How many values the sort sandbox's Random button makes. At most config.engine.maxItems. */
+    randomCount: 8,
+  },
   brackets: {
     /** Longest expression the bracket checker takes: one canvas cell per character. */
     maxLength: 16,

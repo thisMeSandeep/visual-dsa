@@ -259,6 +259,77 @@ const binarySearch: Drawing = (p) => (
   </G>
 );
 
+/* Sorts: a row of cells with three values and a story told by the accent. ------------------- */
+const SORT_X = [15, 37, 59, 81, 103, 125];
+const sortCell = (p: ArtPalette, x: number, value: string, stroke: string, y = 42) => (
+  <G key={`${x}-${y}`}>
+    <Rect x={x} y={y} width={18} height={18} rx={3} fill={p.cell} stroke={stroke} />
+    {label(p, x + 9, y + 12, value, stroke)}
+  </G>
+);
+
+/* Bubble sort: two neighbours trading places along arcs; the biggest already at the end. */
+const BUBBLE_VALUES = ['2', '5', '6', '3', '1', '8'];
+const bubbleSort: Drawing = (p) => (
+  <G>
+    {SORT_X.map((x, i) =>
+      sortCell(p, x, BUBBLE_VALUES[i] ?? '', i === 2 || i === 3 ? p.accent : p.ink),
+    )}
+    <Path d="M 68 38 Q 79 24 90 38" stroke={p.accent} />
+    <Path d={head(90, 38, 87, 32)} stroke={p.accent} />
+    <Path d="M 90 64 Q 79 78 68 64" stroke={p.accent} />
+    <Path d={head(68, 64, 71, 70)} stroke={p.accent} />
+    {label(p, 79, 90, 'swap', p.accent)}
+    {label(p, 134, 76, 'in place')}
+  </G>
+);
+
+/* Selection sort: the smallest jumps straight to the front of the unsorted part. */
+const SELECTION_VALUES = ['1', '3', '9', '7', '4', '8'];
+const selectionSort: Drawing = (p) => (
+  <G>
+    {SORT_X.map((x, i) =>
+      sortCell(p, x, SELECTION_VALUES[i] ?? '', i === 2 || i === 4 ? p.accent : p.ink),
+    )}
+    <Path d="M 112 38 Q 90 12 68 38" stroke={p.accent} />
+    <Path d={head(68, 38, 71, 32)} stroke={p.accent} />
+    {label(p, 112, 76, 'min', p.accent)}
+    <Path d="M 15 68 H 55" stroke={p.muted} />
+    {label(p, 35, 80, 'sorted')}
+  </G>
+);
+
+/* Insertion sort: the key lifted out above a gap that bigger items shift right into. */
+const INSERTION_VALUES = ['2', '4', '', '7', '9', '3'];
+const insertionSort: Drawing = (p) => (
+  <G>
+    {SORT_X.map((x, i) =>
+      i === 2 ? (
+        <Rect
+          key={x}
+          x={x}
+          y={52}
+          width={18}
+          height={18}
+          rx={3}
+          fill="none"
+          stroke={p.muted}
+          strokeDasharray="2.5 2.5"
+        />
+      ) : (
+        sortCell(p, x, INSERTION_VALUES[i] ?? '', p.ink, 52)
+      ),
+    )}
+    {sortCell(p, 59, '5', p.accent, 12)}
+    <Path d="M 68 34 V 46" stroke={p.accent} />
+    <Path d={head(68, 48, 68, 42)} stroke={p.accent} />
+    {label(p, 92, 24, 'key', p.accent)}
+    <Path d="M 82 80 H 100" stroke={p.muted} />
+    <Path d={head(102, 80, 96, 80)} stroke={p.muted} />
+    {label(p, 92, 92, 'shift')}
+  </G>
+);
+
 export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'big-o': bigO,
   array,
@@ -268,4 +339,7 @@ export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   queue,
   'hash-table': hashTable,
   'binary-search': binarySearch,
+  'bubble-sort': bubbleSort,
+  'selection-sort': selectionSort,
+  'insertion-sort': insertionSort,
 };

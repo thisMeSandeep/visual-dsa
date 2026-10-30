@@ -1,0 +1,120 @@
+import type { Quiz } from '../../schema';
+
+/** Selection Sort quiz (ALGORITHM-CATALOG A3). Each question links to its chapter. */
+export const quiz = {
+  topicId: 'selection-sort',
+  questions: [
+    {
+      id: 'first-round',
+      kind: 'multiple-choice',
+      prompt: 'After the first round of selection sort, what does the array look like?',
+      context: '29 10 14 37 13',
+      options: [
+        { id: 'swap', text: '10 29 14 37 13' },
+        { id: 'sorted', text: '10 13 14 29 37' },
+        { id: 'shift', text: '10 29 14 13 37' },
+        { id: 'same', text: '29 10 14 37 13' },
+      ],
+      answer: 'swap',
+      explanation: 'The smallest, 10, swaps with the first item, 29. Nothing else moves.',
+      chapterId: 'find-minimum',
+    },
+    {
+      id: 'min-pointer',
+      kind: 'multiple-choice',
+      prompt: 'While scanning, what does min hold?',
+      options: [
+        { id: 'index', text: 'The index of the smallest item seen so far' },
+        { id: 'value', text: 'The smallest value in the whole array' },
+        { id: 'first', text: 'The index of the first unsorted item' },
+        { id: 'count', text: 'How many items have been checked' },
+      ],
+      answer: 'index',
+      explanation: 'It starts at i and moves to j whenever a[j] is smaller than a[min].',
+      chapterId: 'find-minimum',
+    },
+    {
+      id: 'final-place',
+      kind: 'true-false',
+      prompt: 'Once selection sort swaps an item to index i, that item never moves again.',
+      answer: true,
+      explanation: 'It’s the smallest of everything left, so it’s in its final place.',
+      chapterId: 'swap-into-place',
+    },
+    {
+      id: 'swap-count',
+      kind: 'multiple-choice',
+      prompt: 'At most how many swaps does selection sort make on 8 items?',
+      options: [
+        { id: 'seven', text: '7' },
+        { id: 'eight', text: '8' },
+        { id: 'twentyeight', text: '28' },
+        { id: 'sixtyfour', text: '64' },
+      ],
+      answer: 'seven',
+      explanation: 'One swap per round at most, and n − 1 rounds: 7.',
+      chapterId: 'swap-into-place',
+    },
+    {
+      id: 'comparisons',
+      kind: 'multiple-choice',
+      prompt: 'How many comparisons does selection sort make on 6 items?',
+      options: [
+        { id: 'fifteen', text: '15' },
+        { id: 'five', text: '5' },
+        { id: 'six', text: '6' },
+        { id: 'thirtysix', text: '36' },
+      ],
+      answer: 'fifteen',
+      explanation: '5 + 4 + 3 + 2 + 1 = 15, which is n(n − 1) ÷ 2. It’s the same for any input.',
+      chapterId: 'sorted-prefix',
+    },
+    {
+      id: 'sorted-input',
+      kind: 'complexity',
+      prompt: 'How long does selection sort take on an already sorted array?',
+      options: [
+        { id: 'linear', text: 'O(n)' },
+        { id: 'nlogn', text: 'O(n log n)' },
+        { id: 'quadratic', text: 'O(n²)' },
+        { id: 'constant', text: 'O(1)' },
+      ],
+      answer: 'quadratic',
+      explanation:
+        'It can’t tell the rest is sorted without scanning it, so every round scans in full.',
+      chapterId: 'sorted-prefix',
+    },
+    {
+      id: 'prefix',
+      kind: 'true-false',
+      prompt: 'Selection sort grows its sorted part from the right end.',
+      answer: false,
+      explanation:
+        'It puts the smallest first, so the sorted part grows from the left. Bubble sort grows from the right.',
+      chapterId: 'sorted-prefix',
+    },
+    {
+      id: 'stable',
+      kind: 'true-false',
+      prompt: 'Selection sort is stable.',
+      answer: false,
+      explanation: 'A long swap can jump an item over an equal one, as 5a jumped over 5b.',
+      chapterId: 'not-stable',
+    },
+    {
+      id: 'unstable-result',
+      kind: 'multiple-choice',
+      prompt: 'Selection sort this array. In what order do the two 5s end up?',
+      context: '5a 3 5b 1',
+      options: [
+        { id: 'ba', text: '5b, then 5a' },
+        { id: 'ab', text: '5a, then 5b' },
+        { id: 'apart', text: 'Apart, with 3 between them' },
+        { id: 'front', text: 'At the front' },
+      ],
+      answer: 'ba',
+      explanation: 'The first swap moves 5a to the end, past 5b, giving 1 3 5b 5a.',
+      chapterId: 'not-stable',
+    },
+  ],
+} satisfies Quiz;

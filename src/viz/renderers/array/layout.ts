@@ -5,6 +5,7 @@
  *   ┌─────────────────────┐
  *   │ [··] [ 8] [42] [17] │                     ← items wait here, copies left dimmed
  *   └─────────────────────┘
+ *                  [ 4]                       ← a held item (insertion sort's key), over its slot
  *   new array        i
  *                    ↓
  *   ┌─────────────────────────────────────────┐
@@ -16,6 +17,7 @@
  *     low           high                        ← `below` pointers (binary search's range)
  *
  * Every slot is drawn, empty or not, so free capacity is visible and a shift shows its gap.
+ * Swapping items move along an arc, so they pass each other instead of overlapping.
  */
 import type { ElementState, Scene, SceneElement } from '@/engine/core/types';
 import type { VizSizes } from '@/theme';
@@ -67,8 +69,10 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
     );
   }
 
-  // The array itself: pointer space, the framed row, indices, then addresses.
-  const top = growing ? sourceFrameBottom + sizes.sceneGap : 0;
+  // The array itself: a held item, pointer space, the framed row, indices, then addresses.
+  const sectionTop = growing ? sourceFrameBottom + sizes.sceneGap : 0;
+  const hasHeldLane = meta.laneHeld !== undefined;
+  const top = hasHeldLane ? sectionTop + h + sizes.labelGap : sectionTop;
   const pointerArrowTop = top + labelHeight;
   const frameTop = pointerArrowTop + sizes.pointerLength + sizes.labelGap;
   const rowTop = frameTop + pad;
@@ -84,7 +88,7 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   const laneTop = labelsBottom + sizes.labelGap;
   const bottom = hasLaneBelow ? laneTop + labelHeight + sizes.pointerLength : labelsBottom;
 
-  if (growing) drawables.push(label('main-label', 'new array', top + sizes.fontLabel / 2));
+  if (growing) drawables.push(label('main-label', 'new array', sectionTop + sizes.fontLabel / 2));
   drawables.push(
     {
       kind: 'path',
@@ -124,17 +128,21 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   }
 
   const cells = scene.elements.filter((e): e is Cell => e.kind === 'cell');
+  const rowOf = { index: rowTop, source: sourceRowTop, held: sectionTop };
   for (const cell of cells) {
-    const index = cell.slot.type === 'index' || cell.slot.type === 'source' ? cell.slot.index : 0;
+    const { slot } = cell;
+    if (slot.type !== 'index' && slot.type !== 'source' && slot.type !== 'held') continue;
     drawables.push({
       kind: 'box',
       id: cell.id,
-      x: slotX(index),
-      y: cell.slot.type === 'source' ? sourceRowTop : rowTop,
+      x: slotX(slot.index),
+      y: rowOf[slot.type],
       width: w,
       height: h,
       state: cell.state,
       value: cell.value,
+      ...(cell.detail === undefined ? {} : { detail: cell.detail }),
+      ...(cell.state === 'swapping' ? { arc: true } : {}),
     });
   }
 

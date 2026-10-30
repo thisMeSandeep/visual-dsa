@@ -31,6 +31,14 @@ import {
   traceSearch,
 } from '../algorithms/searching';
 import {
+  createSortArray,
+  describeSort,
+  SORT_ALGORITHMS,
+  sortToScene,
+  traceSort,
+  type SortAlgorithm,
+} from '../algorithms/sorting';
+import {
   CURVE_IDS,
   createGrowth,
   describeGrowth,
@@ -303,6 +311,48 @@ const sortedArray: StructureDefinition<ArrayModel> = {
   },
 };
 
+/**
+ * A sort: an array of numbers (a value may carry a letter tag, "5a", to tell equal values
+ * apart) and one operation, sort. Bubble, selection and insertion sort are one structure each,
+ * so each keeps the room its pointers or held key need.
+ */
+function sortStructure(algorithm: SortAlgorithm): StructureDefinition<ArrayModel> {
+  const create = (input: unknown, at: string) => {
+    const values = optionalTextList(record(input, at), 'values', at);
+    return atSegment(at, () => createSortArray(values));
+  };
+  return {
+    /** { values?: string[] } */
+    create,
+    toScene: (model) => sortToScene(algorithm)(model),
+    describe: describeSort,
+    operations: {
+      /**
+       * Sorts the current array, or `{ values }` when given: the sandbox sorts whatever the
+       * learner typed. Lessons set the array up first, and may pass `{ from }` to carry on
+       * after rounds an earlier `pass` showed.
+       */
+      sort: (model, input, at) => {
+        const fields = record(input, at);
+        const array = fields.values === undefined ? model : create(fields, at);
+        return traceSort(array, algorithm, { from: roundsDone(fields, array, at) });
+      },
+      /** One round (a pass, or placing one item) after `{ from }` rounds already done. */
+      pass: (model, input, at) =>
+        traceSort(model, algorithm, { from: roundsDone(record(input, at), model, at), rounds: 1 }),
+    },
+  };
+}
+
+/** How many rounds a lesson says are done already: 0 to n − 1 for n items. */
+function roundsDone(input: Record<string, unknown>, model: ArrayModel, at: string): number {
+  const from = optionalWholeNumber(input, 'from', at) ?? 0;
+  if (from < 0 || from > Math.max(model.size - 1, 0)) {
+    throw new CompileError(`"from" must be 0–${Math.max(model.size - 1, 0)} rounds`, at);
+  }
+  return from;
+}
+
 function addressesFrom(input: unknown, at: string): ArrayAddresses {
   const fields = record(input, `${at}.addresses`);
   return {
@@ -486,6 +536,12 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   queue: queue as StructureDefinition<unknown>,
   array: array as StructureDefinition<unknown>,
   'sorted-array': sortedArray as StructureDefinition<unknown>,
+  ...Object.fromEntries(
+    SORT_ALGORITHMS.map((algorithm) => [
+      algorithm,
+      sortStructure(algorithm) as StructureDefinition<unknown>,
+    ]),
+  ),
   'linked-list': linkedList as StructureDefinition<unknown>,
   'hash-table': hashTable as StructureDefinition<unknown>,
   'big-o': growth as StructureDefinition<unknown>,

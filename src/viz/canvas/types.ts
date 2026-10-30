@@ -17,6 +17,11 @@ export type BoxDrawable = {
   state: ElementState;
   value: string;
   detail?: string;
+  /**
+   * Moves along an arc instead of a straight line when it changes place sideways: up when
+   * moving right, down when moving left, so two swapping cells pass each other.
+   */
+  arc?: boolean;
 };
 
 /** A label: index, pointer name ("top", "j"), callout text. */

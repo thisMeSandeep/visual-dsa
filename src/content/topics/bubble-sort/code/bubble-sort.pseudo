@@ -1,0 +1,15 @@
+// Sorts a in place, smallest first.
+
+function bubbleSort(a)
+  n = length(a)
+  for pass from 1 to n - 1
+    swapped = false
+    for j from 0 to n - 1 - pass
+      if a[j] > a[j + 1] then // @line compare
+        swap a[j] and a[j + 1] // @line swap
+        swapped = true // @line swap
+      end if
+    end for // @line pass-done
+    if not swapped then return // @line early-exit
+  end for
+end function

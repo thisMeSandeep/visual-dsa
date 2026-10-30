@@ -25,7 +25,12 @@ describe('registered content', () => {
   it('registers the seven MVP topics, then the v1.1 topics, in Home order', () => {
     expect(TOPICS.map((topic) => topic.id)).toEqual(TOPIC_IDS);
     expect(TOPICS.filter((topic) => topic.priority === 'P0')).toHaveLength(7);
-    expect(TOPICS.slice(7).map((topic) => topic.id)).toEqual(['binary-search']);
+    expect(TOPICS.slice(7).map((topic) => topic.id)).toEqual([
+      'binary-search',
+      'bubble-sort',
+      'selection-sort',
+      'insertion-sort',
+    ]);
   });
 });
 

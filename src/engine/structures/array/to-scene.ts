@@ -12,6 +12,10 @@ export type ArrayAnnotations = {
    * high (low and high drawn below the row). A pointer at an index with no item isn't drawn.
    */
   pointers?: readonly ArrayPointer[];
+  /** An item lifted out of the row, above slot `index`: insertion sort's key over the gap. */
+  held?: { item: ArrayItem; index: number };
+  /** Keeps room above the row for a held item even while none is held. */
+  laneHeld?: boolean;
   /** The old array's slots while the items are copied into the new, bigger one. */
   source?: readonly (ArrayItem | null)[];
   /** The array itself: 'error' when an index is out of bounds or it can't grow. */
@@ -48,12 +52,24 @@ export function arrayToScene(model: ArrayModel, annotations: ArrayAnnotations = 
             kind: 'cell',
             id: item.id,
             value: item.value,
+            ...(item.tag === undefined ? {} : { detail: item.tag }),
             state: stateOf(item),
             slot: { type: 'index', index },
           },
         ]
       : [],
   );
+  const { held } = annotations;
+  if (held) {
+    cells.push({
+      kind: 'cell',
+      id: held.item.id,
+      value: held.item.value,
+      ...(held.item.tag === undefined ? {} : { detail: held.item.tag }),
+      state: stateOf(held.item),
+      slot: { type: 'held', index: held.index },
+    });
+  }
 
   const placed = new Set(model.slots.flatMap((item) => (item ? [item.id] : [])));
   const source: SceneElement[] = (annotations.source ?? []).flatMap(
@@ -94,6 +110,7 @@ export function arrayToScene(model: ArrayModel, annotations: ArrayAnnotations = 
         ? { addressBase: model.addresses.base, addressStride: model.addresses.stride }
         : {}),
       ...(annotations.laneBelow ? { laneBelow: 1 } : {}),
+      ...(annotations.laneHeld || held ? { laneHeld: 1 } : {}),
       ...annotations.meta,
     },
   };
