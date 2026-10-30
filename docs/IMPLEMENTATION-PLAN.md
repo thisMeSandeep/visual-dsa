@@ -499,7 +499,7 @@ fix(a11y): accessibility and landscape layout pass
 ### Step 10.3: EAS setup and first preview build
 This is the first time the app leaves Expo Go.
 - Add `eas.json` with `preview` and `production` profiles, then link the project with `eas init`.
-- App icon, splash screen and themed system bars.
+- App icon, splash screen and themed system bars. *(The icon and splash were made early, after Step 10.1: see VISUAL-SPEC §5 "App icon and splash". Check them on the preview build.)*
 - Build an internal `preview` build and install it on your phone.
 
 **Done when:** the preview build installs from the EAS link, behaves the same as in Expo Go, and a `visualdsa://` deep link opens the app.

@@ -204,10 +204,25 @@ Use `<Icon name="…">` with these registry names (`src/components/icons.ts`):
 | State legend | `legend` | `Swatches` |
 | Reset / undo / random | `reset`, `undo`, `random` | `ArrowCounterClockwise`, `ArrowUUpLeft`, `Shuffle` |
 | Bookmark | `bookmark` | `BookmarkSimple` |
-| Tabs | `learn`, `practice`, `progress`, `settings` | `BookOpen`, `GraduationCap`, `ChartLineUp`, `Gear` |
+| Tabs | `learn`, `practice`, `settings` (`progress` returns in Step 13.4) | `BookOpen`, `GraduationCap`, `Gear` (`ChartLineUp`) |
 | Streak | `streak` (fill, `signal`) | `Flame` |
 | Done / incorrect | `done` (`success`), `incorrect` (`danger`) | `Check`, `X` |
 | Prediction prompt | `predict` (fill or duotone, violet) | `Lightbulb` |
+
+### App icon and splash
+
+The logo is a **line-art binary tree** (concept 5b, chosen from the boards in `assets/brand/`): a filled `signal` root over four hollow nodes, `ink` strokes, on the `surface` cream, like the drawings on the topic cards. Edges stop at the circles, so the nodes stay hollow on any background.
+
+| Asset | File (`assets/images/`) | Look |
+|---|---|---|
+| App icon (iOS light, and the default) | `icon.png` | Tree on `surface` `#F0ECE4`, full bleed, no alpha (iOS rounds the corners) |
+| iOS dark | `icon-dark.png` | Dark-theme `ink` and `signal` on dark `surface` |
+| iOS tinted | `icon-tinted.png` | White tree on black; iOS tints it |
+| Android adaptive | `android-icon-foreground.png` + `backgroundColor` `#F0ECE4` | Tree inside the 66% safe circle on a transparent layer |
+| Android 13+ themed | `android-icon-monochrome.png` | White tree; the launcher colours it |
+| Splash | `splash-icon.png`, `splash-icon-dark.png` | Tree on `background` (`#FAF8F4`, dark `#1A1917`), 160 wide |
+
+Sources (SVG masters and the script that makes the PNGs) are in `assets/brand/source/`. The hex values in `app.json` are the tokens above, copied because app config can't read `tokens.css`. Expo Go shows its own icon and splash; these appear in real builds.
 
 ---
 
