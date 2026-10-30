@@ -222,6 +222,43 @@ const hashTable: Drawing = (p) => (
   </G>
 );
 
+/* Binary search: a sorted row, the left half faded away, mid checking the middle of the rest. */
+const SEARCH_X = [12, 32, 52, 72, 92, 112, 132];
+const SEARCH_VALUES = ['3', '8', '12', '17', '23', '31', '42'];
+const binarySearch: Drawing = (p) => (
+  <G>
+    {SEARCH_X.map((x, i) => {
+      const ruledOut = i < 4;
+      const stroke = ruledOut ? p.muted : i === 5 ? p.accent : p.ink;
+      return (
+        <G key={x}>
+          <Rect
+            x={x}
+            y={40}
+            width={16}
+            height={18}
+            rx={3}
+            fill={p.cell}
+            stroke={stroke}
+            strokeDasharray={ruledOut ? '2.5 2.5' : undefined}
+          />
+          {label(p, x + 8, 52, SEARCH_VALUES[i] ?? '', stroke)}
+        </G>
+      );
+    })}
+    <Path d="M 120 18 V 34" stroke={p.accent} />
+    <Path d={head(120, 36, 120, 30)} stroke={p.accent} />
+    {label(p, 120, 14, 'mid', p.accent)}
+    <Path d="M 100 76 V 64" stroke={p.ink} />
+    <Path d={head(100, 62, 100, 68)} stroke={p.ink} />
+    <Path d="M 140 76 V 64" stroke={p.ink} />
+    <Path d={head(140, 62, 140, 68)} stroke={p.ink} />
+    {label(p, 100, 86, 'low')}
+    {label(p, 140, 86, 'high')}
+    {label(p, 46, 86, 'ruled out')}
+  </G>
+);
+
 export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   'big-o': bigO,
   array,
@@ -230,4 +267,5 @@ export const DRAWINGS: Readonly<Record<string, Drawing>> = {
   stack,
   queue,
   'hash-table': hashTable,
+  'binary-search': binarySearch,
 };

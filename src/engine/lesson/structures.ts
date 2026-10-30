@@ -25,6 +25,12 @@ import {
   type ArrayModel,
 } from '../structures/array';
 import {
+  createSortedArray,
+  describeSearch,
+  searchToScene,
+  traceSearch,
+} from '../algorithms/searching';
+import {
   CURVE_IDS,
   createGrowth,
   describeGrowth,
@@ -275,6 +281,28 @@ const array: StructureDefinition<ArrayModel> = {
   },
 };
 
+/**
+ * A sorted array to binary search: one slot per value, values that are numbers. It may be
+ * unsorted on purpose, to show what binary search gets wrong then.
+ */
+const sortedArray: StructureDefinition<ArrayModel> = {
+  /** { values?: string[] } */
+  create: (input, at) => {
+    const values = optionalTextList(record(input, at), 'values', at);
+    return atSegment(at, () => createSortedArray(values));
+  },
+  toScene: (model) => searchToScene(model),
+  describe: describeSearch,
+  operations: {
+    binarySearch: (model, input, at) =>
+      traceSearch(model, { type: 'binarySearch', value: text(record(input, at), 'value', at) }),
+    findFirst: (model, input, at) =>
+      traceSearch(model, { type: 'findFirst', value: text(record(input, at), 'value', at) }),
+    findLast: (model, input, at) =>
+      traceSearch(model, { type: 'findLast', value: text(record(input, at), 'value', at) }),
+  },
+};
+
 function addressesFrom(input: unknown, at: string): ArrayAddresses {
   const fields = record(input, `${at}.addresses`);
   return {
@@ -457,6 +485,7 @@ export const STRUCTURES: Readonly<Record<string, StructureDefinition<unknown>>> 
   brackets: brackets as StructureDefinition<unknown>,
   queue: queue as StructureDefinition<unknown>,
   array: array as StructureDefinition<unknown>,
+  'sorted-array': sortedArray as StructureDefinition<unknown>,
   'linked-list': linkedList as StructureDefinition<unknown>,
   'hash-table': hashTable as StructureDefinition<unknown>,
   'big-o': growth as StructureDefinition<unknown>,

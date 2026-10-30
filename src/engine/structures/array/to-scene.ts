@@ -7,15 +7,28 @@ export type ArrayAnnotations = {
   highlight?: Readonly<Record<string, ElementState>>;
   /** Every item not in `highlight`, e.g. visited once a traversal ends. */
   allItems?: ElementState;
-  /** A labelled pointer at the item in slot `index`, e.g. "i" during a search. */
-  pointer?: { label: string; index: number };
+  /**
+   * Labelled pointers at items: "i" during a linear search, or binary search's low, mid and
+   * high (low and high drawn below the row). A pointer at an index with no item isn't drawn.
+   */
+  pointers?: readonly ArrayPointer[];
   /** The old array's slots while the items are copied into the new, bigger one. */
   source?: readonly (ArrayItem | null)[];
   /** The array itself: 'error' when an index is out of bounds or it can't grow. */
   container?: ElementState;
+  /**
+   * Keeps room under the row for `below` pointers even while none are shown, so the drawing
+   * doesn't change size when they appear (binary search).
+   */
+  laneBelow?: boolean;
+  /** Extra facts for the stat strip and describe(), e.g. how much of a search range is left. */
+  meta?: Readonly<Record<string, number | string>>;
 };
 
-export const POINTER_ID = 'pointer';
+export type ArrayPointer = { label: string; index: number; side?: 'below' };
+
+/** Each pointer's element id, from its label, so a pointer keeps its id as it moves. */
+export const pointerId = (label: string) => `pointer-${label}`;
 /** Prefix for an old-array cell whose item has already been copied: what's left behind. */
 export const COPIED_PREFIX = 'copied:';
 
@@ -59,11 +72,15 @@ export function arrayToScene(model: ArrayModel, annotations: ArrayAnnotations = 
     },
   );
 
-  const target = annotations.pointer ? model.slots[annotations.pointer.index] : undefined;
-  const pointers: SceneElement[] =
-    annotations.pointer && target
-      ? [{ kind: 'pointer', id: POINTER_ID, label: annotations.pointer.label, target: target.id }]
-      : [];
+  const pointers: SceneElement[] = (annotations.pointers ?? []).flatMap(
+    ({ label, index, side }): SceneElement[] => {
+      const target = model.slots[index];
+      if (!target) return [];
+      return [
+        { kind: 'pointer', id: pointerId(label), label, target: target.id, ...(side && { side }) },
+      ];
+    },
+  );
 
   return {
     renderer: 'array',
@@ -76,6 +93,8 @@ export function arrayToScene(model: ArrayModel, annotations: ArrayAnnotations = 
       ...(model.addresses
         ? { addressBase: model.addresses.base, addressStride: model.addresses.stride }
         : {}),
+      ...(annotations.laneBelow ? { laneBelow: 1 } : {}),
+      ...annotations.meta,
     },
   };
 }

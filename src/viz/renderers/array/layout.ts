@@ -12,6 +12,8 @@
  *   └─────────────────────────────────────────┘
  *      0    1    2    3    4    5    6    7     ← indices
  *    1000 1004 1008 1012 …                      ← memory addresses, when the lesson shows them
+ *      ↑              ↑
+ *     low           high                        ← `below` pointers (binary search's range)
  *
  * Every slot is drawn, empty or not, so free capacity is visible and a shift shows its gap.
  */
@@ -75,7 +77,12 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
   const indexBottom = frameBottom + sizes.labelGap + sizes.fontIndex;
   const hasAddresses = meta.addressBase !== undefined;
   const addressY = indexBottom + sizes.labelGap + sizes.fontIndex / 2;
-  const bottom = hasAddresses ? indexBottom + sizes.labelGap + sizes.fontIndex : indexBottom;
+  const labelsBottom = hasAddresses ? indexBottom + sizes.labelGap + sizes.fontIndex : indexBottom;
+  const pointers = scene.elements.filter((e): e is Pointer => e.kind === 'pointer');
+  const hasLaneBelow =
+    meta.laneBelow !== undefined || pointers.some((pointer) => pointer.side === 'below');
+  const laneTop = labelsBottom + sizes.labelGap;
+  const bottom = hasLaneBelow ? laneTop + labelHeight + sizes.pointerLength : labelsBottom;
 
   if (growing) drawables.push(label('main-label', 'new array', top + sizes.fontLabel / 2));
   drawables.push(
@@ -131,31 +138,43 @@ export function layoutArray(scene: Scene, sizes: VizSizes): ArrayLayout {
     });
   }
 
-  // Pointers point down at an item in the array from above.
-  for (const pointer of scene.elements.filter((e): e is Pointer => e.kind === 'pointer')) {
+  // Pointers point down at an item from above, in the signal colour. `below` pointers point up
+  // from under the indices, quieter: they mark a range (low, high), not the item in focus.
+  // Two pointers at the same item on the same side sit either side of their shared arrow.
+  for (const pointer of pointers) {
     const target = cells.find((cell) => cell.id === pointer.target);
     if (target?.slot.type !== 'index') continue;
     const x = centre(target.slot.index);
+    const below = pointer.side === 'below';
+    const sharing = pointers.filter(
+      (other) => other.target === pointer.target && (other.side === 'below') === below,
+    );
+    const place = sharing.indexOf(pointer);
+    const align = sharing.length < 2 ? 'center' : place === 0 ? 'right' : 'left';
+    const labelX =
+      align === 'center' ? x : align === 'right' ? x - sizes.labelGap : x + sizes.labelGap;
     drawables.push(
       {
         kind: 'line',
         id: `${pointer.id}-arrow`,
         x1: x,
         x2: x,
-        y1: pointerArrowTop,
-        y2: frameTop - sizes.labelGap,
-        tone: 'signal',
+        y1: below ? laneTop + sizes.pointerLength : pointerArrowTop,
+        y2: below ? laneTop : frameTop - sizes.labelGap,
+        tone: below ? 'ink-2' : 'signal',
         arrow: true,
       },
       {
         kind: 'text',
         id: pointer.id,
-        x,
-        y: top + sizes.fontLabel / 2,
+        x: labelX,
+        y: below
+          ? laneTop + sizes.pointerLength + sizes.labelGap + sizes.fontLabel / 2
+          : top + sizes.fontLabel / 2,
         text: pointer.label,
         font: 'label',
-        tone: 'signal-ink',
-        align: 'center',
+        tone: below ? 'ink-2' : 'signal-ink',
+        align,
       },
     );
   }

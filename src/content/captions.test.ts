@@ -1,6 +1,11 @@
 import { compileLesson } from '@/engine/lesson/compile';
 import type { Trace } from '@/engine/core/types';
 import {
+  createSortedArray,
+  traceSearch,
+  type SearchOperation,
+} from '@/engine/algorithms/searching';
+import {
   CURVE_IDS,
   createGrowth,
   traceGrowth,
@@ -112,6 +117,31 @@ describe('array captions', () => {
       keys(traceArray(model, operation).trace),
     );
     expect(used.filter((key) => !(key in CAPTIONS))).toEqual([]);
+  });
+});
+
+describe('binary search captions', () => {
+  it('has a caption for every key the searches use, with every placeholder filled', () => {
+    const sorted = ['2', '5', '7', '7', '9'];
+    const cases: [string[], SearchOperation][] = [
+      [sorted, { type: 'binarySearch', value: '9' }],
+      [sorted, { type: 'binarySearch', value: '2' }],
+      [sorted, { type: 'binarySearch', value: '6' }],
+      [['9', '2', '5'], { type: 'binarySearch', value: '5' }],
+      [[], { type: 'binarySearch', value: '5' }],
+      [sorted, { type: 'findFirst', value: '7' }],
+      [sorted, { type: 'findFirst', value: '6' }],
+      [sorted, { type: 'findLast', value: '7' }],
+      [[], { type: 'findLast', value: '7' }],
+    ];
+    for (const [values, operation] of cases) {
+      for (const step of traceSearch(createSortedArray(values), operation).trace.steps) {
+        if ('key' in step.caption) expect(CAPTIONS).toHaveProperty([step.caption.key]);
+        const text = captionText(step.caption);
+        expect(text).not.toMatch(/\{\w+\}/);
+        expect(text.replaceAll('**', '').length).toBeLessThanOrEqual(120);
+      }
+    }
   });
 });
 

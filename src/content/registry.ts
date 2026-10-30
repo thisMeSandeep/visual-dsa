@@ -17,6 +17,11 @@ import { meta as array } from './topics/array/meta';
 import { reference as arrayReference } from './topics/array/reference';
 import { quiz as arrayQuiz } from './topics/array/quiz';
 import { sandbox as arraySandbox } from './topics/array/sandbox';
+import { lesson as binarySearchLesson } from './topics/binary-search/lesson';
+import { meta as binarySearch } from './topics/binary-search/meta';
+import { reference as binarySearchReference } from './topics/binary-search/reference';
+import { quiz as binarySearchQuiz } from './topics/binary-search/quiz';
+import { sandbox as binarySearchSandbox } from './topics/binary-search/sandbox';
 import { lesson as bigOLesson } from './topics/big-o/lesson';
 import { meta as bigO } from './topics/big-o/meta';
 import { reference as bigOReference } from './topics/big-o/reference';
@@ -57,6 +62,7 @@ export const TOPIC_IDS = [
   'stack',
   'queue',
   'hash-table',
+  'binary-search',
 ] as const;
 
 export type TopicId = (typeof TOPIC_IDS)[number];
@@ -70,6 +76,7 @@ export const TOPIC_METAS: Record<TopicId, TopicMeta> = {
   stack,
   queue,
   'hash-table': hashTable,
+  'binary-search': binarySearch,
 };
 
 /**
@@ -84,6 +91,7 @@ export const TOPIC_LESSONS: Partial<Record<TopicId, LessonRecipe & LessonRecipeI
   'doubly-linked-list': doublyLinkedListLesson,
   'hash-table': hashTableLesson,
   'big-o': bigOLesson,
+  'binary-search': binarySearchLesson,
 };
 
 /** Each topic's Play mode (one or more tools), under its topic id. */
@@ -95,6 +103,7 @@ export const TOPIC_SANDBOXES: Partial<Record<TopicId, readonly SandboxConfig[]>>
   'doubly-linked-list': doublyLinkedListSandbox,
   'hash-table': hashTableSandbox,
   'big-o': bigOSandbox,
+  'binary-search': binarySearchSandbox,
 };
 
 /** Each topic's quiz, under its topic id. */
@@ -106,6 +115,7 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'doubly-linked-list': doublyLinkedListQuiz,
   'hash-table': hashTableQuiz,
   'big-o': bigOQuiz,
+  'binary-search': binarySearchQuiz,
 };
 
 /** Each topic's reference sheet (F-801 – F-803), under its topic id. */
@@ -117,6 +127,7 @@ export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
   'doubly-linked-list': doublyLinkedListReference,
   'hash-table': hashTableReference,
   'big-o': bigOReference,
+  'binary-search': binarySearchReference,
 };
 
 /** All topics in Home order. */

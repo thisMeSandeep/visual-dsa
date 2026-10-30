@@ -553,6 +553,8 @@ The order follows ALGORITHM-CATALOG §10. Each topic uses the same recipe as Pha
 | 11.6 | Recursion with the call-stack renderer (F2, F-504) | `feat(recursion): add recursion lesson and call stack view` |
 | 11.7 | Python, Java and C++ code, live variables, haptics (F-502, F-503, F-307) | `feat(code): add more languages, live variables and haptics` |
 
+**Step 11.1, as built:** a `sorted-array` structure in `engine/algorithms/searching/` (the array model, one slot per number, compared as numbers; unsorted input is allowed so the lesson and sandbox can show a miss). Array scenes now take a list of named pointers (`pointers`, ids `pointer-<label>`), and a pointer can sit `below` the row: the array renderer draws `low` and `high` under the indices and `mid` above. The topic is the first in the Algorithms category, with its own glyph and card drawing. Predict questions wait for Step 8.2.
+
 ### v1.2: Trees
 | Step | Work | Commit |
 |---|---|---|

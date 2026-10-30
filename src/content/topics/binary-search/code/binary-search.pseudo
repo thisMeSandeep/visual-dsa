@@ -1,0 +1,56 @@
+// a is sorted, smallest first. low and high mark the part
+// still worth searching; everything outside it is ruled out.
+
+function binarySearch(a, target)
+  low = 0 // @line init
+  high = length(a) - 1 // @line init
+  while low <= high
+    mid = floor((low + high) / 2) // @line mid
+    if a[mid] == target then
+      return mid // @line found
+    else if a[mid] < target then
+      low = mid + 1 // @line go-right
+    else
+      high = mid - 1 // @line go-left
+    end if
+  end while
+  return -1 // @line not-found
+end function
+
+// With duplicates: remember a match, keep searching left.
+function findFirst(a, target)
+  low = 0 // @line first-init
+  high = length(a) - 1 // @line first-init
+  result = -1 // @line first-init
+  while low <= high
+    mid = floor((low + high) / 2) // @line first-mid
+    if a[mid] == target then
+      result = mid // @line first-match
+      high = mid - 1 // @line first-match
+    else if a[mid] < target then
+      low = mid + 1 // @line first-go-right
+    else
+      high = mid - 1 // @line first-go-left
+    end if
+  end while
+  return result // @line first-done
+end function
+
+// The same, but keep searching right after a match.
+function findLast(a, target)
+  low = 0 // @line last-init
+  high = length(a) - 1 // @line last-init
+  result = -1 // @line last-init
+  while low <= high
+    mid = floor((low + high) / 2) // @line last-mid
+    if a[mid] == target then
+      result = mid // @line last-match
+      low = mid + 1 // @line last-match
+    else if a[mid] < target then
+      low = mid + 1 // @line last-go-right
+    else
+      high = mid - 1 // @line last-go-left
+    end if
+  end while
+  return result // @line last-done
+end function

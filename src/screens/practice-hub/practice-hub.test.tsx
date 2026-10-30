@@ -16,7 +16,7 @@ describe('Practice tab', () => {
   it('suggests the first quiz and lists every quiz as a card', async () => {
     await render(<PracticeHub />);
     expect(screen.getByText('Try the Big O Notation quiz')).toBeOnTheScreen();
-    expect(screen.getByText('0 of 7 tried')).toBeOnTheScreen();
+    expect(screen.getByText('0 of 8 tried')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Start' }));
     expect(router.push).toHaveBeenLastCalledWith({
       pathname: '/topic/[topicId]/practice',
@@ -42,7 +42,7 @@ describe('Practice tab', () => {
     });
     await render(<PracticeHub />);
     expect(screen.getByText('Revise 2 missed questions')).toBeOnTheScreen();
-    expect(screen.getByText('1 of 7 tried')).toBeOnTheScreen();
+    expect(screen.getByText('1 of 8 tried')).toBeOnTheScreen();
     expect(
       screen.getByRole('button', { name: 'Stack quiz, 10 questions, best score 8 of 10' }),
     ).toBeOnTheScreen();

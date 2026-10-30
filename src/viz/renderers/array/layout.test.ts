@@ -1,3 +1,4 @@
+import { createSortedArray, searchToScene } from '@/engine/algorithms/searching';
 import { arrayToScene, createArray, traceArray } from '@/engine/structures/array';
 
 import type {
@@ -39,11 +40,50 @@ describe('layoutArray', () => {
     const { trace } = traceArray(createArray(['23', '8', '42']), { type: 'get', index: 2 });
     const { drawables } = layoutArray(trace.steps.at(-1)!.scene, SIZES);
     const item = byId<BoxDrawable>(drawables, 'item-2')!;
-    const label = byId<TextDrawable>(drawables, 'pointer')!;
-    const arrow = byId<LineDrawable>(drawables, 'pointer-arrow')!;
+    const label = byId<TextDrawable>(drawables, 'pointer-i')!;
+    const arrow = byId<LineDrawable>(drawables, 'pointer-i-arrow')!;
     expect(label).toMatchObject({ text: 'i', x: item.x + item.width / 2 });
     expect(arrow.y2).toBeLessThan(item.y);
     expect(label.y).toBeLessThan(arrow.y1);
+  });
+
+  it('points low and high up from under the indices, quieter than mid above', () => {
+    const scene = searchToScene(createSortedArray(['1', '2', '3', '4']), {
+      low: 0,
+      high: 3,
+      mid: 1,
+    });
+    const { drawables } = layoutArray(scene, SIZES);
+    const index = byId<TextDrawable>(drawables, 'index-0')!;
+    const low = byId<TextDrawable>(drawables, 'pointer-low')!;
+    const lowArrow = byId<LineDrawable>(drawables, 'pointer-low-arrow')!;
+    const mid = byId<TextDrawable>(drawables, 'pointer-mid')!;
+    expect(lowArrow.y2).toBeGreaterThan(index.y);
+    expect(lowArrow.y2).toBeLessThan(lowArrow.y1);
+    expect(low.y).toBeGreaterThan(lowArrow.y1);
+    expect(low).toMatchObject({ tone: 'ink-2', align: 'center' });
+    expect(mid).toMatchObject({ tone: 'signal-ink' });
+  });
+
+  it('puts two pointers at the same item either side of their arrow', () => {
+    const scene = searchToScene(createSortedArray(['1', '2', '3']), { low: 2, high: 2 });
+    const { drawables } = layoutArray(scene, SIZES);
+    const low = byId<TextDrawable>(drawables, 'pointer-low')!;
+    const high = byId<TextDrawable>(drawables, 'pointer-high')!;
+    const arrow = byId<LineDrawable>(drawables, 'pointer-low-arrow')!;
+    expect(low).toMatchObject({ align: 'right' });
+    expect(high).toMatchObject({ align: 'left' });
+    expect(low.x).toBeLessThan(arrow.x1);
+    expect(high.x).toBeGreaterThan(arrow.x1);
+  });
+
+  it('keeps the same size whether or not low and high are showing', () => {
+    const model = createSortedArray(['1', '2', '3']);
+    const resting = layoutArray(searchToScene(model), SIZES);
+    const searching = layoutArray(searchToScene(model, { low: 0, high: 2, mid: 1 }), SIZES);
+    const plain = layoutArray(arrayToScene(model), SIZES);
+    expect(resting.height).toBe(searching.height);
+    expect(plain.height).toBeLessThan(resting.height);
   });
 
   it('draws the old array above while growing, and the copied item down in the new one', () => {

@@ -60,8 +60,11 @@ export type SceneElement =
       weight?: string;
       state: ElementState;
     }
-  /** A labelled arrow at an element: "top", "head", "j". */
-  | { kind: 'pointer'; id: string; label: string; target: string }
+  /**
+   * A labelled arrow at an element: "top", "head", "j". Renderers that support it draw a
+   * `below` pointer under the row, e.g. binary search's low and high under the mid it points at.
+   */
+  | { kind: 'pointer'; id: string; label: string; target: string; side?: 'below' }
   /** A short note such as h("Sid") = 2, optionally next to an element. */
   | { kind: 'callout'; id: string; text: string; anchor?: string }
   /** Small text attached to an element: indices, tombstones. */

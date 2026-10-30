@@ -75,7 +75,7 @@ export function get(t: ArrayTracer, index: number): string | undefined {
     vars: { index, value: item.value },
     annotations: {
       highlight: { [item.id]: 'active' },
-      pointer: { label: POINTER_LABEL, index },
+      pointers: [{ label: POINTER_LABEL, index }],
     },
   });
   return item.value;
@@ -98,7 +98,7 @@ export function set(t: ArrayTracer, index: number, value: string): void {
     line: 'set',
     caption: { key: 'array.set', params: { index, old, value } },
     vars: { index, value },
-    annotations: { highlight: { [item.id]: 'new' }, pointer: { label: POINTER_LABEL, index } },
+    annotations: { highlight: { [item.id]: 'new' }, pointers: [{ label: POINTER_LABEL, index }] },
   });
 }
 
@@ -236,7 +236,10 @@ export function removeAt(t: ArrayTracer, index: number): string | undefined {
     line: 'remove-read',
     caption: { key: 'array.remove.read', params: { index, value: item.value } },
     vars: { index, value: item.value },
-    annotations: { highlight: { [item.id]: 'active' }, pointer: { label: POINTER_LABEL, index } },
+    annotations: {
+      highlight: { [item.id]: 'active' },
+      pointers: [{ label: POINTER_LABEL, index }],
+    },
   });
 
   const last = index === size - 1;
@@ -285,7 +288,7 @@ export function search(t: ArrayTracer, value: string): number {
         vars: { i: index },
         annotations: {
           highlight: { ...visited, [item.id]: 'found' },
-          pointer: { label: POINTER_LABEL, index },
+          pointers: [{ label: POINTER_LABEL, index }],
         },
       });
       return index;
@@ -296,7 +299,7 @@ export function search(t: ArrayTracer, value: string): number {
       vars: { i: index },
       annotations: {
         highlight: { ...visited, [item.id]: 'active' },
-        pointer: { label: POINTER_LABEL, index },
+        pointers: [{ label: POINTER_LABEL, index }],
       },
     });
     visited[item.id] = 'visited';
@@ -328,7 +331,7 @@ export function traverse(t: ArrayTracer): void {
       vars: { i: index },
       annotations: {
         highlight: { ...visited, [item.id]: 'active' },
-        pointer: { label: POINTER_LABEL, index },
+        pointers: [{ label: POINTER_LABEL, index }],
       },
     });
     visited[item.id] = 'visited';

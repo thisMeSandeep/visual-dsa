@@ -37,6 +37,13 @@ export const GLYPHS = {
     'M8 12h5',
     'M14 9.75h7a1 1 0 0 1 1 1v2.5a1 1 0 0 1 -1 1h-7a1 1 0 0 1 -1 -1v-2.5a1 1 0 0 1 1 -1z',
   ],
+  'binary-search': [
+    'M3.5 10h3a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1z',
+    'M10.5 10h3a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1z',
+    'M17.5 10h3a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1z',
+    'M12 2.5v5M10 5.5l2 2l2 -2',
+    'M2.5 18.5v2h19v-2',
+  ],
 } as const;
 
 export type GlyphName = keyof typeof GLYPHS;

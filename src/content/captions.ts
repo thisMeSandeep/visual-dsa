@@ -65,6 +65,35 @@ export const CAPTIONS: Readonly<Record<string, string>> = {
   'array.traversed': 'All {size} items visited once, front to back. Traversal is **O(n)**.',
   'array.traverse.empty': 'The array is empty: nothing to visit.',
 
+  // Binary search (engine/algorithms/searching/operations.ts)
+  'binary-search.start':
+    'Look for **{value}** among {size} items. **low** starts at index 0, **high** at index {high}.',
+  'binary-search.first.start':
+    'Look for the **first {value}**. **low** starts at 0, **high** at {high}, and there’s no answer yet.',
+  'binary-search.last.start':
+    'Look for the **last {value}**. **low** starts at 0, **high** at {high}, and there’s no answer yet.',
+  'binary-search.empty':
+    'The array is empty, so there’s nothing to search: **{value}** isn’t here.',
+  'binary-search.mid':
+    'The middle of index {low} to {high} is ({low} + {high}) ÷ 2 = **{mid}**, rounded down. It holds **{item}**.',
+  'binary-search.found': '**{value}** is at index {mid}. Found it! Checks made: {checks}.',
+  'binary-search.go-right':
+    '**{item}** is less than **{value}**, so {value} can only be further right. **low** moves to {low}.',
+  'binary-search.go-left':
+    '**{item}** is more than **{value}**, so {value} can only be further left. **high** moves to {high}.',
+  'binary-search.not-found':
+    '**low** ({low}) has passed **high** ({high}): nothing is left. **{value}** isn’t here. Checks made: {checks}.',
+  'binary-search.not-found.unsorted':
+    'Nothing is left, so it says **{value}** isn’t here. But the array isn’t **sorted**, so that may be wrong.',
+  'binary-search.first.match':
+    'A **{value}** at index {mid}. Remember it, but an earlier one could be to the left: **high** moves to {high}.',
+  'binary-search.last.match':
+    'A **{value}** at index {mid}. Remember it, but a later one could be to the right: **low** moves to {low}.',
+  'binary-search.first.done':
+    'Nothing is left. The **first {value}** is the one remembered, at index {result}. Checks made: {checks}.',
+  'binary-search.last.done':
+    'Nothing is left. The **last {value}** is the one remembered, at index {result}. Checks made: {checks}.',
+
   // Linked lists (engine/structures/linked-list/operations.ts)
   'list.create': 'Make a new node for **{value}**. Nothing points to it yet.',
   'list.search.compare':

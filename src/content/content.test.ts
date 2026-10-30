@@ -22,10 +22,10 @@ describe('registered content', () => {
     expect(validateContent()).toEqual([]);
   });
 
-  it('registers the seven MVP topics in Home order', () => {
+  it('registers the seven MVP topics, then the v1.1 topics, in Home order', () => {
     expect(TOPICS.map((topic) => topic.id)).toEqual(TOPIC_IDS);
-    expect(TOPIC_IDS).toHaveLength(7);
-    expect(TOPICS.every((topic) => topic.priority === 'P0')).toBe(true);
+    expect(TOPICS.filter((topic) => topic.priority === 'P0')).toHaveLength(7);
+    expect(TOPICS.slice(7).map((topic) => topic.id)).toEqual(['binary-search']);
   });
 });
 
@@ -45,6 +45,7 @@ describe('registry lookups', () => {
       'foundations',
       'linear',
       'hashing',
+      'algorithms',
     ]);
   });
 });

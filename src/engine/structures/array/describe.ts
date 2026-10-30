@@ -4,7 +4,7 @@ type Cell = Extract<SceneElement, { kind: 'cell' }>;
 
 /**
  * Screen-reader summary of an array scene (F-1105), e.g.
- * "Array of 3 items, 4 slots: 23, 8, 42. i at index 1."
+ * "Array of 3 items, 4 slots: 23, 8, 42. i at index 1.", naming every pointer.
  */
 export function describeArray(scene: Scene): string {
   const meta = scene.meta ?? {};
@@ -27,9 +27,11 @@ export function describeArray(scene: Scene): string {
       `Copying from the old array of ${meta.sourceCapacity} slots: ${inRow('source').join(', ')}.`,
     );
   }
-  const pointer = scene.elements.find((e) => e.kind === 'pointer');
-  const pointed = pointer && cells.find((cell) => cell.id === pointer.target);
-  if (pointer && pointed) parts.push(`${pointer.label} at index ${indexOf(pointed)}.`);
+  for (const pointer of scene.elements) {
+    if (pointer.kind !== 'pointer') continue;
+    const pointed = cells.find((cell) => cell.id === pointer.target);
+    if (pointed) parts.push(`${pointer.label} at index ${indexOf(pointed)}.`);
+  }
   const found = cells.find((cell) => cell.state === 'found');
   if (found) parts.push(`Found ${found.value} at index ${indexOf(found)}.`);
   if (meta.container === 'error') parts.push('Error.');

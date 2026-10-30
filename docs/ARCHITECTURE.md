@@ -122,7 +122,8 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── structures/             #   array/, linked-list/, stack/, queue/, hash-table/
 │   │   │   └── stack/              #     model.ts, operations.ts, to-scene.ts,
 │   │   │                           #     describe.ts, operations.test.ts
-│   │   ├── algorithms/             #   sorting/, searching/ (P1)
+│   │   ├── algorithms/             #   searching/: binary search on the array model (the
+│   │   │                           #   `sorted-array` structure); sorting/ next (P1)
 │   │   ├── lesson/                 #   lesson compiler (recipe → steps), STRUCTURES
 │   │   ├── sandbox/                #   sandbox session: run, undo, reset, presets
 │   │   └── player/                 #   player state machine (pure reducer)

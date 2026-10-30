@@ -374,6 +374,8 @@ All sorting and searching topics use the `array` renderer with comparison/swap c
 **Chapters:** Requires sorted input · low / mid / high pointers · Halving the range · Not found · Variants: first / last occurrence
 **Complexity:** O(log n) time · O(1) space (iterative)
 **States:** active (mid), dimmed (discarded half), found
+**Sandbox:** Search, First and Last for a typed or random value. Presets: sorted (8), 12 items, duplicates, unsorted (to see it miss), one item. Stats: size, items still in range, sorted or not.
+**Built as:** the `sorted-array` structure (`engine/algorithms/searching/`): the array model with one slot per number, drawn by the `array` renderer with `mid` above and `low`/`high` below.
 
 ### Sorting
 
