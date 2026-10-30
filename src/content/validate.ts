@@ -16,11 +16,13 @@ import {
   TOPIC_LESSONS,
   TOPIC_METAS,
   TOPIC_QUIZZES,
+  TOPIC_REFERENCES,
   TOPIC_SANDBOXES,
 } from './registry';
 import {
   LessonRecipeSchema,
   QuizSchema,
+  ReferenceSchema,
   SandboxToolsSchema,
   TopicMetaSchema,
   type TopicMeta,
@@ -202,6 +204,23 @@ export function validateQuizzes(
   });
 }
 
+/** Checks each reference sheet against the schema, and that it's registered under its topic. */
+export function validateReferences(references: Record<string, unknown>): ContentIssue[] {
+  return Object.entries(references).flatMap(([key, value]): ContentIssue[] => {
+    const result = ReferenceSchema.safeParse(value);
+    if (!result.success) return toIssues(key, result.error);
+    return result.data.topicId === key
+      ? []
+      : [
+          {
+            topicId: key,
+            path: 'topicId',
+            message: `Registered as "${key}" but its topicId is "${result.data.topicId}"`,
+          },
+        ];
+  });
+}
+
 /** Validates all registered content. */
 export function validateContent(): ContentIssue[] {
   return [
@@ -209,5 +228,6 @@ export function validateContent(): ContentIssue[] {
     ...validateLessons(TOPIC_LESSONS, TOPIC_METAS),
     ...validateSandboxes(TOPIC_SANDBOXES),
     ...validateQuizzes(TOPIC_QUIZZES, TOPIC_METAS),
+    ...validateReferences(TOPIC_REFERENCES),
   ];
 }

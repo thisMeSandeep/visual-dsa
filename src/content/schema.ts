@@ -287,7 +287,13 @@ export type Quiz = z.infer<typeof QuizSchema>;
  * Reference sheet (F-801 – F-803)
  * ---------------------------------------------------------------------------------------------- */
 
+/**
+ * What a reference tab is made of. Text and bullets may mark key terms in **bold**; table cells
+ * that are complexities (O(n)) or numbers are set in mono.
+ */
 export const ReferenceBlockSchema = z.discriminatedUnion('kind', [
+  /** A small heading inside a tab, e.g. "Use it for". */
+  z.strictObject({ kind: z.literal('heading'), text: TextSchema }),
   z.strictObject({ kind: z.literal('text'), text: TextSchema }),
   z.strictObject({ kind: z.literal('bullets'), items: z.array(TextSchema).min(1) }),
   z

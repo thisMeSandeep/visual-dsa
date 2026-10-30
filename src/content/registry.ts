@@ -1,36 +1,50 @@
 /**
  * Every topic the app knows about. Metas are small and loaded up front (Home lists them all).
- * Lessons are registered here as they're written; quizzes and reference sheets follow.
+ * Lessons, sandboxes, quizzes and reference sheets are registered here under their topic ids.
  */
 import type { LessonRecipeInput } from '@/engine/lesson/recipe';
 
-import type { LessonRecipe, Quiz, SandboxConfig, TopicCategory, TopicMeta } from './schema';
+import type {
+  LessonRecipe,
+  Quiz,
+  Reference,
+  SandboxConfig,
+  TopicCategory,
+  TopicMeta,
+} from './schema';
 import { lesson as arrayLesson } from './topics/array/lesson';
 import { meta as array } from './topics/array/meta';
+import { reference as arrayReference } from './topics/array/reference';
 import { quiz as arrayQuiz } from './topics/array/quiz';
 import { sandbox as arraySandbox } from './topics/array/sandbox';
 import { lesson as bigOLesson } from './topics/big-o/lesson';
 import { meta as bigO } from './topics/big-o/meta';
+import { reference as bigOReference } from './topics/big-o/reference';
 import { quiz as bigOQuiz } from './topics/big-o/quiz';
 import { sandbox as bigOSandbox } from './topics/big-o/sandbox';
 import { lesson as doublyLinkedListLesson } from './topics/doubly-linked-list/lesson';
 import { meta as doublyLinkedList } from './topics/doubly-linked-list/meta';
+import { reference as doublyLinkedListReference } from './topics/doubly-linked-list/reference';
 import { quiz as doublyLinkedListQuiz } from './topics/doubly-linked-list/quiz';
 import { sandbox as doublyLinkedListSandbox } from './topics/doubly-linked-list/sandbox';
 import { lesson as hashTableLesson } from './topics/hash-table/lesson';
 import { meta as hashTable } from './topics/hash-table/meta';
+import { reference as hashTableReference } from './topics/hash-table/reference';
 import { quiz as hashTableQuiz } from './topics/hash-table/quiz';
 import { sandbox as hashTableSandbox } from './topics/hash-table/sandbox';
 import { lesson as queueLesson } from './topics/queue/lesson';
 import { meta as queue } from './topics/queue/meta';
+import { reference as queueReference } from './topics/queue/reference';
 import { quiz as queueQuiz } from './topics/queue/quiz';
 import { sandbox as queueSandbox } from './topics/queue/sandbox';
 import { lesson as singlyLinkedListLesson } from './topics/singly-linked-list/lesson';
 import { meta as singlyLinkedList } from './topics/singly-linked-list/meta';
+import { reference as singlyLinkedListReference } from './topics/singly-linked-list/reference';
 import { quiz as singlyLinkedListQuiz } from './topics/singly-linked-list/quiz';
 import { sandbox as singlyLinkedListSandbox } from './topics/singly-linked-list/sandbox';
 import { lesson as stackLesson } from './topics/stack/lesson';
 import { meta as stack } from './topics/stack/meta';
+import { reference as stackReference } from './topics/stack/reference';
 import { quiz as stackQuiz } from './topics/stack/quiz';
 import { sandbox as stackSandbox } from './topics/stack/sandbox';
 
@@ -92,6 +106,17 @@ export const TOPIC_QUIZZES: Partial<Record<TopicId, Quiz>> = {
   'doubly-linked-list': doublyLinkedListQuiz,
   'hash-table': hashTableQuiz,
   'big-o': bigOQuiz,
+};
+
+/** Each topic's reference sheet (F-801 – F-803), under its topic id. */
+export const TOPIC_REFERENCES: Partial<Record<TopicId, Reference>> = {
+  stack: stackReference,
+  queue: queueReference,
+  array: arrayReference,
+  'singly-linked-list': singlyLinkedListReference,
+  'doubly-linked-list': doublyLinkedListReference,
+  'hash-table': hashTableReference,
+  'big-o': bigOReference,
 };
 
 /** All topics in Home order. */

@@ -468,6 +468,7 @@ feat(big-o): add growth chart, Big O lesson, sandbox and quiz
 
 ### Step 9.6: Reference sheets
 - Reference sheet for every MVP topic: tabs, complexity table, key concepts and pitfalls (F-801–F-803). It opens from the lesson's top bar (there's no separate topic screen since the UI rework), and keeps today's summary and "How it scales" strip at the top.
+- Also: a `heading` block for sub-headings inside a tab; `validate:content` checks every sheet.
 
 **Commit:**
 ```

@@ -82,7 +82,7 @@ The project follows the Expo project-structure conventions: app code lives under
 │   │   ├── lesson/                 #   landscape player, chapter panel
 │   │   ├── sandbox/                #   Play mode screen, value-input.ts (Zod + engine limits)
 │   │   ├── practice/               #   topic quiz, revise session, quiz runner + session
-│   │   ├── reference/              #   form sheet: summary + complexity
+│   │   ├── reference/              #   form sheet: summary, how it scales, tabbed cheat sheet
 │   │   └── dev/                    #   dev-only showcases (tokens, components)
 │   │
 │   ├── components/                 # shared UI from VISUAL-SPEC §6
@@ -552,7 +552,7 @@ Each answer is written to the progress store. Wrong answers are added to the rev
 | `/topic/[topicId]/play` | Sandbox | Stack push |
 | `/topic/[topicId]/practice` | Topic quiz | Stack push |
 | `/revise` | Revise session: the missed questions, across topics | Stack push |
-| `/topic/[topicId]/reference` | Reference sheet (summary, complexity) | Form sheet, landscape (it opens over the lesson) |
+| `/topic/[topicId]/reference` | Reference sheet (summary, how it scales, tabbed cheat sheet) | Form sheet, landscape (it opens over the lesson) |
 | `/dev/tokens`, `/dev/components` | Dev-only showcases | Stack push; production redirects to `/` |
 
 Deep links come for free from Expo Router, e.g. `visualdsa://topic/hash-table/learn?step=6`. These are needed later for shared scenarios (F-607).
@@ -721,10 +721,10 @@ Techniques: layout is memoised per step; per-element shared values are reused ac
 
 ## 13. Adding a new topic
 
-1. **Engine:** add `engine/structures/<topic>/` (or `algorithms/`) with model, operations, `toScene`, `describe` and tests. Skip this if the topic only adds new operations to an existing structure.
+1. **Engine:** add `engine/structures/<topic>/` (or `algorithms/`, or `foundations/`) with model, operations, `toScene`, `describe` and tests, and add it to `STRUCTURES` (`engine/lesson/structures.ts`) so lessons and the sandbox can drive it. Skip this if the topic only adds new operations to an existing structure.
 2. **Renderer:** reuse one from the registry. Add a new renderer only if none fits (ALGORITHM-CATALOG §9).
-3. **Content:** add `content/topics/<topic>/` with `meta.ts`, `lesson.ts`, `quiz.ts`, `reference.ts`, and code samples with `@line` markers.
-4. **Register** the topic in `content/registry.ts`.
+3. **Content:** add `content/topics/<topic>/` with `meta.ts`, `lesson.ts`, `sandbox.ts`, `quiz.ts`, `reference.ts`, and code samples with `@line` markers. Captions for the engine's keys go in `content/captions.ts`.
+4. **Register** the topic in `content/registry.ts`: its meta, and its lesson, sandbox, quiz and reference sheet in `TOPIC_LESSONS`, `TOPIC_SANDBOXES`, `TOPIC_QUIZZES` and `TOPIC_REFERENCES`.
 5. **Verify:** run `validate-content`, update the compiled-lesson snapshot, and check the lesson on a small phone in both portrait and landscape.
 
 ---
