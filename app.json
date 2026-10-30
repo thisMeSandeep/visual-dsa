@@ -8,6 +8,7 @@
     "scheme": "visualdsa",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.sandeep.visualdsa",
       "icon": {
         "light": "./assets/images/icon.png",
         "dark": "./assets/images/icon-dark.png",
@@ -15,6 +16,7 @@
       }
     },
     "android": {
+      "package": "com.sandeep.visualdsa",
       "adaptiveIcon": {
         "backgroundColor": "#F0ECE4",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -40,6 +42,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "656d3da6-ab25-461b-bf3d-814b22afb36f"
+      }
+    },
+    "owner": "sandeep_singh"
   }
 }
